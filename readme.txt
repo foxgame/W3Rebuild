@@ -10,7 +10,7 @@
 -只支持jass转c#，不支持lua。
 -本版本基于war3代码重制，基本上对接了全部功能模块，理论上只要实现了对应接口即可调用jass，实现魔兽3全部功能。
 
--新版本转移至rtsmaker项目，不在依赖war3架构，而是作为mod加载war3 mod即可。
+-新版本转移至rtsmaker项目，不再依赖war3架构，而是作为mod加载war3 mod即可。
 -新版本支持urp、hdrp、shadergraph、ecs等。
 
 方块世界类、幻兽帕鲁类游戏开发中，
