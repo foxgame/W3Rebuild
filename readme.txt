@@ -1,6 +1,6 @@
 # W3Rebuild
 魔兽3早期重制代码。
-暂不提供资源文件，可以使用tools/3dmax工具自行导出。
+暂不提供资源文件，可以使用tools/3dmax工具自行导出放入Assets/Objects/。
 
 -由于早期代码，不再继续维护。
 -不支持urp、hdrp、ecs等.
