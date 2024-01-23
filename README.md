@@ -28,7 +28,7 @@
 
 -新版本转移至rtsmaker项目，不再依赖war3架构，而是作为mod加载war3 mod即可。
 
--新版本支持urp、hdrp、shadergraph、ecs等。
+-新版本支持urp、hdrp、shadergraph、ecs、jass2lua等。
 
 方块世界类、幻兽帕鲁类游戏开发中，
 
