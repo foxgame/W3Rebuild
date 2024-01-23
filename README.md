@@ -1,7 +1,7 @@
 # W3Rebuild
 魔兽3早期重制代码。
 
-资源文件可以使用tools/3dmax工具自行导出放入Assets/Objects/。
+资源文件可以使用tools/3dmax工具自行导出放入Assets/。
 
 或下载：https://pan.baidu.com/s/1QfLYEu83T6HdllzqsN6NAQ?pwd=1mce 
 
