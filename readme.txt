@@ -3,7 +3,7 @@
 资源文件可以使用tools/3dmax工具自行导出放入Assets/Objects/。
 或下载：https://pan.baidu.com/s/1QfLYEu83T6HdllzqsN6NAQ?pwd=1mce 
 
--由于开发周期过长（十年左右），早期代码不再继续维护。
+-由于开发周期过长，早期代码不再继续维护。
 -不支持urp、hdrp、ecs等.
 -只支持jass转c#，不支持lua。
 -本版本基于war3代码重制，基本上对接了全部功能模块，理论上只要实现了对应接口即可调用jass，实现魔兽3全部功能。
