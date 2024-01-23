@@ -1,0 +1,47 @@
+//============================================================================
+//  Undead 02 -- Blue player -- AI Script
+//============================================================================
+globals
+    player user = Player(3)
+endglobals
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    debug set do_debug_cheats = true
+
+    call CampaignAI(HOUSE,null)
+	call SetReplacements(1,1,3)
+    
+    call CampaignDefenderEx(1,1,3, FOOTMAN     )
+
+    call WaitForSignal()
+
+    //*** WAVE 1 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 2,2,6, FOOTMEN     )
+    call SuicideOnPlayer(0,user)
+
+	//*** WAVE 2 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 2,2,7, FOOTMEN     )
+    call SuicideOnPlayer(M3,user)
+
+	//*** WAVE 3 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 2,2,6, FOOTMEN     )
+    call SuicideOnPlayer(M3,user)
+
+    loop
+        //*** WAVE 4 ***
+        call InitAssaultGroup()
+        call CampaignAttackerEx( 3,3,7, FOOTMEN     )
+        call SuicideOnPlayer(M3,user)
+
+        //*** WAVE 5 ***
+        call InitAssaultGroup()
+        call CampaignAttackerEx( 4,4,6, FOOTMEN     )
+        call SuicideOnPlayer(M3,user)
+    endloop
+endfunction

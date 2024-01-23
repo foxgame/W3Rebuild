@@ -1,0 +1,81 @@
+//============================================================================
+//  Orc 04 -- Teal player -- AI Script
+//============================================================================
+globals
+    player user = Player(3)
+endglobals
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(MOON_WELL,null)
+
+    set campaign_wood_peons = 100
+
+    call SetBuildUnit( 5, WISP          )
+
+	call SetBuildUpgrEx( 1,1,1, UPG_HIPPO_TAME	)
+
+    call CampaignDefenderEx( 1,1,2, ARCHER      )
+    call CampaignDefenderEx( 1,1,1, DRYAD       )
+	call CampaignDefenderEx( 1,1,2, HIPPO		)
+    call CampaignDefenderEx( 1,1,2, HIPPO_RIDER )
+
+    call WaitForSignal()
+
+    //*** WAVE 1 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 2,2,3, HIPPO_RIDER		)
+    call SuicideOnPlayerEx(M1,M1,0,user)
+
+	call SetBuildUpgrEx( 0,0,1, UPG_STR_MOON	)
+	call SetBuildUpgrEx( 0,0,1, UPG_STR_WILD	)
+	call SetBuildUpgrEx( 1,1,1, UPG_ULTRAVISION	)
+
+    //*** WAVE 2 ***
+    call InitAssaultGroup()
+	call CampaignAttackerEx( 4,4,5, HIPPO_RIDER		)
+    call SuicideOnPlayerEx(M8,M8,M7,user)
+
+	call SetBuildUpgrEx( 0,0,1, UPG_MOON_ARMOR	)
+	call SetBuildUpgrEx( 0,0,1, UPG_HIDES		)
+	call SetBuildUpgrEx( 0,0,1, UPG_GLAIVE		)
+
+    //*** WAVE 3 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 1,1,2, BALLISTA        )
+    call CampaignAttackerEx( 4,4,5, ARCHER          )
+	call CampaignAttackerEx( 3,3,5, DRYAD           )
+    call SuicideOnPlayerEx(M8,M8,M7,user)
+
+	call SetBuildUpgrEx( 1,1,1, UPG_BOWS		)
+	call SetBuildUpgrEx( 1,1,2, UPG_STR_MOON	)
+	call SetBuildUpgrEx( 1,1,2, UPG_STR_WILD	)
+
+    //*** WAVE 4 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 6,6,9, HIPPO_RIDER		)
+    call SuicideOnPlayerEx(M8,M8,M7,user)
+
+	call SetBuildUpgrEx( 0,0,1, UPG_MARKSMAN	)
+	call SetBuildUpgrEx( 1,1,2, UPG_MOON_ARMOR	)
+	call SetBuildUpgrEx( 1,1,2, UPG_HIDES		)
+	call SetBuildUpgrEx( 1,1,1, UPG_GLAIVE		)
+	call SetBuildUpgrEx( 0,0,1, UPG_BOLT		)
+
+    loop
+        //*** WAVE 5 ***
+        call InitAssaultGroup()
+        call CampaignAttackerEx( 2,2,3, BALLISTA        )
+		call CampaignAttackerEx( 5,5,6, ARCHER          )
+		call CampaignAttackerEx( 4,4,6, DRYAD           )
+        call SuicideOnPlayerEx(M8,M8,M7,user)
+
+        //*** WAVE 6 ***
+        call InitAssaultGroup()
+        call CampaignAttackerEx( 7,7,10, HIPPO_RIDER		)
+        call SuicideOnPlayerEx(M8,M8,M7,user)
+
+    endloop
+endfunction

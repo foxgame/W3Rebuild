@@ -1,0 +1,129 @@
+//==================================================================================================
+//  $Id: h05x07.ai,v 1.15 2003/05/05 12:04:17 bfitch Exp $
+//==================================================================================================
+globals
+    player targ1 = PlayerEx(6)
+    player targ2 = PlayerEx(4)
+    player targ  = targ1
+
+    constant integer AKAMA          = 'Naka' // hero
+
+    constant integer DPEON          = 'ndrl'
+    constant integer DCATAPULT      = 'ncat'
+    constant integer DSALAMANDER    = 'ndsa' // lvl 4, ranged
+    constant integer DSTALKER       = 'ndrt' // lvl 5, assassin unit
+    constant integer DVINDICATOR    = 'ndrn' // lvl 5, heavy melee
+    constant integer DHARBINGER     = 'ndrh' // lvl 4, bloodlust, dispel
+    constant integer DSEER          = 'ndrs' // lvl 6, healwave, brilliance,slow
+endglobals
+
+//--------------------------------------------------------------------------------------------------
+//  switch_targets
+//--------------------------------------------------------------------------------------------------
+function switch_targets takes nothing returns nothing
+    loop
+        exitwhen CommandsWaiting() > 0
+        call Sleep(1)
+    endloop
+
+    set targ = targ2
+endfunction
+
+//--------------------------------------------------------------------------------------------------
+//  main
+//--------------------------------------------------------------------------------------------------
+function main takes nothing returns nothing
+
+    call CampaignAI(PIG_FARM,null)
+
+    call DoCampaignFarms(false)
+    call SetReplacements(9,9,9)
+    call SetPeonsRepair(true)
+
+    call SetCaptainHome(ATTACK_CAPTAIN, -4268,-6436)
+    call SetCaptainHome(DEFENSE_CAPTAIN,-4723,-6604)
+
+    call SetBuildUnitEx( 3,3,3, DPEON )
+
+    call CampaignDefenderEx( 1, 1, 1, DVINDICATOR   )
+    call CampaignDefenderEx( 1, 1, 1, DSEER         )
+    call CampaignDefenderEx( 1, 1, 1, DSALAMANDER   )
+    call CampaignDefenderEx( 1, 1, 1, AKAMA         )
+
+    call WaitForSignal()
+
+    call StartThread(function switch_targets)
+
+    //*** WAVE 1 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 3,3,2, DVINDICATOR     )
+    call CampaignAttackerEx( 4,4,3, DSALAMANDER     )
+    call CampaignAttackerEx( 1,1,1, AKAMA           )
+    call SuicideOnPlayerEx(M1,M1,M1,targ)
+
+    //*** WAVE 2 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 8,8,6, DSTALKER        )
+    call SuicideOnPlayerEx(M4,M4,M4,targ)
+
+    //*** WAVE 3 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 3,3,2, DVINDICATOR     )
+    call CampaignAttackerEx( 2,2,1, DHARBINGER      )
+    call CampaignAttackerEx( 2,2,1, DCATAPULT       )
+    call CampaignAttackerEx( 1,1,1, AKAMA           )
+    call SuicideOnPlayerEx(M4,M4,M4,targ)
+
+    //*** WAVE 4 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 3,3,2, DVINDICATOR     )
+    call CampaignAttackerEx( 2,2,1, DHARBINGER      )
+    call CampaignAttackerEx( 2,2,1, DCATAPULT       )
+    call SuicideOnPlayerEx(M4,M4,M4,targ)
+
+    loop
+        //*** WAVE 5 ***
+        call InitAssaultGroup()
+        call CampaignAttackerEx( 5,5,4, DVINDICATOR     )
+        call CampaignAttackerEx( 2,2,2, DSALAMANDER     )
+        call CampaignAttackerEx( 1,1,1, DSEER           )
+        call CampaignAttackerEx( 1,1,1, DCATAPULT       )
+        call SuicideOnPlayerEx(M4,M4,M4,targ)
+
+        //*** WAVE 6 ***
+        call InitAssaultGroup()
+        call CampaignAttackerEx( 9,9,7, DSTALKER        )
+        call CampaignAttackerEx( 1,1,1, AKAMA           )
+        call SuicideOnPlayerEx(M4,M4,M4,targ)
+        
+        //*** WAVE 7 ***
+        call InitAssaultGroup()
+        call CampaignAttackerEx( 5,5,4, DVINDICATOR     )
+        call CampaignAttackerEx( 2,2,2, DSALAMANDER     )
+        call CampaignAttackerEx( 1,1,1, DSEER           )
+        call CampaignAttackerEx( 1,1,1, DCATAPULT       )
+        call SuicideOnPlayerEx(M4,M4,M4,targ)
+
+        //*** WAVE 8 ***
+        call InitAssaultGroup()
+        call CampaignAttackerEx( 5,5,4, DVINDICATOR     )
+        call CampaignAttackerEx( 2,2,2, DSALAMANDER     )
+        call CampaignAttackerEx( 1,1,1, DHARBINGER      )
+        call CampaignAttackerEx( 1,1,1, DCATAPULT       )
+        call SuicideOnPlayerEx(M4,M4,M4,targ)
+
+        //*** WAVE 9 ***
+        call InitAssaultGroup()
+        call CampaignAttackerEx( 8,8,7, DSTALKER        )
+        call CampaignAttackerEx( 1,1,1, AKAMA           )
+        call SuicideOnPlayerEx(M4,M4,M4,targ)
+
+        //*** WAVE 10 ***
+        call InitAssaultGroup()
+        call CampaignAttackerEx( 5,5,4, DVINDICATOR     )
+        call CampaignAttackerEx( 2,2,2, DSALAMANDER     )
+        call CampaignAttackerEx( 1,1,1, DSEER           )
+        call CampaignAttackerEx( 1,1,1, DCATAPULT       )
+        call SuicideOnPlayerEx(M4,M4,M4,targ)
+    endloop
+endfunction

@@ -1,0 +1,112 @@
+//============================================================================
+//  $Id: u06x04.ai,v 1.12.2.1 2003/05/09 09:17:05 abond Exp $
+//============================================================================
+globals
+    player sylvie = PlayerEx(2)
+    player garit  = PlayerEx(9)
+
+    constant integer BALNAZZAR  = 'Ubal'
+endglobals
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(ZIGGURAT_1,null)
+	call SetReplacements(3,3,5)
+	set campaign_wood_peons = 2
+    call GroupTimedLife(true)
+
+    call SetBuildUnitEx( 5, 5, 5, ACOLYTE           )
+
+    call SetBuildUpgrEx( 1, 1, 1, UPG_BLK_SPHINX    )
+
+    call CampaignDefenderEx( 1, 1, 1, ABOMINATION   )
+	call CampaignDefenderEx( 1, 1, 1, OBS_STATUE    )
+	call CampaignDefenderEx( 1, 1, 1, FROST_WYRM	)
+	call CampaignDefenderEx( 0, 0, 1, CRYPT_FIEND	)
+	call CampaignDefenderEx( 0, 0, 1, BALNAZZAR		)
+    call CampaignDefenderEx( 0, 0, 1, DOOMGUARD		)
+    call CampaignDefenderEx( 1, 1, 1, FELLHOUND 	)
+
+	call WaitForSignal()
+
+    //*** WAVE 1 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 1,1,1,	DOOMGUARD	)
+	call CampaignAttackerEx( 6,6,8,	GHOUL		)
+    call SuicideOnPlayerEx(M7,M7,M6,sylvie)
+
+	call SetBuildUpgrEx( 0,0,1, UPG_UNHOLY_STR  )
+	call SetBuildUpgrEx( 0,1,1, UPG_CR_ATTACK   )
+
+    //*** WAVE 2 ***
+    call InitAssaultGroup()
+	call CampaignAttackerEx( 1,1,1,	BALNAZZAR	)
+    call SuicideOnPlayerEx(M7,M7,M5,garit)
+
+	call SetBuildUpgrEx( 0,0,1, UPG_UNHOLY_ARMOR)
+    call SetBuildUpgrEx( 0,0,1, UPG_CR_ARMOR	)
+	call SetBuildUpgrEx( 1,1,1, UPG_NECROS		)
+    call SetBuildUpgrEx( 1,1,1, UPG_GHOUL_FRENZY)
+
+    //*** WAVE 3 ***
+    call InitAssaultGroup()
+	call CampaignAttackerEx( 1,1,1,	BALNAZZAR	)
+    call SuicideOnPlayerEx(M6,M6,M5,sylvie)
+
+	call SetBuildUpgrEx( 1,1,1, UPG_PLAGUE		)
+	call SetBuildUpgrEx( 1,1,1, UPG_WYRM_BREATH )
+
+    //*** WAVE 4 ***
+    call InitAssaultGroup()
+	call CampaignAttackerEx( 1,1,1,	BALNAZZAR	)
+    call SuicideOnPlayerEx(M7,M7,M5,garit)
+
+	call SetBuildUpgrEx( 1,1,2, UPG_UNHOLY_STR  )
+    call SetBuildUpgrEx( 1,1,2, UPG_CR_ATTACK   )
+
+    //*** WAVE 5 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 1,1,2,	DOOMGUARD	)
+	call CampaignAttackerEx( 4,4,5,	ABOMINATION	)
+    call CampaignAttackerEx( 1,1,2,	MEAT_WAGON	)
+    call SuicideOnPlayerEx(M6,M6,M5,sylvie)
+
+	call SetBuildUpgrEx( 1,1,2, UPG_UNHOLY_ARMOR)
+    call SetBuildUpgrEx( 1,1,2, UPG_CR_ARMOR    )
+	call SetBuildUpgrEx( 2,2,2, UPG_NECROS		)
+
+    //*** WAVE 6 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 1,1,1,	BALNAZZAR	)
+    call SuicideOnPlayerEx(M7,M7,M5,garit)
+
+	call SetBuildUpgrEx( 2,2,3, UPG_UNHOLY_STR  )
+    call SetBuildUpgrEx( 2,2,3, UPG_CR_ATTACK   )
+
+    //*** WAVE 7+ ***
+    loop
+        call InitAssaultGroup()
+		call CampaignAttackerEx( 1,1,1,	BALNAZZAR	)
+        call SuicideOnPlayerEx(M7,M7,M5,sylvie)
+
+        call InitAssaultGroup()
+		call CampaignAttackerEx( 1,1,2,	DOOMGUARD	)
+	    call CampaignAttackerEx( 4,4,4,	ABOMINATION	)
+        call CampaignAttackerEx( 1,1,2,	MEAT_WAGON	)
+        call SuicideOnPlayerEx(M7,M7,M5,garit)
+
+        call InitAssaultGroup()
+		call CampaignAttackerEx( 1,1,1,	BALNAZZAR	)
+        call SuicideOnPlayerEx(M7,M7,M5,sylvie)
+
+		call InitAssaultGroup()
+		call CampaignAttackerEx( 1,1,1,	BALNAZZAR	)
+        call SuicideOnPlayerEx(M7,M7,M5,garit)
+    endloop
+endfunction
+
+
+
+

@@ -1,0 +1,629 @@
+//============================================================================
+//  Human Melee AI
+//============================================================================
+globals
+    // general AI variables
+    //
+    integer total_gold
+    integer total_wood
+    integer total_stones
+
+    // structures IDs
+    //
+    integer altar       = 'halt'
+    integer sanctum     = 'hars'
+    integer armory      = 'harm'
+    integer garrison    = 'hbar'
+    integer house       = 'hhou'
+    integer town_hall   = 'htow'
+    integer smith       = 'hbla'
+    integer castle      = 'hcas'
+    integer cannon      = 'hctw'
+    integer guard       = 'hgtw'
+    integer keep        = 'hkee'
+    integer church      = 'htws'
+    integer mill        = 'hlum'
+
+    // people IDs
+    //
+    integer peon        = 'hpea'
+    integer footman     = 'hfoo'
+    integer serpent     = 'hegr'
+    integer copter      = 'hgyr'
+    integer knight      = 'hkni'
+    integer priest      = 'hmpr'
+    integer mortar      = 'hmtm'
+    integer rifle       = 'hrif'
+    integer caster      = 'hsor'
+    integer tank        = 'hstt'
+    integer elemental   = 'hwat'
+
+    // upgrades
+    //
+    integer Uweapons    = 'Rhme'
+    integer Uranged     = 'Rhra'
+    integer Uartillery  = 'Rhaa'
+    integer Uarmor      = 'Rhar'
+    integer Ubldgs      = 'Rhac'
+    integer Usight      = 'Rhss'
+
+    // hero IDs
+    //
+    integer paladin     = 'Hpal'
+    integer king        = 'Hamg'
+    integer mage        = 'Hmkg'
+    integer ranger      = 'Hran'
+
+    // Assault Variables
+    //
+    constant integer END_ASSAULT    = 0
+    constant integer NO_CREEPS      = 1
+    constant integer CHECK_CREEPS   = 2
+    constant integer AWAIT_TROOPS   = 3
+    constant integer KILL_CREEP     = 4
+    constant integer AWAIT_BATTLE   = 5
+    constant integer AWAIT_GOAL     = 6
+    constant integer RETURN_HOME    = 7
+    constant integer AWAIT_HEALING  = 8
+
+    integer assault_timer   = 0
+    integer assaultN        = 1    
+    integer assault_state   = CHECK_CREEPS
+
+    constant integer PEON_ASSIGNMENT = 10
+    integer peon_timer = 0
+
+    unit creep_target
+
+    // Build Sequence
+    //
+    integer build_index
+    integer array build_qty
+    integer array build_item
+    integer array build_type
+
+    constant integer NORMAL     = 1
+    constant integer UPGRADE    = 2
+
+    integer assault_index
+    integer array assault_qty
+    integer array assault_item
+endglobals
+
+//============================================================================
+function set_build takes integer qty, integer id returns nothing
+    set build_qty[build_index] = qty
+    set build_item[build_index] = id
+    set build_type[build_index] = NORMAL
+    set build_index = build_index + 1
+endfunction
+
+//============================================================================
+function set_upgrd takes integer qty, integer id returns nothing
+    set build_qty[build_index] = qty
+    set build_item[build_index] = id
+    set build_type[build_index] = UPGRADE
+    set build_index = build_index + 1
+endfunction
+
+//============================================================================
+function set_assault takes integer qty, integer id returns nothing
+    set assault_qty[assault_index] = qty
+
+    set assault_qty[assault_index] = qty
+    set assault_item[assault_index] = id
+    set assault_index = assault_index + 1
+endfunction
+
+//============================================================================
+function paladin_sequence takes nothing returns nothing
+    set build_index = 0
+
+    call set_build(1, town_hall )
+    call set_build(4, peon      )
+    call set_build(7, peon      )
+    call set_build(1, house     )
+    call set_build(9, peon      )
+    call set_build(1, garrison  )
+    call set_build(1, paladin   )
+    call set_build(1, smith     )
+    call set_build(1, footman   )
+    call set_build(2, house     )
+    call set_upgrd(1, Uweapons  )
+    call set_build(4, footman   )
+    call set_upgrd(1, Uarmor    )
+    call set_build(3, rifle     )
+
+    // get stones x1
+
+    call set_build(6, footman   )
+    call set_build(4, rifle     )
+    call set_upgrd(2, Uweapons  )
+    call set_build(6, rifle     )
+
+    // get stones x1
+
+    call set_build(1, mill      )
+    call set_upgrd(2, Uarmor    )
+    call set_build(3, house     )
+
+
+return //xxx old script out of date
+    call set_build(6, peon      )
+    call set_build(1, house     )
+    call set_build(4, footman   )
+
+    // get stones x2
+
+    call set_build(2, rifle     )
+
+    call set_build(1, keep      )
+    call set_build(2, house     )
+    call set_build(5, footman   )
+    call set_build(4, rifle     )
+
+    // get stones x3
+
+    call set_build(1, armory    )
+    call set_upgrd(2, Uarmor    )
+    call set_build(1, altar     )
+    call set_upgrd(1, Uranged   )
+    call set_build(1, church    )
+    call set_upgrd(2, Uranged   )
+    call set_upgrd(3, Uweapons  )
+    call set_build(1, priest    )
+
+    // get stones x1
+
+    call set_build(6, footman   )
+    call set_build(5, rifle     )
+    call set_build(2, priest    )
+
+    // get stones x1
+
+    call set_build(3, priest    )
+    call set_build(6, rifle     )
+    call set_build(3, house     )
+
+    // get stones x1
+
+    call set_upgrd(3, Uranged   )
+    call set_upgrd(3, Uarmor    )
+    call set_build(1, castle    )
+    call set_build(7, rifle     )
+    call set_build(4, priest    )
+    call set_build(8, rifle     )
+    call set_build(2, knight    )
+    call set_build(4, house     )
+    call set_build(1, sanctum   )
+    call set_build(4, knight    )
+    call set_build(5, house     )
+    call set_build(1, caster    )
+    call set_build(5, knight    )
+    call set_build(2, caster    )
+    call set_build(9, rifle     )
+    call set_build(3, caster    )
+    call set_build(6, house     )
+    call set_build(11, rifle    )
+    call set_build(5, priest    )
+
+    call set_upgrd(1, Ubldgs    )
+    call set_upgrd(1, Uartillery)
+    call set_upgrd(2, Uartillery)
+    call set_upgrd(3, Uartillery)
+    call set_upgrd(2, Ubldgs    )
+    call set_upgrd(3, Ubldgs    )
+
+    call set_build(0,0)
+endfunction
+
+//============================================================================
+function paladin_assault takes nothing returns nothing
+    set assault_index = 0
+
+    if assaultN <= 1 then
+        call set_assault(1, paladin     )
+        call set_assault(4, footman     )
+        call set_assault(3, rifle       )
+
+    elseif assaultN <= 2 then
+        call set_assault(1, paladin     )
+        call set_assault(6, footman     )
+        call set_assault(6, rifle       )
+    endif
+
+    call set_assault(0,0)
+endfunction
+
+//============================================================================
+function hero_levels takes nothing returns integer
+    local integer hero = GetHeroId()
+    local integer level = GetHeroLevelAI()
+
+    //*** PALADIN ***
+    if hero == paladin then
+
+        //xxx what about ultimate ability?
+        //xxx also, add racial check to get exorcism sooner if enemy is undead
+
+        // res for levels 2,3,4
+        if level <= 4 then
+            return 'AHre' // resurrection
+        endif
+
+        // defense aura for 5,6,7
+        if level <= 7 then
+            return 'AHad' // devotion aura
+        endif
+
+        // exorcism for 8,9,10
+        return 'AHex' // exorcism
+    endif
+
+	if hero == 'Edem' then
+		if level == 1 then
+			return 'AEso'
+		endif
+		if level == 2 then
+			return 'AEfl'
+		endif
+		if level == 3 then
+			return 'AEso'
+		endif
+		if level == 4 then
+			return 'AEfl'
+		endif
+		if level == 5 then
+			return 'AEme'
+		endif
+	endif
+
+    return 0
+endfunction
+
+//============================================================================
+function set_upgrade takes integer level, integer upgid returns boolean
+    local integer gold_cost
+    local integer wood_cost
+    local integer stone_cost
+
+    if GetUpgradeLevel(upgid) >= level then
+        return true
+    endif
+
+    set gold_cost = GetUpgradeGoldCost(upgid)
+    if total_gold < gold_cost then
+        return false
+    endif
+
+    set wood_cost = GetUpgradeWoodCost(upgid)
+    if total_wood < wood_cost then
+        return false
+    endif
+
+    set stone_cost = GetUpgradeStoneCost(upgid)
+
+    // when there're not enough stones we can't assume we can get more,
+    // so it's ok to skip it in that case
+    //
+    return total_stones < stone_cost or SetUpgrade(upgid)
+endfunction
+
+//============================================================================
+function set_start takes integer ask_qty, integer unitid returns boolean
+    local integer have_qty
+    local integer need_qty
+    local integer afford_gold
+    local integer afford_wood
+    local integer afford_stones
+    local integer afford_qty
+    local integer gold_cost
+    local integer wood_cost
+    local integer stone_cost
+
+    //------------------------------------------------------------------------
+    // if we have all we're asking for then make nothing
+    //
+    set have_qty = GetUnitCount(unitid)
+    if have_qty >= ask_qty then
+        return true
+    endif
+    set need_qty = ask_qty - have_qty
+
+    //------------------------------------------------------------------------
+    // limit the qty we're requesting to the amount of resources available
+    // (unlike gold/wood costs, stones reduce request and we go on in the order)
+    //
+    set gold_cost = GetUnitGoldCost(unitid)
+    set wood_cost = GetUnitWoodCost(unitid)
+    set stone_cost = GetUnitStoneCost(unitid)
+
+    if gold_cost == 0 then
+        set afford_gold = need_qty
+    else
+        set afford_gold = total_gold / gold_cost
+    endif
+
+    if wood_cost == 0 then
+        set afford_wood = need_qty
+    else
+        set afford_wood = total_wood / wood_cost
+    endif
+
+    set afford_qty = need_qty
+    if afford_gold < afford_qty then
+        set afford_qty = afford_gold
+    endif
+    if afford_wood < afford_qty then
+        set afford_qty = afford_wood
+    endif
+
+    if stone_cost > 0 then
+        set afford_stones = total_stones / stone_cost
+        if afford_stones < 1 then
+            return true     // we can't assume we'll magically get stones we need
+        endif
+        if afford_stones < afford_qty then
+            set afford_qty = afford_stones
+        endif
+    else
+        if afford_qty < 1 then
+            return false    // we're waiting on gold/wood; pause build orders
+        endif
+    endif
+
+    //------------------------------------------------------------------------
+    // whether we make right now what we're requesting or not, assume we will
+    // and deduct the cost of the units from our fake gold total right away
+    //
+    set total_gold   = total_gold   - gold_cost  * need_qty
+    set total_stones = total_stones - stone_cost * need_qty
+
+    //------------------------------------------------------------------------
+    // give the AI a chance to make the units (it may not be able to right now
+    // but that doesn't stop us from trying other units after this as long
+    // as we have enough money to make this AND the needed, unbuilt ones)
+    //
+    return SetProduce(afford_qty,unitid)
+endfunction
+
+//============================================================================
+function set_start_peons takes integer max returns boolean
+    local integer have = GetUnitCount(peon)
+
+    if have >= max then
+        return true
+    endif
+
+    if GetAiMineBusy() then
+        return true
+    endif
+
+    return set_start(have + 1,peon)
+endfunction
+
+//===========================================================================
+function setup_assault takes nothing returns nothing
+    local integer index = 0
+    local integer qty
+
+    call StartAssault()
+    loop
+        set qty = assault_qty[index]
+        exitwhen qty == 0
+
+        call AddAssault(qty,assault_item[index])
+
+        set index = index + 1
+    endloop
+endfunction
+
+//===========================================================================
+function assault_sequence takes nothing returns nothing
+
+    // The initial modes of an assault don't need to be run very fast.
+    //
+    if assault_state <= AWAIT_TROOPS then
+        if assault_timer == 0 then
+            set assault_timer = 6
+        else
+            set assault_timer = assault_timer - 1
+            return
+        endif
+    endif
+
+    //*** ASSAULT STATE MACHINE ***
+    //
+    if assault_state == NO_CREEPS then
+        if GetUnitCount(rifle) == 8 then
+            if assaultN < 100 then
+                set assaultN = 100
+            endif
+
+            call setup_assault()
+
+            if AttackEnemy() then
+                set assault_state = END_ASSAULT
+            endif
+        endif
+
+    elseif assault_state == CHECK_CREEPS then
+        if CreepsOnMap() then
+            call paladin_assault()
+            set assault_state = AWAIT_TROOPS
+        else
+            set assault_state = NO_CREEPS
+            call CaptainGoHome()
+        endif
+
+    elseif assault_state == AWAIT_TROOPS then
+        call setup_assault()
+
+        set creep_target = AcquireStones()
+
+        if creep_target != null then
+            set assault_state = KILL_CREEP
+        endif
+
+    elseif assault_state == KILL_CREEP then
+        if not UnitAlive(creep_target) then
+            set assault_state = AWAIT_BATTLE
+        endif
+
+    elseif assault_state == AWAIT_BATTLE then
+        if not CaptainInCombat() then
+            set assault_state = AWAIT_GOAL
+        endif
+
+    elseif assault_state == AWAIT_GOAL then
+        if CaptainAtGoal() then
+            set assault_state = RETURN_HOME
+            call CaptainGoHome()
+        endif
+
+    elseif assault_state == RETURN_HOME then
+        if CaptainIsHome() then
+            set assault_state = AWAIT_HEALING
+        endif
+
+    elseif assault_state == AWAIT_HEALING then
+        if CaptainHealth() >= 50 then
+            set assaultN = assaultN + 1
+            set assault_state = CHECK_CREEPS
+            set assault_timer = 0
+        endif
+    endif
+endfunction
+
+//============================================================================
+function peon_assignments takes nothing returns nothing
+    if peon_timer > 0 then
+        set peon_timer = peon_timer - 1
+        return
+    endif
+    set peon_timer = PEON_ASSIGNMENT // check assignments every few seconds
+
+    call ClearHarvestAI()   // 0
+    call HarvestGold(2)     // 2
+    call HarvestWood(2)     // 4
+    call HarvestGold(1)     // 5
+    call HarvestWood(1)     // 6
+    call HarvestGold(1)     // 7
+    call HarvestWood(1)     // 8
+    call HarvestGold(1)     // 9
+endfunction
+
+//============================================================================
+function run_build_sequence takes nothing returns boolean
+    local integer index = 0
+    local integer qty
+    local integer id
+    local boolean built
+
+    set total_gold = GetGold()
+    set total_wood = GetWood()
+    set total_stones = GetStones()
+    
+    call peon_assignments()
+
+    loop
+        //--------------------------------------------------------------------
+        // the end of the qty list has a 0 to terminate the search
+        //--------------------------------------------------------------------
+        set qty = build_qty[index]
+        exitwhen qty == 0
+
+        set id = build_item[index]
+
+        //--------------------------------------------------------------------
+        // a town hall can be upgraded, so check for any of those units
+        //--------------------------------------------------------------------
+        set built = false
+        if id == town_hall then
+            if GetUnitCount(keep) != 0 or GetUnitCount(castle) != 0 then
+                set built = true
+            endif
+        elseif id == keep then
+            if GetUnitCount(castle) != 0 then
+                set built = true
+            endif
+        endif
+
+        //--------------------------------------------------------------------
+        // town halls are handled above, everything else right here
+        //--------------------------------------------------------------------
+        if not built then
+
+            //----------------------------------------------------------------
+            // NORMAL and UPGRADE are the two types of build requests
+            //----------------------------------------------------------------
+            if build_type[index] == NORMAL then
+
+                //------------------------------------------------------------
+                // peons are a special case because you want to build as many
+                // as will "fill" the mine, but not any more than that
+                //------------------------------------------------------------
+                if id == peon then
+                    if not set_start_peons(qty) then
+                        return false
+                    endif
+
+                //------------------------------------------------------------
+                // this builds all other units and stuff
+                //------------------------------------------------------------
+                else
+                    if not set_start(qty,id) then
+                        return false
+                    endif
+                endif
+            else
+                //------------------------------------------------------------
+                // this does upgrades
+                //------------------------------------------------------------
+                if not set_upgrade(qty,id) then
+                    return false
+                endif
+            endif
+        endif
+
+        set index = index + 1
+    endloop
+
+    return true
+endfunction
+
+//============================================================================
+//  threads
+//============================================================================
+function assault_loop takes nothing returns nothing
+    loop
+        call assault_sequence()
+        call Sleep(5)
+    endloop
+endfunction
+
+function build_loop takes nothing returns nothing
+    loop
+        call run_build_sequence()
+        call Sleep(2)
+    endloop
+endfunction
+
+//============================================================================
+//	main
+//============================================================================
+function main takes nothing returns nothing
+    call InitAI()
+    call SetHeroLevels(function hero_levels)
+    call CreateCaptains()
+
+    call paladin_sequence()
+
+    call StartThread(function assault_loop)
+    call StartThread(function build_loop)
+
+    loop
+        exitwhen assault_state == END_ASSAULT
+        call Sleep(10)
+    endloop
+endfunction

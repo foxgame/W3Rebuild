@@ -1,0 +1,15 @@
+//============================================================================
+//  $Id
+//============================================================================
+
+function main takes nothing returns nothing
+    call CampaignAI(BURROW,null)
+    loop
+        call SuicideUnitEx( 2, GHOUL, 0 )
+        call SuicideUnitEx( 1, NECRO, 0 )
+        call SuicideUnitEx( 1, ABOMINATION, 0 )
+        call SuicideUnitEx( 1, CRYPT_FIEND, 0 )
+        call SuicideUnitEx( 1, BANSHEE,     0 )
+        call Sleep(1)
+    endloop
+endfunction

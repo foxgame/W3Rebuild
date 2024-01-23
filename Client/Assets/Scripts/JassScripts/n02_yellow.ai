@@ -1,0 +1,15 @@
+//============================================================================
+//  Night Elf 02 -- yellow player -- AI Script
+//============================================================================
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(MOON_WELL,null)
+	call SetCaptainHome(DEFENSE_CAPTAIN,2534,-2171)
+
+	call CampaignDefender( EASY,	3, ARCHER   )
+
+    call SleepForever()
+endfunction

@@ -1,0 +1,16 @@
+//============================================================================
+//  $Id
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(ZIGGURAT_1,null)
+    call SetReplacements(1,1,3)
+	set campaign_wood_peons = 2
+
+    call SetBuildUnit( 1, ACOLYTE )
+
+    call CampaignDefenderEx( 2, 2, 3, GHOUL         )
+    call CampaignDefenderEx( 1, 1, 3, CRYPT_FIEND   )
+
+    call SleepForever()
+endfunction
+

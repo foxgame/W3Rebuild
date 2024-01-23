@@ -1,0 +1,553 @@
+//==================================================================================================
+//  $Id: h05xD.ai,v 1.26 2003/05/04 21:19:47 rpardo Exp $
+//==================================================================================================
+globals
+    constant integer SET_SLOT       = 1
+    constant integer TURN_ON        = 2
+    constant integer TURN_OFF       = 3
+    constant integer CAPT_X         = 4
+    constant integer CAPT_Y         = 5
+
+    constant integer FEL_GUARD      = 'nfgu'
+    constant integer BLOODFIEND     = 'nfgb'
+    constant integer FEL_BEAST      = 'npfl'
+    constant integer ELDER_VOID     = 'nvde'
+    constant integer GREATER_VOID   = 'nvdg'
+    constant integer NETHER_DRAKE   = 'nndk'
+    constant integer NETHER_HATCH   = 'nnht'
+    constant integer OVERLORD       = 'nfov'
+    constant integer SORCEROR       = 'ners' //lvl 3 abolish
+    constant integer DIABOLIST      = 'nerd' //lvl 6 curse, firebolt, parasite
+    constant integer FEL_RAVAGER    = 'npfm'
+    constant integer ERE_WARLOCK    = 'nerw'
+    constant integer NETHER_DRAGON  = 'nndr'
+    constant integer TORMENTOR      = 'ndqv'
+    constant integer TEMPTRESS      = 'ndqt'
+    constant integer MAIDEN         = 'ndqp'
+    constant integer QUEEN          = 'ndqs'
+
+    constant integer ILLIDAN_SLOT   = 11
+
+    integer slot                    = 0
+    boolean gate_open               = false
+    boolean suicide_off             = true
+
+    integer array suicide_list
+    integer next_suicide            = 0
+    integer next_declare            = 0
+endglobals
+
+//--------------------------------------------------------------------------------------------------
+//  suicide_next
+//--------------------------------------------------------------------------------------------------
+function suicide_next takes nothing returns nothing
+    local integer unitid
+
+    if suicide_off then
+        if gate_open then
+            set suicide_off = false
+        else
+            return
+        endif
+    endif
+
+    set unitid = suicide_list[next_suicide]
+    if unitid == -1 then
+        set unitid = suicide_list[0]
+        set next_suicide = 0
+    endif
+
+    call SuicideUnitEx(3,unitid,ILLIDAN_SLOT)
+    set next_suicide = next_suicide + 1
+endfunction
+
+//--------------------------------------------------------------------------------------------------
+//  declare_unit
+//--------------------------------------------------------------------------------------------------
+function declare_unit takes integer unitid returns nothing
+    set suicide_list[next_declare] = unitid
+    set next_declare = next_declare + 1
+    set suicide_list[next_declare] = -1
+endfunction
+
+//--------------------------------------------------------------------------------------------------
+//  command_loop
+//--------------------------------------------------------------------------------------------------
+function command_loop takes nothing returns nothing
+
+    local integer x = -1
+    local integer y = -1
+
+    local integer cmd
+    local integer data
+    loop
+        loop
+            call suicide_next()
+            call Sleep(0.1)
+            exitwhen CommandsWaiting() > 0
+        endloop
+        set cmd  = GetLastCommand()
+        set data = GetLastData()
+        call PopLastCommand()
+
+        //------------------------------------------------------------------------------------------
+        if cmd == SET_SLOT then
+        //------------------------------------------------------------------------------------------
+            set slot = data
+
+        //------------------------------------------------------------------------------------------
+        elseif cmd == TURN_ON then
+        //------------------------------------------------------------------------------------------
+            set gate_open = true
+
+        //------------------------------------------------------------------------------------------
+        elseif cmd == TURN_OFF then
+        //------------------------------------------------------------------------------------------
+            set gate_open = false
+
+        //------------------------------------------------------------------------------------------
+        elseif cmd == CAPT_X then
+        //------------------------------------------------------------------------------------------
+            set x = data
+
+        //------------------------------------------------------------------------------------------
+        elseif cmd == CAPT_Y then
+        //------------------------------------------------------------------------------------------
+            set y = data
+        endif
+
+        //------------------------------------------------------------------------------------------
+        if (cmd == CAPT_X or cmd == CAPT_Y) and (x != -1 and y != -1) then
+            call SetCaptainHome(BOTH_CAPTAINS,x,y)
+        endif
+    endloop
+endfunction
+
+//--------------------------------------------------------------------------------------------------
+//  send_one
+//--------------------------------------------------------------------------------------------------
+function send_one takes integer unitid, integer seconds returns nothing
+    call SetProduce(1,unitid,-1)
+    call Sleep(seconds)
+endfunction
+
+//--------------------------------------------------------------------------------------------------
+//  send
+//--------------------------------------------------------------------------------------------------
+function send takes integer unitid, integer seconds returns nothing
+    if gate_open then
+        call send_one(unitid,seconds)
+    endif
+endfunction
+
+//--------------------------------------------------------------------------------------------------
+//  send_group
+//--------------------------------------------------------------------------------------------------
+function send_group takes integer qty, integer unitid returns nothing
+    if gate_open then
+        loop
+            exitwhen qty <= 0
+            set qty = qty - 1
+            call send_one(unitid,2)
+        endloop
+    endif
+endfunction
+
+//--------------------------------------------------------------------------------------------------
+//  send_sleep
+//--------------------------------------------------------------------------------------------------
+function send_sleep takes integer seconds returns nothing
+    if gate_open then
+        call Sleep(seconds)
+    endif
+endfunction
+
+
+//**************************************************************************************************
+//***  NORMAL GATES ***
+//**************************************************************************************************
+//--------------------------------------------------------------------------------------------------
+//  gate1_normal
+//--------------------------------------------------------------------------------------------------
+function gate1_normal takes nothing returns nothing
+    call send_sleep(15)                   // 3:00
+    call send_group( 4, FEL_BEAST       ) // 2:45
+    call send_group( 3, FELLHOUND       ) // 2:37
+
+    call send_sleep(15)                   // 2:31
+    call send_group( 6, FEL_GUARD       ) // 2:16
+    call send_group( 1, DIABOLIST       ) // 2:04
+    call send_group( 4, BLOODFIEND      ) // 2:02
+
+    call send_sleep(20)                   // 1:54
+
+    call send_group( 6, FEL_BEAST       ) // 1:34
+    call send_group( 1, GREATER_VOID    ) // 1:22
+    call send_group( 4, FELLHOUND       ) // 1:20
+
+    call send_sleep(20)                   // 1:12
+
+    call send_group( 5, FEL_GUARD       ) // 0:52
+    call send_group( 3, BLOODFIEND      ) // 0:42
+    call send_group( 1, OVERLORD        ) // 0:36
+    call send_group( 3, BLOODFIEND      ) // 0:34
+    call send_group( 1, DOOMGUARD       ) // 0:28
+    call send_group( 4, FEL_BEAST       ) // 0:26
+    call send_group( 1, ELDER_VOID      ) // 0:18
+    call send_group( 7, FEL_BEAST       ) // 0:16
+
+endfunction
+
+//--------------------------------------------------------------------------------------------------
+//  gate2_normal
+//--------------------------------------------------------------------------------------------------
+function gate2_normal takes nothing returns nothing
+    call send_sleep(5)                   // 3:00
+    call send_group( 4, NETHER_HATCH    ) // 2:55
+
+    call send_sleep(20)                   // 2:47
+
+    call send_group( 6, FEL_BEAST       ) // 2:27
+    call send_group( 3, FELLHOUND       ) // 2:15
+
+    call send_sleep(20)                   // 2:09
+
+    call send_group( 3, NETHER_HATCH    ) // 1:49
+    call send_group( 1, GREATER_VOID    ) // 1:43
+    call send_group( 3, NETHER_HATCH    ) // 1:41
+    call send_group( 1, NETHER_DRAKE    ) // 1:35
+
+    call send_sleep(20)                   // 1:33
+
+    call send_group( 5, FEL_BEAST       ) // 1:13
+    call send_group( 3, FELLHOUND       ) // 1:03
+    call send_group( 1, FEL_RAVAGER     ) // 0:57
+    call send_group( 1, DIABOLIST       ) // 0:55
+
+    call send_sleep(20)                   // 0:53
+
+    call send_group( 4, NETHER_HATCH    ) // 0:33
+    call send_group( 2, GREATER_VOID    ) // 0:25
+    call send_group( 3, NETHER_DRAKE    ) // 0:21
+
+    call send_sleep(5)                   // 0:15
+    call send_group( 1, INFERNAL        ) // 0:10
+    call send_group( 1, ELDER_VOID      ) // 0:08
+    call send_group( 1, INFERNAL        ) // 0:06
+
+endfunction
+
+//--------------------------------------------------------------------------------------------------
+//  gate3_normal
+//--------------------------------------------------------------------------------------------------
+function gate3_normal takes nothing returns nothing
+    call send_sleep(5)                   // 3:00
+    call send_group( 6, TORMENTOR       ) // 2:55
+    call send_group( 1, TEMPTRESS       ) // 2:43
+
+    call send_sleep(20)                   // 2:41
+
+    call send_group( 5, BLOODFIEND      ) // 2:21
+    call send_group( 1, OVERLORD        ) // 2:11
+    call send_group( 1, DIABOLIST       ) // 2:09
+
+    call send_sleep(20)                   // 2:07
+
+    call send_group( 5, TORMENTOR       ) // 1:47
+    call send_group( 2, TEMPTRESS       ) // 1:37
+    call send_group( 1, MAIDEN          ) // 1:33
+    call send_group( 5, TORMENTOR       ) // 1:31
+    call send_group( 1, QUEEN           ) // 1:21
+
+    call send_sleep(20)                   // 1:19
+
+    call send_group( 4, BLOODFIEND      ) // 0:59
+    call send_group( 2, OVERLORD        ) // 0:51
+    call send_group( 1, DOOMGUARD       ) // 0:47
+    call send_group( 5, BLOODFIEND      ) // 0:45
+
+    call send_sleep(10)                   // 0:35
+
+    call send_group( 1, DOOMGUARD       ) // 0:25
+    call send_group( 1, ERE_WARLOCK     ) // 0:23
+    call send_group( 1, QUEEN           ) // 0:21
+    call send_group( 8, TORMENTOR       ) // 0:19
+
+endfunction
+
+//--------------------------------------------------------------------------------------------------
+//  gate4_normal
+//--------------------------------------------------------------------------------------------------
+function gate4_normal takes nothing returns nothing
+    call send_sleep(5)                   // 3:00
+
+    call send_group( 2, INFERNAL        ) // 2:55
+
+    call send_sleep(5)                   // 2:51
+
+    call send_group( 1, DOOMGUARD       ) // 2:46
+
+    call send_sleep(15)                   // 2:44
+
+    call send_group( 2, FEL_BEAST       ) // 2:29
+    call send_group( 4, FELLHOUND       ) // 2:25
+    call send_group( 1, FEL_RAVAGER     ) // 2:17
+    call send_group( 1, QUEEN           ) // 2:15
+    call send_group( 1, MAIDEN          ) // 2:13
+
+    call send_sleep(20)                   // 2:11
+
+    call send_group( 5, NETHER_DRAKE    ) // 1:51
+    call send_group( 1, NETHER_DRAGON   ) // 1:41
+    call send_group( 1, DOOMGUARD       ) // 1:39
+    call send_group( 1, INFERNAL        ) // 1:37
+
+    call send_sleep(20)                   // 1:35
+
+    call send_group( 1, INFERNAL        ) // 1:15
+
+    call send_sleep(10)                   // 1:13
+
+    call send_group( 1, QUEEN           ) // 1:03
+
+    call send_sleep(10)                   // 1:01
+
+    call send_group( 1, DOOMGUARD       ) // 0:51
+
+    call send_sleep(15)                   // 0:49
+
+    call send_group( 5, FEL_BEAST       ) // 0:34
+    call send_group( 2, FELLHOUND       ) // 0:24
+    call send_group( 2, FEL_RAVAGER     ) // 0:20
+    call send_group( 1, TEMPTRESS       ) // 0:16
+    call send_group( 1, MAIDEN          ) // 0:14
+    call send_group( 5, FEL_BEAST       ) // 0:12
+
+endfunction
+
+
+//**************************************************************************************************
+//***  HARD GATES ***
+//**************************************************************************************************
+//--------------------------------------------------------------------------------------------------
+//  gate1_hard
+//--------------------------------------------------------------------------------------------------
+function gate1_hard takes nothing returns nothing
+    call send_sleep(10)                   // 3:00
+    call send_group( 8, FEL_BEAST       ) // 2:50
+    call send_group( 2, FELLHOUND       ) // 2:34
+    call send_group( 2, GREATER_VOID    ) // 2:30
+
+    call send_sleep(10)                   // 2:26
+    call send_group( 6, FEL_GUARD       ) // 2:16
+    call send_group( 6, BLOODFIEND      ) // 2:04
+    call send_group( 2, DOOMGUARD       ) // 1:52
+
+    call send_sleep(10)                   // 1:48
+    call send_group( 8, FEL_BEAST       ) // 1:38
+    call send_group( 4, FEL_RAVAGER     ) // 1:22
+    call send_group( 2, GREATER_VOID    ) // 1:14
+    call send_group( 2, ELDER_VOID      ) // 1:10
+
+    call send_sleep(10)                   // 1:06
+    call send_group( 2, DOOMGUARD       ) // 0:56
+    call send_group( 5, BLOODFIEND      ) // 0:52
+    call send_group( 5, FEL_GUARD       ) // 0:42
+    call send_group( 2, OVERLORD        ) // 0:32
+    call send_group( 2, DOOMGUARD       ) // 0:28
+    call send_group( 5, BLOODFIEND      ) // 0:24
+    call send_group( 1, OVERLORD        ) // 0:14
+    call send_group( 2, DOOMGUARD       ) // 0:12
+    call send_group( 3, FEL_GUARD       ) // 0:08
+
+endfunction
+
+//--------------------------------------------------------------------------------------------------
+//  gate2_hard
+//--------------------------------------------------------------------------------------------------
+function gate2_hard takes nothing returns nothing
+    call send_sleep(5)                   // 3:00
+    call send_group( 4, NETHER_HATCH    ) // 2:55
+    call send_group( 2, NETHER_DRAKE    ) // 2:47
+
+    call send_sleep(5)                   // 2:43
+    call send_group( 4, FELLHOUND       ) // 2:38
+    call send_group( 6, FEL_BEAST       ) // 2:30
+    call send_group( 3, FEL_RAVAGER     ) // 2:18
+    call send_group( 2, DIABOLIST       ) // 2:12
+
+    call send_sleep(5)                   // 2:08
+    call send_group( 6, NETHER_DRAKE    ) // 2:03
+    call send_group( 3, NETHER_HATCH    ) // 1:51
+    call send_group( 3, GREATER_VOID    ) // 1:45
+    call send_group( 3, NETHER_DRAKE    ) // 1:39
+    call send_group( 3, ELDER_VOID      ) // 1:33
+
+    call send_sleep(5)                   // 1:27
+    call send_group( 5, FELLHOUND       ) // 1:22
+    call send_group( 5, FEL_BEAST       ) // 1:12
+    call send_group( 2, DIABOLIST       ) // 1:02
+    call send_group( 2, FEL_RAVAGER     ) // 0:58
+    call send_group( 3, ERE_WARLOCK     ) // 0:54
+
+    call send_sleep(5)                   // 0:48
+    call send_group( 4, ELDER_VOID      ) // 0:43
+    call send_group( 3, INFERNAL        ) // 0:35
+    call send_group( 3, NETHER_DRAKE    ) // 0:29
+
+    call send_sleep(5)                   // 0:23
+    call send_group( 1, DIABOLIST       ) // 0:18
+    call send_group( 2, FEL_RAVAGER     ) // 0:16
+    call send_group( 1, ERE_WARLOCK     ) // 0:12
+    call send_group( 5, FELLHOUND       ) // 0:10
+
+
+endfunction
+
+//--------------------------------------------------------------------------------------------------
+//  gate3_hard
+//--------------------------------------------------------------------------------------------------
+function gate3_hard takes nothing returns nothing
+    call send_sleep(5)                   // 3:00
+    call send_group( 6, TORMENTOR       ) // 2:55
+    call send_group( 4, TEMPTRESS       ) // 2:43
+    call send_group( 3, MAIDEN          ) // 2:35
+    call send_group( 2, QUEEN           ) // 2:29
+
+    call send_sleep(5)                   // 2:25
+    call send_group( 3, BLOODFIEND      ) // 2:20
+    call send_group( 2, OVERLORD        ) // 2:14
+    call send_group( 1, DIABOLIST       ) // 2:10
+    call send_group( 3, BLOODFIEND      ) // 2:08
+    call send_group( 3, OVERLORD        ) // 2:02
+    call send_group( 2, ERE_WARLOCK     ) // 1:56
+    call send_group( 3, BLOODFIEND      ) // 1:52
+    call send_group( 3, OVERLORD        ) // 1:46
+    call send_group( 2, DOOMGUARD       ) // 1:40
+
+    call send_sleep(5)                   // 1:36
+    call send_group( 2, QUEEN           ) // 1:31
+    call send_group( 6, TORMENTOR       ) // 1:27
+    call send_group( 4, TEMPTRESS       ) // 1:15
+    call send_group( 3, MAIDEN          ) // 1:07
+    call send_group( 3, QUEEN           ) // 1:01
+
+    call send_sleep(5)                   // 0:55
+    call send_group( 4, BLOODFIEND      ) // 0:50
+    call send_group( 3, DOOMGUARD       ) // 0:42
+    call send_group( 2, ERE_WARLOCK     ) // 0:36
+    call send_group( 3, QUEEN           ) // 0:32
+    call send_group( 8, TORMENTOR       ) // 0:26
+    call send_group( 3, TEMPTRESS       ) // 0:10
+
+
+endfunction
+
+//--------------------------------------------------------------------------------------------------
+//  gate4_hard
+//--------------------------------------------------------------------------------------------------
+function gate4_hard takes nothing returns nothing
+    call send_sleep(2)                   // 3:00
+    call send_group( 4, INFERNAL        ) // 2:58
+
+    call send_sleep(5)                   // 2:50
+    call send_group( 3, DOOMGUARD       ) // 2:45
+
+    call send_sleep(5)                   // 2:39
+    call send_group( 2, FEL_BEAST       ) // 2:34
+    call send_group( 5, FELLHOUND       ) // 2:30
+    call send_group( 4, FEL_RAVAGER     ) // 2:20
+    call send_group( 3, QUEEN           ) // 2:12
+    call send_group( 2, MAIDEN          ) // 2:06
+
+    call send_sleep(5)                   // 2:02
+    call send_group( 5, NETHER_DRAKE    ) // 1:57
+    call send_group( 3, NETHER_DRAGON   ) // 1:47
+    call send_group( 2, DOOMGUARD       ) // 1:41
+    call send_group( 2, INFERNAL        ) // 1:37
+    call send_group( 2, NETHER_DRAKE    ) // 1:33
+
+    call send_sleep(8)                   // 1:29
+    call send_group( 2, FEL_BEAST       ) // 1:21
+    call send_group( 4, FELLHOUND       ) // 1:17
+    call send_group( 4, FEL_RAVAGER     ) // 1:09
+    call send_group( 2, TEMPTRESS       ) // 1:01
+    call send_group( 3, QUEEN           ) // 0:57
+    call send_group( 3, FEL_RAVAGER     ) // 0:51
+
+    call send_sleep(5)                   // 0:45
+    call send_group( 4, INFERNAL        ) // 0:40
+    call send_group( 3, DOOMGUARD       ) // 0:32
+    call send_group( 5, INFERNAL        ) // 0:26
+    call send_group( 3, QUEEN           ) // 0:16
+    call send_group( 5, INFERNAL        ) // 0:10
+
+endfunction
+//**************************************************************************************************
+
+
+//--------------------------------------------------------------------------------------------------
+//  main
+//--------------------------------------------------------------------------------------------------
+function main takes nothing returns nothing
+
+    call CampaignAI(BURROW,null)
+    call SetReplacements(0,0,0)
+
+    call declare_unit( FEL_GUARD        )
+    call declare_unit( BLOODFIEND       )
+    call declare_unit( FEL_BEAST        )
+    call declare_unit( ELDER_VOID       )
+    call declare_unit( GREATER_VOID     )
+    call declare_unit( NETHER_DRAKE     )
+    call declare_unit( NETHER_HATCH     )
+    call declare_unit( OVERLORD         )
+    call declare_unit( SORCEROR         )
+    call declare_unit( DIABOLIST        )
+    call declare_unit( FEL_RAVAGER      )
+    call declare_unit( ERE_WARLOCK      )
+    call declare_unit( NETHER_DRAGON    )
+    call declare_unit( TORMENTOR        )
+    call declare_unit( TEMPTRESS        )
+    call declare_unit( MAIDEN           )
+    call declare_unit( QUEEN            )
+    call declare_unit( INFERNAL         )
+    call declare_unit( DOOMGUARD        )
+    call declare_unit( FELLHOUND        )
+
+    call StartThread(function command_loop)
+
+    loop
+        loop
+            exitwhen gate_open
+            call Sleep(0.5)
+        endloop
+
+        if difficulty == HARD then
+            if slot == 1 then
+                call gate1_hard()
+            elseif slot == 2 then
+                call gate2_hard()
+            elseif slot == 3 then
+                call gate3_hard()
+            elseif slot == 4 then
+                call gate4_hard()
+            endif
+        else
+            if slot == 1 then
+                call gate1_normal()
+            elseif slot == 2 then
+                call gate2_normal()
+            elseif slot == 3 then
+                call gate3_normal()
+            elseif slot == 4 then
+                call gate4_normal()
+            endif
+        endif
+
+        loop
+            exitwhen not gate_open
+            call Sleep(0.5)
+        endloop
+    endloop
+endfunction

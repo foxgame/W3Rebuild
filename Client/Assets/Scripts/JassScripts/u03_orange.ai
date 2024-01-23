@@ -1,0 +1,19 @@
+//============================================================================
+//  Undead 03 -- orange player -- AI Script
+//============================================================================
+globals
+    player user = Player(3)
+endglobals
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(ELF_FARM,null)
+
+	call SetReplacements(0,1,3)
+
+    call CampaignDefenderEx( 1,3,5, HIGH_FOOTMEN )
+    
+    call SleepForever()    
+endfunction

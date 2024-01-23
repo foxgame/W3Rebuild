@@ -1,0 +1,68 @@
+//============================================================================
+//  Night Elf 04 -- grey player -- AI Script
+//============================================================================
+globals
+    player user = Player(1)
+endglobals
+
+//============================================================================
+//  stop_waves
+//============================================================================
+function stop_waves takes nothing returns nothing
+
+	call SleepForever()
+endfunction
+//============================================================================
+//  test
+//============================================================================
+function test takes nothing returns nothing
+    if CommandsWaiting() > 0 then
+        call stop_waves()
+    endif
+endfunction 
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+
+    call CampaignAI(HOUSE,null)
+
+	call SetBuildUnit( 2, ZEPPLIN		)
+
+    call CampaignDefender( EASY, 1, FOOTMAN		)
+    call CampaignDefender( EASY, 1, MORTAR		)
+	call CampaignDefender( EASY, 1, RIFLEMAN	)
+    call CampaignDefender( EASY, 1, COPTER		)
+
+	call WaitForSignal()
+
+    //*** WAVE 1 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 2,2,3, FOOTMAN     )
+    call SuicideOnPlayer(M4,user)
+	call test()
+
+    //*** WAVE 2 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 3,3,3, FOOTMAN		)
+    call CampaignAttackerEx( 2,2,2, RIFLEMAN	)
+    call SuicideOnPlayer(M4,user)
+	call test()
+
+    //*** WAVE 3 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 3,3,3, FOOTMAN     )
+    call CampaignAttackerEx( 3,3,3, MORTAR		)
+    call CampaignAttackerEx( 2,2,2, RIFLEMAN	)
+    call SuicideOnPlayer(M4,user)
+	call test()
+
+	//*** WAVE 4 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 4,4,4,    COPTER    )
+    call SuicideOnPlayer(M4,user)
+	call test()
+
+	call SleepForever()
+
+endfunction

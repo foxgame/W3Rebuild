@@ -1,0 +1,95 @@
+//============================================================================
+//  Orc 08 -- Jaina -- AI Script
+//============================================================================
+globals
+	player purple	= Player(3)
+	player green	= Player(10)
+endglobals
+
+//============================================================================
+//  assaults
+//============================================================================
+function assaults takes nothing returns nothing
+    local integer target
+	local integer strength = 1
+
+    loop
+        loop
+            exitwhen CommandsWaiting() != 0
+            call Sleep(5)
+        endloop
+
+		if strength == 1 then
+            call CampaignAttackerEx	( 4,4,3, FOOTMAN	)
+			call CampaignAttackerEx	( 2,2,2, RIFLEMAN	)
+
+        elseif strength == 2 then
+			call CampaignAttackerEx	( 4,4,2, FOOTMAN	)
+            call CampaignAttackerEx	( 4,4,4, RIFLEMAN	)
+
+        else
+			call CampaignAttackerEx	( 2,2,4, FOOTMAN	)
+            call CampaignAttackerEx	( 3,3,2, RIFLEMAN	)
+			call CampaignAttackerEx	( 1,1,1, KNIGHT		)
+			call CampaignAttackerEx	( 1,1,0, SORCERESS	)
+        endif
+
+		set strength = strength + 1
+        set target = GetLastCommand()
+		call PopLastCommand()
+		call SuicideOnPlayer(M3,Player(target))
+		
+    endloop
+endfunction
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+
+    call CampaignAI(HOUSE,null)
+    //call SetCaptainChanges(false)
+
+    // disable certain campaign behaviors
+    // (mostly to make Jaina appear more intelligent)
+    //
+    //call SetHeroesFlee(true)
+    //call SetUnitsFlee(true)
+    //call SetGroupsFlee(true)
+    call SetSlowChopping(false)
+	set campaign_wood_peons = 7
+
+    // define basic tech tree buildings required
+    //
+    call SetBuildUnit( 1, PEASANT       )
+    call SetBuildUnit( 1, TOWN_HALL     )
+    call SetBuildUnit( 2, PEASANT       )
+    call SetBuildUnit( 1, BARRACKS      )
+    call SetBuildUnit( 1, BLACKSMITH    )
+    call SetBuildUnit( 1, KEEP          )
+    call SetBuildUnit( 1, HUMAN_ALTAR   )
+    call SetBuildUnit( 1, SANCTUM       )
+    call SetBuildUnit( 1, CASTLE        )
+    call SetBuildUnit( 12, PEASANT		)
+
+	call CampaignDefenderEx( 1,1,1, FOOTMAN     )
+	call CampaignDefenderEx( 1,1,1, SORCERESS	)
+	call CampaignDefenderEx( 1,1,0, KNIGHT		)
+	call CampaignDefenderEx( 1,1,0, RIFLEMAN	)
+    call CampaignDefenderEx( 1,1,1, JAINA		)	
+
+	call SetBuildUpgrEx( 2,2,1, UPG_MELEE		)
+	call SetBuildUpgrEx( 2,2,1, UPG_RANGED		)
+	call SetBuildUpgrEx( 2,2,1, UPG_ARMOR		)
+	call SetBuildUpgrEx( 2,2,1, UPG_LEATHER		)
+	call SetBuildUpgrEx( 2,2,1, UPG_MASONRY		)
+	call SetBuildUpgrEx( 1,1,0, UPG_DEFEND		)
+	call SetBuildUpgrEx( 1,1,0, UPG_BREEDING	)
+	call SetBuildUpgrEx( 2,2,1, UPG_PRAYING		)
+	call SetBuildUpgrEx( 2,2,1, UPG_SORCERY		)
+	call SetBuildUpgrEx( 1,1,1, UPG_GUN_RANGE	)
+	call SetBuildUpgrEx( 1,1,0, UPG_BOMBS		)
+	call SetBuildUpgrEx( 1,1,0, UPG_HAMMERS		)
+
+	call assaults()
+endfunction

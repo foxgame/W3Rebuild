@@ -1,0 +1,63 @@
+//============================================================================
+//  Night Elf 04 -- teal player -- AI Script
+//============================================================================
+globals
+    player user = Player(1)
+endglobals
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+
+    call CampaignAI(BURROW,null)
+	set do_campaign_farms = false
+	set campaign_wood_peons = 2
+	set campaign_gold_peons = 0
+
+	call SetBuildUnit( 2, PEON			)
+	call SetBuildUnit( 2, ZEPPLIN		)
+
+    call CampaignDefender( EASY, 1, GRUNT			)
+    call CampaignDefender( EASY, 1, HEAD_HUNTER		)
+	call CampaignDefender( EASY, 1, RAIDER			)
+    call CampaignDefender( EASY, 1, WYVERN			)
+	call CampaignDefender( EASY, 1, CATAPULT		)
+
+	call WaitForSignal()
+
+	set allow_signal_abort = true
+
+	//*** WAVE 1 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 2,2,3, WYVERN		)
+    call SuicideOnPlayer(M1,user)
+
+    //*** WAVE 2 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 2,2,3, GRUNT       )
+    call SuicideOnPlayerEx(M5,M5,M4,user)
+
+    //*** WAVE 3 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 3,3,3, HEAD_HUNTER	)
+    call CampaignAttackerEx( 2,2,2, WYVERN		)
+    call SuicideOnPlayerEx(M5,M5,M4,user)
+
+	loop
+		//*** WAVE 4 ***
+		call InitAssaultGroup()
+		call CampaignAttackerEx( 3,3,3, GRUNT        )
+		call CampaignAttackerEx( 3,3,3, HEAD_HUNTER  )
+		call CampaignAttackerEx( 2,2,2, CATAPULT     )
+		call SuicideOnPlayerEx(M5,M5,M4,user)
+
+		//*** WAVE 5 ***
+		call InitAssaultGroup()
+		call CampaignAttackerEx( 4,4,4,    WYVERN    )
+		call SuicideOnPlayerEx(M5,M5,M4,user)
+
+		exitwhen CommandsWaiting() !=0
+	endloop
+
+	call SleepForever()
+endfunction

@@ -1,0 +1,19 @@
+function PreloadFiles takes nothing returns nothing
+
+	call Preload( "units\\critters\\Seal\\Seal_portrait.mdx" )
+	call Preload( "units\\Critters\\Seal\\Seal_Portrait.blp" )
+	call Preload( "units\\creeps\\Revenant\\Revenant_portrait.mdx" )
+	call Preload( "units\\Creeps\\Revenant\\Revenant.blp" )
+	call Preload( "units\\Creeps\\Revenant\\BlueWaves.blp" )
+	call Preload( "Textures\\Blue_Glow2.blp" )
+	call Preload( "units\\critters\\VillagerMan\\VillagerMan_portrait.mdx" )
+	call Preload( "units\\Critters\\VillagerMan\\VillagerMale.blp" )
+	call Preload( "units\\critters\\Pig\\Pig_portrait.mdx" )
+	call Preload( "units\\Critters\\Pig\\Pig.blp" )
+	call Preload( "units\\creeps\\Owlbear\\Owlbear_portrait.mdx" )
+	call Preload( "units\\Creeps\\Owlbear\\HeroForceOfNature.blp" )
+	call PreloadEnd( 0.0 )
+
+endfunction
+
+

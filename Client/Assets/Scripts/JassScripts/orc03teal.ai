@@ -1,0 +1,48 @@
+//============================================================================
+//  Orc 3 -- teal player -- AI Script
+//============================================================================
+
+function heroes takes nothing returns integer
+    local integer level = GetHeroLevelAI()
+
+    if level == 2 or level == 3 or level == 5 then
+        return 'AHad' // devotion aura
+    endif
+
+    if level == 4 or level == 6 or level == 11 then
+        return 'AHds' // divine shield
+    endif
+
+    if level == 9 then
+        return 'AHre' // resurrection
+    endif
+
+    return 'AHhb' // holy bolt
+endfunction
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(function heroes)
+
+    call SetBuildUnit( 1, PEASANT       )
+    call SetBuildUnit( 1, TOWN_HALL     )
+    call SetBuildUnit( 1, KEEP          )
+    call SetBuildUnit( 1, HUMAN_ALTAR   )
+    call SetBuildUnit( 1, PALADIN       )
+    call SetBuildUnit( 1, BARRACKS      )
+    call SetBuildUnit( 4, FOOTMEN       )
+    call SetBuildUnit( 1, CHURCH        )
+    call SetBuildUnit( 1, PRIEST        )
+    call SetBuildUnit( 3, PEASANT       )
+
+    call SetAssaultGroup( 1, 1, PALADIN     )
+    call SetAssaultGroup( 4, 4, FOOTMEN     )
+    call SetAssaultGroup( 1, 1, PRIEST      )
+
+    call SuicideOnPlayer(1*60,Player(0))
+    loop
+        call SuicideOnPlayer(7*60,Player(0))
+    endloop
+endfunction

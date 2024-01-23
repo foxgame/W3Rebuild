@@ -1,0 +1,112 @@
+//============================================================================
+//  Undead 05b -- teal player -- AI Script
+//============================================================================
+globals
+    player user = Player(3)
+endglobals
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(ELF_FARM,null)
+	
+	call SetReplacements(0,1,3)
+
+    call SetBuildUnitEx( 0,0,1, TOWN_HALL			)
+    call SetBuildUnitEx( 2,2,2, PEASANT				)
+    call SetBuildUnitEx( 0,0,2, ELF_HIGH_BARRACKS	)
+	call SetBuildUnitEx( 0,0,13, ELF_FARM			)
+    call SetBuildUnitEx( 0,0,1, LUMBER_MILL			)
+    call SetBuildUnitEx( 5,5,5, PEASANT				)
+    call SetBuildUnitEx( 0,0,1, BLACKSMITH			)
+    call SetBuildUnitEx( 0,0,1, HUMAN_ALTAR			)
+	call SetBuildUnitEx( 0,0,1, KEEP				)
+    call SetBuildUnitEx( 0,0,1, SANCTUM				)
+	call SetBuildUnitEx( 0,0,1, CASTLE				)
+    
+    call CampaignDefenderEx( 1,1,3, HIGH_SWORDMAN	)
+    call CampaignDefenderEx( 1,1,4, HIGH_ARCHER		)
+	call CampaignDefenderEx( 0,0,1, PRIEST			)
+	call CampaignDefenderEx( 0,0,1, SORCERESS		)
+	call CampaignDefenderEx( 0,2,4, DRAGON_HAWK		)
+	call CampaignDefenderEx( 0,0,1, ARCHMAGE		)
+
+    call WaitForSignal()
+
+    //*** WAVE 1 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 1,1,2, HIGH_SWORDMAN	)
+    call CampaignAttackerEx( 1,2,4, HIGH_ARCHER		)
+    call SuicideOnPlayerEx(M10,M8,M5,user)
+
+	call SetBuildUpgrEx( 0,1,1, UPG_SORCERY			)
+	call SetBuildUpgrEx( 0,1,1, UPG_PRAYING			)
+
+    //*** WAVE 2 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 1,1,3, HIGH_SWORDMAN	)	
+    call CampaignAttackerEx( 2,3,3, HIGH_ARCHER		)
+    call CampaignDefenderEx( 0,2,4, DRAGON_HAWK		)
+    call SuicideOnPlayerEx(M10,M8,M4,user)
+
+    //*** WAVE 3 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 0,1,4, HIGH_SWORDMAN	)
+    call CampaignAttackerEx( 2,3,4, HIGH_ARCHER		)
+    call CampaignAttackerEx( 1,1,1, PRIEST			)
+	call CampaignAttackerEx( 0,0,1, SORCERESS		)
+	call CampaignAttackerEx( 0,1,2, BALLISTA		)
+    call SuicideOnPlayerEx(M10,M8,M4,user)
+
+    //*** WAVE 4 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 2,4,4, HIGH_SWORDMAN	)
+    call CampaignAttackerEx( 2,2,4, HIGH_ARCHER		)
+    call CampaignAttackerEx( 0,1,1, PRIEST			)	
+    call CampaignDefenderEx( 0,2,4, DRAGON_HAWK		)
+    call SuicideOnPlayerEx(M10,M8,M4,user)
+
+	call SetBuildUpgrEx( 0,0,2, UPG_SORCERY			)
+	call SetBuildUpgrEx( 0,0,2, UPG_PRAYING			)
+
+    //*** WAVE 5 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 2,3,4, HIGH_SWORDMAN	)
+    call CampaignAttackerEx( 1,3,4, HIGH_ARCHER		)
+    call CampaignAttackerEx( 1,1,2, PRIEST			)
+	call CampaignAttackerEx( 0,0,1, SORCERESS		)
+    call CampaignDefenderEx( 0,2,4, DRAGON_HAWK		)
+	call CampaignAttackerEx( 0,1,2, BALLISTA		)
+    call SuicideOnPlayerEx(M10,M8,M4,user)
+
+    loop
+        //*** WAVE 6+ ***
+        call InitAssaultGroup()
+        call CampaignAttackerEx( 1,2,2, HIGH_SWORDMAN	)
+        call CampaignAttackerEx( 3,5,7, HIGH_ARCHER		)
+        call CampaignAttackerEx( 1,1,2, PRIEST			)
+		call CampaignAttackerEx( 0,1,1, SORCERESS		)	
+        call CampaignDefenderEx( 0,2,4, DRAGON_HAWK		)
+        call SuicideOnPlayerEx(M10,M8,M4,user)
+
+		//*** WAVE 7+ ***
+		call InitAssaultGroup()
+		call CampaignAttackerEx( 3,4,8, HIGH_SWORDMAN	)
+		call CampaignAttackerEx( 0,2,2, HIGH_ARCHER		)
+		call CampaignAttackerEx( 1,3,4, PRIEST			)
+		call CampaignAttackerEx( 0,0,1, SORCERESS		)
+		call CampaignAttackerEx( 0,1,2, BALLISTA		)
+		call SuicideOnPlayerEx(M10,M8,M4,user)
+
+		//*** WAVE 8+ ***
+		call InitAssaultGroup()
+		call CampaignAttackerEx( 2,2,5, HIGH_SWORDMAN	)
+		call CampaignAttackerEx( 1,3,3, HIGH_ARCHER		)
+		call CampaignAttackerEx( 1,1,2, PRIEST			)
+		call CampaignAttackerEx( 1,2,4, SORCERESS		)
+		call CampaignDefenderEx( 0,2,4, DRAGON_HAWK		)
+		call SuicideOnPlayerEx(M10,M8,M4,user)
+
+    endloop
+endfunction

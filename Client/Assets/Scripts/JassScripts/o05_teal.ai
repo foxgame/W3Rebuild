@@ -1,0 +1,112 @@
+//============================================================================
+//  Orc 05 -- Cenarius -- AI Script
+//============================================================================
+
+//============================================================================
+// Cenarius uses Command 5 to defend a town, Command 6 to retreat to his base.
+//
+// Prior to using Command 6, Commands 3 & 4 must be used to init the home base 
+// coords. This only needs to be done once at the start of the level.
+//
+// Prior to using Command 5, Commands 1 & 2 must be used to set up goal 
+// coordinates. This should be done each time Command 5 is used, since the 
+// goal will be changing throughout the level.
+//============================================================================
+
+//============================================================================
+//  gather_force 
+//============================================================================
+function gather_force takes nothing returns nothing
+    call Trace("Cenarius gather_force\n")
+    call InitAssaultGroup()
+    call SetAssaultGroup( 1,1,CENARIUS       )
+    call SetAssaultGroup( 2,99,ARCHER        )
+    call SetAssaultGroup( 2,99,HUNTRESS      )
+    call SetInitialWave(1)
+    call FormGroup(1,true)
+    call Trace("Cenarius force ready\n")
+endfunction
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    local integer command
+    local integer data
+    local real goal_x = 0
+    local real goal_y = 0
+    local real home_x = 0
+    local real home_y = 0
+
+    call CampaignAI(MOON_WELL,null)
+
+    call SetBuildUnit( 2, ARCHER    )
+    call SetBuildUnit( 2, HUNTRESS  )
+
+    set campaign_wood_peons = 0
+
+    loop
+        loop
+            exitwhen CommandsWaiting() != 0
+            call Sleep(0.5)
+        endloop
+        set command = GetLastCommand()
+        set data    = GetLastData()
+        call PopLastCommand()
+
+        //--------------------------------------------------------------------
+        //*** SET GOAL X
+        //--------------------------------------------------------------------
+        if command==1 then
+            call Trace("Cenarius set goal x\n")
+
+            set goal_x = data
+
+        //--------------------------------------------------------------------
+        //*** SET GOAL Y
+        //--------------------------------------------------------------------
+        elseif command==2 then
+            call Trace("Cenarius set goal y\n")
+
+            set goal_y = data
+
+        //--------------------------------------------------------------------
+        //*** SET GOAL X
+        //--------------------------------------------------------------------
+        elseif command==3 then
+            call Trace("Cenarius set home x\n")
+
+            set home_x = data
+
+        //--------------------------------------------------------------------
+        //*** SET GOAL Y
+        //--------------------------------------------------------------------
+        elseif command==4 then
+            call Trace("Cenarius set home y\n")
+
+            set home_y = data
+
+        //--------------------------------------------------------------------
+        //*** ATTACK GOAL
+        //--------------------------------------------------------------------
+        elseif command==5 then
+            call Trace("Cenarius attack goal\n")
+
+            call gather_force()
+
+            call Trace("Cenarius home change & attack order\n")
+            call SetCaptainHome(ATTACK_CAPTAIN, goal_x, goal_y)
+            call CaptainAttack(goal_x,goal_y)
+
+        //--------------------------------------------------------------------
+        //*** GO HOME
+        //--------------------------------------------------------------------
+        elseif command==6 then
+            call Trace("Cenarius home change & go home order\n")
+
+            call SetCaptainHome(ATTACK_CAPTAIN, home_x, home_y)
+            call ClearCaptainTargets()
+            call CaptainGoHome()
+        endif
+    endloop
+endfunction

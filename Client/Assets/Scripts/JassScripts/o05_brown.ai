@@ -1,0 +1,7 @@
+//============================================================================
+//  Orc 05  -- brown player -- AI Script
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(MOON_WELL,null)
+    call SuicideUnits( ARCHER, HUNTRESS, HIPPO_RIDER, CHIMAERA, ARCHER, HUNTRESS, HIPPO_RIDER, CHIMAERA, ARCHER, HUNTRESS )
+endfunction

@@ -1,0 +1,16 @@
+//============================================================================
+//  Orc 04 -- light blue player -- AI Script
+//============================================================================
+globals
+endglobals
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(MOON_WELL,null)
+
+    set campaign_wood_peons = 100
+
+    call SleepForever()
+endfunction

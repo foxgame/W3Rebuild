@@ -1,0 +1,39 @@
+//============================================================================
+//  Human 04 -- orange player -- AI Script
+//============================================================================
+
+globals
+    player user = Player(1)
+endglobals
+
+function do_cheats takes nothing returns nothing
+    call Cheat("showmap")
+    call Cheat("av")
+    call Cheat("dg")
+    call Cheat("warnings")
+    call Cheat("viewres")
+//    call Cheat("superspeed")
+    set debug_fast_attacks = true
+endfunction
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    debug call do_cheats()
+
+    set campaign_wood_peons = 1
+
+    call CampaignAI(ZIGGURAT_1,null)
+
+    call SetBuildUnit( 3, ACOLYTE           )
+    call SetBuildUnit( 1, NECROPOLIS_1      )
+    call SetBuildUnit( 1, UNDEAD_MINE       )
+    call SetBuildUnit( 1, ZIGGURAT_1        )
+    call SetBuildUnit( 1, ZIGGURAT_2        )
+    call SetBuildUnit( 1, CRYPT             )
+
+    call CampaignDefender (EASY, 2, GHOUL     )
+
+//    call SleepForever()
+endfunction

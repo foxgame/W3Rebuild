@@ -1,0 +1,47 @@
+//============================================================================
+//  Orc 3 -- Warsong Ally -- AI Script
+//============================================================================
+
+function heroes takes nothing returns integer
+    local integer level = GetHeroLevelAI()
+
+    if level == 2 or level == 3 or level == 7 then
+        return 'AOcr' // critical strike
+    endif
+
+    if level == 4 or level == 6 or level == 8 then
+        return 'AOmi' // mirror image
+    endif
+
+    if level == 5 then
+        return 'AOww' // whirlwind
+    endif
+
+    return 'AOwk' // wind walk
+endfunction
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(function heroes)
+
+    call SetBuildUnit( 1, PEON          )
+    call SetBuildUnit( 1, GREAT_HALL    )
+    call SetBuildUnit( 1, STRONGHOLD    )
+    call SetBuildUnit( 1, ORC_ALTAR     )
+    call SetBuildUnit( 1, BLADE_MASTER  )
+    call SetBuildUnit( 1, ORC_BARRACKS  )
+    call SetBuildUnit( 4, GRUNT         )
+    call SetBuildUnit( 3, PEON          )
+
+    call SetAssaultGroup( 1, 1, BLADE_MASTER   )
+    call SetAssaultGroup( 4, 4, GRUNT          )
+
+    call SuicideOnPlayer(0,Player(1))
+    call SuicideOnPlayer(7*60,Player(3))
+    call SuicideOnPlayer(8*60,Player(2))
+    call SuicideOnPlayer(9*60,Player(9))
+
+    call SleepForever()
+endfunction

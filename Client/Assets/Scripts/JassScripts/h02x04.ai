@@ -1,0 +1,135 @@
+//==================================================================================================
+//  $Id: h02x04.ai,v 1.18 2003/05/07 23:04:17 rpardo Exp $
+//==================================================================================================
+globals
+    player user = PlayerEx(1)
+endglobals
+
+//--------------------------------------------------------------------------------------------------
+//  after_expand
+//--------------------------------------------------------------------------------------------------
+function after_expand takes nothing returns nothing
+
+    // grab all the upgrades we're ever going to get post-quest, then start a post-quest loop
+    //
+    call SetBuildUpgrEx( 1,1,1, UPG_BLK_SPHINX      )
+    call SetBuildUpgrEx( 2,2,3, UPG_UNHOLY_STR      )
+    call SetBuildUpgrEx( 2,2,3, UPG_CR_ATTACK       )
+    call SetBuildUpgrEx( 2,2,3, UPG_UNHOLY_ARMOR    )
+    call SetBuildUpgrEx( 2,2,3, UPG_CR_ARMOR        )
+
+    call SetBuildUpgrEx( 1,1,1, UPG_FIEND_WEB       )
+
+    call SetBuildUpgrEx( 0,0,1, UPG_PLAGUE          )
+    call SetBuildUpgrEx( 1,1,1, UPG_GHOUL_FRENZY    )
+    call SetBuildUpgrEx( 1,1,1, UPG_EXHUME          )
+    call SetBuildUpgrEx( 1,1,1, UPG_WYRM_BREATH     )
+
+    //*** WAVE 1 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 1,1,2, ABOMINATION )
+    call CampaignAttackerEx( 4,4,6, GHOUL       )
+    call SuicideOnPlayerEx(M2,M2,M2,user)
+
+    //*** WAVE 2 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 2,2,7, GARGOYLE    )
+    call CampaignAttackerEx( 1,1,2, FROST_WYRM  )
+    call CampaignAttackerEx( 1,1,3, BLK_SPHINX  )
+    call SuicideOnPlayerEx(M4,M4,M3,user)
+
+    //*** WAVE 3 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 1,1,1, DREAD_LORD  )
+    call CampaignAttackerEx( 4,4,6, GHOUL       )
+    call CampaignAttackerEx( 2,2,3, CRYPT_FIEND )
+    call CampaignAttackerEx( 1,1,2, MEAT_WAGON  )
+    call SuicideOnPlayerEx(M5,M5,M4,user)
+
+    loop
+        //*** WAVE 4+ ***
+        call InitAssaultGroup()
+        call CampaignAttackerEx( 3,3,8, GARGOYLE    )
+        call CampaignAttackerEx( 2,2,4, BLK_SPHINX  )
+        call SuicideOnPlayerEx(M4,M4,M3,user)
+
+        call InitAssaultGroup()
+        call CampaignAttackerEx( 1,1,1, DREAD_LORD  )
+        call CampaignAttackerEx( 3,3,5, ABOMINATION )
+        call CampaignAttackerEx( 1,1,2, BLK_SPHINX  )
+        call SuicideOnPlayerEx(M5,M5,M4,user)
+
+        call InitAssaultGroup()
+        call CampaignAttackerEx( 3,3,8, GARGOYLE    )
+        call CampaignAttackerEx( 1,1,2, FROST_WYRM  )
+        call CampaignAttackerEx( 1,1,3, BLK_SPHINX  )
+        call SuicideOnPlayerEx(M4,M4,M3,user)
+
+        call InitAssaultGroup()
+        call CampaignAttackerEx( 4,4,6, GHOUL       )
+        call CampaignAttackerEx( 2,2,3, ABOMINATION )
+        call CampaignAttackerEx( 2,2,3, CRYPT_FIEND )
+        call CampaignAttackerEx( 1,1,1, MEAT_WAGON  )
+        call CampaignAttackerEx( 0,0,1, DREAD_LORD  )
+        call SuicideOnPlayerEx(M5,M5,M4,user)
+    endloop
+endfunction
+
+//--------------------------------------------------------------------------------------------------
+//  test_expand
+//--------------------------------------------------------------------------------------------------
+function test_expand takes nothing returns nothing
+    if CommandsWaiting() > 0 then
+        call after_expand()
+    endif
+endfunction 
+
+//--------------------------------------------------------------------------------------------------
+//  main
+//--------------------------------------------------------------------------------------------------
+function main takes nothing returns nothing
+
+    call CampaignAI(ZIGGURAT_1,null)
+
+    call DoCampaignFarms(false)
+    call SetRandomPaths(false)
+    call SetReplacements(2,2,3)
+    call SetWoodPeons(2)
+
+    call SetBuildUnitEx( 2,2,2, UNDEAD_BARGE    )
+    call SetBuildUnitEx( 5,5,5, ACOLYTE         )
+
+    call SetBuildUpgrEx( 1,1,1, UPG_BLK_SPHINX  )
+
+    call CampaignDefenderEx( 0,0,1, DREAD_LORD  )
+    call CampaignDefenderEx( 1,1,2, ABOMINATION )
+    call CampaignDefenderEx( 1,1,1, BLK_SPHINX  )
+    call CampaignDefenderEx( 0,0,1, GARGOYLE    )
+    call CampaignDefenderEx( 0,0,1, CRYPT_FIEND )
+    call CampaignDefenderEx( 1,1,1, OBS_STATUE  )
+
+    call WaitForSignal()
+
+    //*** WAVE 1 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 3,3,5, GARGOYLE    )
+    call SuicideOnPlayerEx(20,20,20,user)
+    call test_expand()
+
+    loop
+        //*** WAVE 2+ ***
+        call InitAssaultGroup()
+        call CampaignAttackerEx( 3,3,7, GARGOYLE    )
+        call CampaignAttackerEx( 1,1,2, FROST_WYRM  )
+        call SuicideOnPlayerEx(M2,M2,M2,user)
+        call test_expand()
+
+        //*** WAVE 3+ ***
+        call InitAssaultGroup()
+        call CampaignAttackerEx( 4,4,7, GARGOYLE    )
+        call CampaignAttackerEx( 0,0,1, BLK_SPHINX  )
+        call SuicideOnPlayerEx(M2,M2,M2,user)
+        call test_expand()
+    endloop
+endfunction
+

@@ -1,0 +1,21 @@
+//============================================================================
+//  Undead 02 -- Teal player -- AI Script
+//============================================================================
+globals
+    player user = Player(3)
+endglobals
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    debug set do_debug_cheats = true
+
+    call CampaignAI(HOUSE,null)
+	call SetReplacements(0,0,3)
+    
+    call CampaignDefenderEx(1,1,2, FOOTMAN     )
+
+	call SleepForever()
+
+endfunction

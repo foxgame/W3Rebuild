@@ -1,0 +1,11 @@
+//==================================================================================================
+//  $Id: h04x10.ai,v 1.7 2003/04/20 22:10:55 smercer Exp $
+//==================================================================================================
+globals
+    constant integer USER = 1
+endglobals
+
+function main takes nothing returns nothing
+    call CampaignAI(HOUSE,null)
+    call SuicideUnitsEx( USER, NAGA_MYRMIDON, NAGA_SIREN, NAGA_DRAGON, HIGH_SWORDMAN, HIGH_ARCHER, SORCERESS, PRIEST, SPELL_BREAKER, 'ncfs', NAGA_ROYAL)
+endfunction

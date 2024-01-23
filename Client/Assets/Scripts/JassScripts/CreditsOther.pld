@@ -1,0 +1,13 @@
+function PreloadFiles takes nothing returns nothing
+
+	call Preload( "units\\creeps\\RedDragonWelp\\RedDragonWelp_portrait.mdx" )
+	call Preload( "Textures\\RedDragon.blp" )
+	call Preload( "units\\creeps\\ChaosWarlockGreen\\ChaosWarlockGreen_portrait.mdx" )
+	call Preload( "units\\Creeps\\ChaosWarlockGreen\\ChaosGreenWarlock.blp" )
+	call Preload( "units\\nightelf\\HeroMoonPriestess\\HeroMoonPriestess_portrait.mdx" )
+	call Preload( "units\\NightElf\\HeroMoonPriestess\\PriestessOfTheMoon.blp" )
+	call PreloadEnd( 0.0 )
+
+endfunction
+
+

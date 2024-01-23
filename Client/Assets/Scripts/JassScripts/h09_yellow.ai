@@ -1,0 +1,7 @@
+//============================================================================
+//  Orc 05  -- brown player -- AI Script
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(ZIGGURAT_1,null)
+    call SuicideUnits( GHOUL, NECRO, ABOMINATION, GARGOYLE, CRYPT_FIEND, GHOUL, ABOMINATION, NECRO, GARGOYLE, CRYPT_FIEND )
+endfunction

@@ -1,0 +1,7 @@
+//============================================================================
+//  Night Elf 1 -- purple player -- AI Script
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(HOUSE,null)
+    call SuicideUnits( FOOTMAN, 0, 0, 0, 0, 0, 0, 0, 0, 0 )
+endfunction

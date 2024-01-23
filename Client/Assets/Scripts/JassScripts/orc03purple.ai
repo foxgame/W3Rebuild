@@ -1,0 +1,29 @@
+//============================================================================
+//  Orc 3 -- purple player -- AI Script
+//============================================================================
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(null)
+
+    call SetBuildUnit( 1, PEASANT       )
+    call SetBuildUnit( 1, TOWN_HALL     )
+    call SetBuildUnit( 2, PEASANT       )
+    call SetBuildUnit( 1, BARRACKS      )
+    call SetBuildUnit( 1, BLACKSMITH    )
+    call SetBuildUnit( 4, RIFLEMEN      )
+    call SetBuildUnit( 1, KEEP          )
+    call SetBuildUnit( 1, WORKSHOP      )
+    call SetBuildUnit( 1, MORTAR        )
+    call SetBuildUnit( 3, PEASANT       )
+
+    call SetAssaultGroup( 4, 4, RIFLEMEN    )
+    call SetAssaultGroup( 1, 1, MORTAR      )
+
+    call SuicideOnPlayer(1*60,Player(0))
+    loop
+        call SuicideOnPlayer(8*60,Player(0))
+    endloop
+endfunction

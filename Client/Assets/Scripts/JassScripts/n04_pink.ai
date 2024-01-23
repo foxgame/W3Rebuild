@@ -1,0 +1,52 @@
+//============================================================================
+//  Night Elf 04 -- pink player -- AI Script
+//============================================================================
+globals
+    player User = Player(1)
+endglobals
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+
+    call CampaignAI(ZIGGURAT_1,null)
+	set do_campaign_farms = false
+
+    call CampaignDefender( EASY, 3, GARGOYLE	)
+
+	call WaitForSignal()
+
+	set allow_signal_abort = true
+
+    //*** WAVE 1 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 2,2,3, GARGOYLE	)
+    call SuicideOnPlayerEx(M3,M3,M2,User)
+
+    //*** WAVE 2 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 3,3,4, GARGOYLE	)
+    call SuicideOnPlayerEx(M5,M5,M4,User)
+
+	loop
+		//*** WAVE 3 ***
+		call InitAssaultGroup()
+		call CampaignAttackerEx( 3,3,4, GARGOYLE	)
+		call SuicideOnPlayerEx(M5,M5,M4,User)
+
+		//*** WAVE 4 ***
+		call InitAssaultGroup()
+		call CampaignAttackerEx( 4,4,5, GARGOYLE	)
+		call SuicideOnPlayerEx(M5,M5,M4,User)
+
+		//*** WAVE 5 ***
+		call InitAssaultGroup()
+		call CampaignAttackerEx( 3,3,3, GARGOYLE	)
+		call SuicideOnPlayerEx(M5,M5,M4,User)
+
+		exitwhen CommandsWaiting() !=0
+	endloop
+
+	call SleepForever()
+endfunction
+

@@ -1,0 +1,30 @@
+//==================================================================================================
+//  $Id: u08x05.ai,v 1.5 2003/04/29 22:18:47 bfitch Exp $
+//==================================================================================================
+function main takes nothing returns nothing
+
+    call CampaignAI(NAGA_CORAL,null)
+    call SetAmphibious()
+    call DoCampaignFarms(false)
+    call SetPeonsRepair(true)
+    call SetReplacements(9,9,9)
+    call SetCaptainHome(BOTH_CAPTAINS,3300,5700)
+
+    set campaign_wood_peons = 3
+
+    call SetBuildUnitEx( 1,1,1, NAGA_TEMPLE     )
+    call SetBuildUnitEx( 1,1,1, NAGA_SLAVE      )
+    call SetBuildUnitEx( 1,1,1, NAGA_SPAWNING   )
+    call SetBuildUnitEx( 1,1,1, NAGA_SHRINE     )
+    call SetBuildUnitEx( 3,3,3, NAGA_SLAVE      )
+    call SetBuildUnitEx( 3,3,3, NAGA_GUARDIAN   )
+
+    // this town is not to be attacked, so it has uber defense
+    //
+    call CampaignDefenderEx( 2,2,2, NAGA_ROYAL          )
+    call CampaignDefenderEx( 8,8,8, NAGA_SNAP_DRAGON    )
+    call CampaignDefenderEx( 3,3,3, NAGA_SIREN          )
+    call CampaignDefenderEx( 8,8,8, NAGA_COUATL         )
+
+    call SleepForever()
+endfunction

@@ -1,0 +1,860 @@
+//============================================================================
+//  Night Elf 07 -- any player -- AI Script
+//============================================================================
+globals
+    constant integer NORMAL_WAVE_DUR    = 75 // seconds
+    constant integer HARD_WAVE_DUR      = 75
+
+    constant integer NORM_ALLOW_TREES   = 0
+    constant integer NORM_TREE_FACTOR   = 5
+    constant integer NORM_BASE_BONUS    = 0
+    constant integer NORM_BONUS_CAP     = 10
+
+    constant integer HARD_ALLOW_TREES   = 0
+    constant integer HARD_TREE_FACTOR   = 4
+    constant integer HARD_BASE_BONUS    = 1
+    constant integer HARD_BONUS_CAP     = 10
+    
+    constant integer PIT_STOP_WAVE      = 0
+    constant integer BASIC_WAVE1        = 1
+    constant integer BASIC_WAVE2        = 2
+    constant integer AIR_WAVE           = 3
+    constant integer ANTI_AIR_WAVE      = 4
+    constant integer ANTIMAGIC_WAVE     = 5
+    constant integer SIEGE_WAVE         = 6
+    constant integer POSSESS_WAVE       = 7
+    constant integer SKELETON_WAVE      = 8
+    constant integer PLAGUE_WAVE        = 9
+    constant integer BURNING_WAVE       = 10
+    constant integer F_U1_WAVE          = 11
+    constant integer F_U2_WAVE          = 12
+    constant integer F_U3_WAVE          = 13
+
+    constant integer CMD_SET_X1         = 1
+    constant integer CMD_SET_Y1         = 2
+    constant integer CMD_SET_SEQUENCE   = 3
+    constant integer CMD_SET_TARGET     = 4
+    constant integer CMD_STOP           = 5
+    constant integer CMD_SET_X2         = 6
+    constant integer CMD_SET_Y2         = 7
+
+    constant integer BANSHEE_POSSESS    = 'uC00'
+    constant integer BANSHEE_CURSE      = 'uC01'
+    constant integer BANSHEE_ANTIMAGIC  = 'uC02'
+  //constant integer NECRO_CRIPPLE      = 'uC03'
+  //constant integer NECRO_RAISE        = 'uC04'
+  //constant integer NECRO_UNHOLY       = 'uC05'
+  //constant integer ?                  = 'uC06'
+  //constant integer ?                  = 'uC07'
+    constant integer BUILD_INFERNAL     = 'nC08'
+  //constant integer ?                  = 'uC09'
+  //constant integer ?                  = 'uC10'
+  //constant integer ?                  = 'uC11'
+    constant integer GHOULZ             = 'uC12'
+
+    player USER                         = Player(1)
+
+    integer stage_x1                    = 0
+    integer stage_y1                    = 0
+    integer stage_x2                    = 0
+    integer stage_y2                    = 0
+
+    boolean need_stage2                 = true
+    boolean at_stage1                   = false
+    boolean aborting                    = false
+    boolean send_lich                   = false
+    boolean send_lord                   = false
+    boolean send_azga                   = false
+
+    integer wave_count                  = 0
+    integer wave_restart                = 0
+    integer strength                    = 0
+    integer target                      = 0
+    integer harvest_ghouls              = 0
+
+    integer array wave_type
+    integer array wave_sleep
+    integer array wave_hero
+endglobals
+
+//============================================================================
+//  add_wave
+//============================================================================
+function add_wave takes integer whero, integer wtype returns nothing
+    set wave_hero  [wave_count] = whero
+    set wave_type  [wave_count] = wtype
+
+    if difficulty == HARD then
+        set wave_sleep [wave_count] = HARD_WAVE_DUR
+    else
+        set wave_sleep [wave_count] = NORMAL_WAVE_DUR
+    endif
+
+    set wave_count = wave_count + 1
+endfunction
+
+//============================================================================
+//  pit_stop
+//============================================================================
+function pit_stop takes integer ensecs, integer hsecs returns nothing
+    set wave_hero  [wave_count] = 0
+    set wave_type  [wave_count] = PIT_STOP_WAVE
+
+    if difficulty==HARD then
+        set wave_sleep [wave_count] = hsecs
+    else
+        set wave_sleep [wave_count] = ensecs
+    endif
+
+    set wave_count = wave_count + 1
+endfunction
+
+//============================================================================
+//  loop_waves
+//============================================================================
+function loop_waves takes nothing returns nothing
+    set wave_restart = wave_count
+endfunction
+
+//============================================================================
+//  setup_waves
+//============================================================================
+function setup_waves takes integer sequence returns nothing
+    call TraceI("***** setup_waves (group %d) *****\n",sequence)
+
+    set wave_count = 0
+
+    //------------------------------------------------------------------------
+    if sequence == 1 then // Jaina
+    //------------------------------------------------------------------------
+        call add_wave( 0,          BASIC_WAVE1      )
+        call add_wave( 0,          BASIC_WAVE2      )
+
+        call add_wave( 0,          ANTIMAGIC_WAVE   ) // Jaina theme
+        call add_wave( LICH,       POSSESS_WAVE     )
+
+		call pit_stop( 20, 20 )
+
+        call add_wave( 0,          ANTI_AIR_WAVE    )
+        call add_wave( 0,          AIR_WAVE         )
+
+        call pit_stop( 30, 30 )
+
+        call add_wave( DREAD_LORD, ANTIMAGIC_WAVE   ) // Jaina theme
+        call add_wave( LICH,       POSSESS_WAVE     )
+
+        call pit_stop( 30, 30 )
+
+        call loop_waves()
+
+        call add_wave( PIT_LORD,   F_U1_WAVE        )
+
+		call pit_stop( 40, 30 )
+
+        call add_wave( DREAD_LORD, F_U2_WAVE        )
+
+		call pit_stop( 40, 30 )
+
+        call add_wave( PIT_LORD,   F_U3_WAVE        )
+
+    //------------------------------------------------------------------------
+    elseif sequence == 2 then // Thrall
+    //------------------------------------------------------------------------
+        call add_wave( 0,          BASIC_WAVE1      )
+        call add_wave( 0,          BASIC_WAVE2      )
+
+        call add_wave( DREAD_LORD, SIEGE_WAVE       ) // Thrall theme
+        call add_wave( LICH,       SKELETON_WAVE    )
+
+        call pit_stop( 30, 30 )
+
+        call add_wave( 0,          ANTI_AIR_WAVE    )
+        call add_wave( 0,          AIR_WAVE         )
+
+        call pit_stop( 30, 30 )
+
+        call add_wave( LICH,       SKELETON_WAVE    ) // Thrall theme
+        call add_wave( DREAD_LORD, SIEGE_WAVE       )
+
+        call pit_stop( 60, 30 )
+
+        call loop_waves()
+
+        call add_wave( PIT_LORD,   F_U1_WAVE        )
+
+		call pit_stop( 40, 30 )
+
+        call add_wave( DREAD_LORD, F_U2_WAVE        )
+
+		call pit_stop( 40, 30 )
+
+        call add_wave( PIT_LORD,   F_U3_WAVE        )
+
+    //------------------------------------------------------------------------
+    else // sequence == 3 then // USER
+    //------------------------------------------------------------------------
+        call add_wave( 0,          BASIC_WAVE1      )
+        call add_wave( 0,          BASIC_WAVE2      )
+
+        call pit_stop( 60, 40 )
+
+        call add_wave( 0,          AIR_WAVE         )
+        call add_wave( LICH,       SKELETON_WAVE    )
+
+		call pit_stop( 60, 40 )
+
+        call add_wave( 0,          PLAGUE_WAVE      ) // User theme
+        call add_wave( DREAD_LORD, BURNING_WAVE     )
+
+        call pit_stop( 60, 40 )
+
+        call add_wave( 0,          ANTIMAGIC_WAVE   ) // recap Jaina theme
+        call add_wave( 0,          POSSESS_WAVE     )
+
+        call pit_stop( 60, 40 )
+
+        call add_wave( DREAD_LORD, SIEGE_WAVE       ) // recap Thrall theme
+        call add_wave( LICH,       SKELETON_WAVE    )
+
+        call pit_stop( 60, 40 )
+
+        call loop_waves()
+
+        call add_wave( PIT_LORD,   F_U1_WAVE        )
+        call add_wave( DREAD_LORD, F_U2_WAVE        )
+        call add_wave( PIT_LORD,   F_U3_WAVE        )
+    endif
+endfunction
+
+//============================================================================
+//  wave_units
+//============================================================================
+function wave_units takes integer norm, integer hard, integer unitid returns nothing
+    local integer adding
+    local integer index
+    
+    if difficulty==HARD then
+        set adding = hard
+    else
+        set adding = norm
+    endif
+    if adding < 1 then
+        return
+    endif
+
+    // if unitid is already being built, add more to existing desires
+    //
+    set index = 0
+    loop
+        exitwhen index == harass_length
+
+        if harass_units[index] == unitid then
+            set harass_qty[index] = harass_qty[index] + adding
+            set harass_max[index] = harass_max[index] + adding
+            return
+        endif
+        set index = index + 1
+    endloop
+
+    // if unitid is not in harass list then add this new unitid
+    //
+    set harass_qty   [harass_length] = adding
+    set harass_max   [harass_length] = adding
+    set harass_units [harass_length] = unitid
+
+    set harass_length = harass_length + 1
+endfunction
+
+//============================================================================
+//  do_BONUS_LOVE
+//============================================================================
+function do_BONUS_LOVE takes nothing returns nothing
+    call wave_units( 1, 1, MEAT_WAGON       )
+endfunction
+
+//============================================================================
+//  do_EVERY_WAVE_FIRST
+//============================================================================
+function do_EVERY_WAVE_FIRST takes nothing returns nothing
+endfunction
+
+//============================================================================
+//  do_EVERY_WAVE_LAST
+//============================================================================
+function do_EVERY_WAVE_LAST takes integer heroid returns nothing
+    if heroid != 0 then
+        call wave_units( 1, 1, heroid       ) // undead altar
+        call wave_units( 1, 1, BANSHEE      ) // temple of the damned
+    endif
+endfunction
+
+//============================================================================
+//  do_BASIC_WAVE1
+//============================================================================
+function do_BASIC_WAVE1 takes nothing returns nothing
+    call wave_units( 6,10, GHOULZ           ) // crypt
+    call wave_units( 4, 6, CRYPT_FIEND      ) // crypt
+endfunction
+
+//============================================================================
+//  do_BASIC_WAVE2
+//============================================================================
+function do_BASIC_WAVE2 takes nothing returns nothing
+    call wave_units( 0, 1, MEAT_WAGON       )
+    call wave_units( 8,12, GHOULZ           ) // crypt
+    call wave_units( 5, 7, CRYPT_FIEND      ) // crypt
+endfunction
+
+//============================================================================
+//  do_POSSESS_WAVE
+//============================================================================
+function do_POSSESS_WAVE takes nothing returns nothing
+    call wave_units( 2, 3, ABOMINATION      ) // slaughterhouse
+    call wave_units( 8,10, BANSHEE_POSSESS  ) // temple of the damned
+endfunction
+
+//============================================================================
+//  do_ANTIMAGIC_WAVE
+//============================================================================
+function do_ANTIMAGIC_WAVE takes nothing returns nothing
+    call wave_units( 0, 1, MEAT_WAGON       ) // slaughterhouse
+    call wave_units( 2, 3, DOOMGUARD        ) // crypt
+    call wave_units( 6, 8, FELLHOUND        ) // crypt
+endfunction
+
+//============================================================================
+//  do_AIR_WAVE
+//============================================================================
+function do_AIR_WAVE takes nothing returns nothing
+    call wave_units( 6, 8, GARGOYLE         ) // crypt
+    call wave_units( 4, 5, FROST_WYRM       ) // boneyard
+endfunction
+
+//============================================================================
+//  do_ANTI_AIR_WAVE
+//============================================================================
+function do_ANTI_AIR_WAVE takes nothing returns nothing
+    call wave_units( 1, 2, DOOMGUARD        ) // crypt
+    call wave_units( 5, 7, CRYPT_FIEND      ) // crypt
+    call wave_units( 7, 9, GARGOYLE         ) // crypt
+endfunction
+
+//============================================================================
+//  do_SIEGE_WAVE
+//============================================================================
+function do_SIEGE_WAVE takes nothing returns nothing
+    call wave_units( 5, 7, MEAT_WAGON       ) // slaughterhouse
+    call wave_units( 5, 7, ABOMINATION      ) // slaughterhouse
+    call wave_units( 2, 3, FROST_WYRM       ) // boneyard
+endfunction
+
+//============================================================================
+//  do_BURNING_WAVE
+//============================================================================
+function do_BURNING_WAVE takes nothing returns nothing
+    call wave_units( 1, 2, DOOMGUARD        ) // crypt
+    call wave_units( 6, 8, BUILD_INFERNAL   ) // crypt
+endfunction
+
+//============================================================================
+//  do_PLAGUE_WAVE
+//============================================================================
+function do_PLAGUE_WAVE takes nothing returns nothing
+    call wave_units( 1, 2, MEAT_WAGON       ) // slaughterhouse
+    call wave_units( 4, 6, GHOULZ           ) // crypt
+    call wave_units( 5, 7, ABOMINATION      ) // slaughterhouse
+    call wave_units( 3, 4, NECRO            ) // temple of the damned
+endfunction
+
+//============================================================================
+//  do_SKELETON_WAVE
+//============================================================================
+function do_SKELETON_WAVE takes nothing returns nothing
+    call wave_units( 0, 1, MEAT_WAGON       ) // slaughterhouse
+    call wave_units( 4, 6, ABOMINATION      ) // slaughterhouse
+    call wave_units( 8,10, NECRO            ) // temple of the damned
+endfunction
+
+//============================================================================
+//  do_F_U1_WAVE
+//============================================================================
+function do_F_U1_WAVE takes nothing returns nothing
+    call wave_units( 1, 2, MEAT_WAGON       ) // slaughterhouse
+    call wave_units( 2, 3, DOOMGUARD        ) // crypt
+    call wave_units( 5, 7, FELLHOUND        ) // crypt
+    call wave_units( 2, 3, BANSHEE_CURSE    ) // temple of the damned
+    call wave_units( 2, 3, FROST_WYRM       ) // boneyard
+    call wave_units( 2, 3, NECRO            ) // temple of the damned
+endfunction
+
+//============================================================================
+//  do_F_U2_WAVE
+//============================================================================
+function do_F_U2_WAVE takes nothing returns nothing
+    call wave_units( 1, 2, MEAT_WAGON       ) // slaughterhouse
+    call wave_units( 2, 3, BUILD_INFERNAL   ) // crypt
+    call wave_units( 3, 5, ABOMINATION      ) // slaughterhouse
+    call wave_units( 4, 6, CRYPT_FIEND      ) // crypt
+    call wave_units( 2, 3, BANSHEE_CURSE    ) // temple of the damned
+    call wave_units( 2, 3, NECRO            ) // temple of the damned
+endfunction
+
+//============================================================================
+//  do_F_U3_WAVE
+//============================================================================
+function do_F_U3_WAVE takes nothing returns nothing
+    call wave_units( 2, 3, MEAT_WAGON       ) // slaughterhouse
+    call wave_units( 2, 3, BUILD_INFERNAL   ) // crypt
+    call wave_units( 3, 4, BANSHEE_POSSESS  ) // temple of the damned
+    call wave_units( 3, 4, DOOMGUARD        ) // crypt
+    call wave_units( 4, 5, FELLHOUND        ) // crypt
+    call wave_units( 2, 3, FROST_WYRM       ) // boneyard
+    call wave_units( 1, 1, LICH             ) // undead altar
+    call wave_units( 2, 3, NECRO            ) // temple of the damned
+endfunction
+
+//============================================================================
+//  bonus_waves
+//============================================================================
+function bonus_waves takes integer allow, integer factor, integer base, integer cap returns integer
+    local integer trees = GetPlayerUnitTypeCount( USER, ANCIENT_PROTECT )
+    local integer result
+
+    if trees <= allow or factor <= 0 then
+        return base
+    endif
+
+    set result = base + (trees - allow) / factor + 1
+
+    if result > cap then
+        return cap
+    endif
+
+    return result
+endfunction
+
+//============================================================================
+//  consider_bonus_love
+//============================================================================
+function consider_bonus_love takes nothing returns nothing
+    local integer times
+
+    if difficulty==HARD then
+        set times = bonus_waves( HARD_ALLOW_TREES, HARD_TREE_FACTOR, HARD_BASE_BONUS, HARD_BONUS_CAP )
+    else
+        set times = bonus_waves( NORM_ALLOW_TREES, NORM_TREE_FACTOR, NORM_BASE_BONUS, NORM_BONUS_CAP )
+    endif
+    call TraceI("Bonus love = %d\n",times)
+
+    loop
+        exitwhen times <= 0
+        call do_BONUS_LOVE()
+        set times = times - 1
+    endloop
+endfunction
+
+//============================================================================
+//  check_abort
+//============================================================================
+function check_abort takes nothing returns nothing
+    if CommandsWaiting() == 0 then
+        return
+    endif
+
+    if GetLastCommand()==CMD_STOP then
+        call Trace("***** ABORT *****\n")
+        set aborting = true
+        call SleepForever()
+    else
+        call Trace("***** UNEXPECTED COMMAND *****\n")
+        call PopLastCommand()
+    endif
+endfunction
+
+//============================================================================
+//  form_wave
+//============================================================================
+function form_wave takes nothing returns nothing
+    local integer index
+    set index = 0
+    loop
+        exitwhen index == harass_length
+        call AddAssault(harass_max[index],harass_units[index])
+        set index = index + 1
+    endloop
+endfunction
+
+//============================================================================
+//  suicide_wave
+//============================================================================
+function suicide_wave takes nothing returns nothing
+    local integer index
+    local integer count
+    local integer desire
+    local integer unitid
+
+    local integer length = harass_length
+    set harass_length = 0
+
+    set index = 0
+    loop
+        exitwhen index == length
+
+        call TraceI("wave cycle %d\n",index+1)
+
+        set desire = harass_max[index]
+        set unitid = harass_units[index]
+
+        if unitid==LICH then
+            set send_lich = true
+
+        elseif unitid==DREAD_LORD then
+            set send_lord = true
+
+        elseif unitid==PIT_LORD then
+            set send_azga = true
+        endif
+
+        set sleep_seconds = sleep_seconds-2 // 20 cycles
+        set count = 0
+        loop
+            call SuicideUnitEx(1,unitid,target)
+            call Sleep(0.1)
+
+            set count = count + 1
+            exitwhen count==20 // 2 seconds
+        endloop
+
+        set index = index + 1
+    endloop
+    call Trace("all waves sent\n")
+endfunction
+
+//============================================================================
+// suicide_unit
+//============================================================================
+function suicide_unit takes integer unitid returns nothing
+    call SuicideUnitEx(1,unitid,target)
+    call SuicideUnitEx(1,SKEL_WARRIOR,target)
+    call Sleep(0.1)
+endfunction
+
+//============================================================================
+//  possessions
+//============================================================================
+function possessions takes nothing returns nothing
+
+    set sleep_seconds = sleep_seconds - 1
+    call suicide_unit( INFERNAL      )
+    call suicide_unit( FOOTMAN       )
+    call suicide_unit( RIFLEMAN      )
+    call suicide_unit( SORCERESS     )
+    call suicide_unit( PRIEST        )
+    call suicide_unit( MORTAR        )
+    call suicide_unit( ELEMENTAL     )
+    call suicide_unit( KNIGHT        )
+    call suicide_unit( GRYPHON       )
+    call suicide_unit( MILITIA       )
+
+    set sleep_seconds = sleep_seconds - 1
+    call suicide_unit( GRUNT         )
+    call suicide_unit( HEAD_HUNTER   )
+    call suicide_unit( TAUREN        )
+    call suicide_unit( WITCH_DOCTOR  )
+    call suicide_unit( KODO_BEAST    )
+    call suicide_unit( RAIDER        )
+    call suicide_unit( SHAMAN        )
+    call suicide_unit( WYVERN        )
+    call suicide_unit( SHANDRIS      )
+    call suicide_unit( ENT           )
+
+    set sleep_seconds = sleep_seconds - 1
+    call suicide_unit( ARCHER        )
+    call suicide_unit( DRUID_TALON   )
+    call suicide_unit( DRUID_TALON_M )
+    call suicide_unit( DRUID_CLAW    )
+    call suicide_unit( DRUID_CLAW_M  )
+    call suicide_unit( DRYAD         )
+    call suicide_unit( HIPPO         )
+    call suicide_unit( HIPPO_RIDER   )
+    call suicide_unit( HUNTRESS      )
+    call suicide_unit( CHIMAERA      )
+endfunction
+
+//============================================================================
+//  send_hero
+//============================================================================
+function send_hero takes boolean send, integer heroid returns boolean
+    if not send or GetUnitCountDone(heroid) < 1 then
+        return false
+    endif
+    call SuicideUnitEx( 1, heroid, target )
+    return true
+endfunction
+
+//============================================================================
+//  hero_failsafe
+//============================================================================
+function hero_failsafe takes nothing returns nothing
+    loop
+        set send_lich = send_hero( send_lich, LICH       )
+        call Sleep(0.5)
+
+        set send_lord = send_hero( send_lord, DREAD_LORD )
+        call Sleep(0.5)
+
+        set send_azga = send_hero( send_azga, PIT_LORD   )
+        call Sleep(0.5)
+    endloop
+endfunction
+
+//============================================================================
+//  send_waves
+//============================================================================
+function send_waves takes nothing returns nothing
+    local integer index = 0
+
+    loop
+        exitwhen GetUnitCountDone(CRYPT)>0
+        call Sleep(1)
+    endloop
+
+    loop
+        call check_abort()
+
+        call InitAssaultGroup()
+
+        call TraceI("next wave = %d\n",wave_type[index])
+        call TraceI("strength  = %d\n",strength)
+
+        if wave_type[index]!=PIT_STOP_WAVE then
+            call do_EVERY_WAVE_FIRST()
+
+            if index >= 2 then
+                call consider_bonus_love()
+            endif
+        endif
+
+        if wave_type[index]==BASIC_WAVE1 then
+            call do_BASIC_WAVE1()
+
+        elseif wave_type[index]==BASIC_WAVE2 then
+            call do_BASIC_WAVE2()
+
+        elseif wave_type[index]==AIR_WAVE then
+            call do_AIR_WAVE()
+
+        elseif wave_type[index]==ANTI_AIR_WAVE then
+            call do_ANTI_AIR_WAVE()
+
+        elseif wave_type[index]==ANTIMAGIC_WAVE then
+            call do_ANTIMAGIC_WAVE()
+
+        elseif wave_type[index]==SIEGE_WAVE then
+            call do_SIEGE_WAVE()
+
+        elseif wave_type[index]==POSSESS_WAVE then
+            call do_POSSESS_WAVE()
+
+        elseif wave_type[index]==SKELETON_WAVE then
+            call do_SKELETON_WAVE()
+
+        elseif wave_type[index]==PLAGUE_WAVE then
+            call do_PLAGUE_WAVE()
+
+        elseif wave_type[index]==BURNING_WAVE then
+            call do_BURNING_WAVE()
+
+        elseif wave_type[index]==F_U1_WAVE then
+            call do_F_U1_WAVE()
+
+        elseif wave_type[index]==F_U2_WAVE then
+            call do_F_U2_WAVE()
+
+        elseif wave_type[index]==F_U3_WAVE then
+            call do_F_U3_WAVE()
+
+        elseif wave_type[index]==PIT_STOP_WAVE then
+            // no units
+
+        else // error
+            call Trace("**UNKNOWN WAVE CONTENTS**\n")
+            call do_BASIC_WAVE1()
+        endif
+
+        if wave_type[index]!=PIT_STOP_WAVE then
+            call do_EVERY_WAVE_LAST(wave_hero[index])
+
+            if at_stage1 then
+                set at_stage1 = false
+                call SetCaptainHome(BOTH_CAPTAINS,stage_x2,stage_y2)
+            else
+                set at_stage1 = true
+                call SetCaptainHome(BOTH_CAPTAINS,stage_x1,stage_y1)
+            endif
+        endif
+
+        call AddSleepSeconds(wave_sleep[index])
+        loop
+            call TraceI("forming wave (T%+d seconds)\n",-sleep_seconds)
+            call check_abort()
+            call possessions()
+            call form_wave()
+            exitwhen sleep_seconds <= 0
+        endloop
+
+        call suicide_wave()
+
+        set index = index + 1
+        if index==wave_count then
+            set index = wave_restart
+        endif
+    endloop
+endfunction
+
+//============================================================================
+//  get_commands
+//============================================================================
+function get_commands takes nothing returns nothing
+    local integer cmd
+    local integer data
+    loop
+        loop
+            exitwhen CommandsWaiting() != 0
+            call Sleep(1)
+        endloop
+
+        set cmd  = GetLastCommand()
+        set data = GetLastData()
+        call PopLastCommand()
+        
+        if cmd == CMD_SET_X1 then
+            call TraceI("CMD_SET_X1 (%d)\n",data)
+
+            set stage_x1 = data
+
+        elseif cmd == CMD_SET_Y1 then
+            call TraceI("CMD_SET_Y1 (%d)\n",data)
+
+            set stage_y1 = data
+
+        elseif cmd == CMD_SET_X2 then
+            call TraceI("CMD_SET_X2 (%d)\n",data)
+
+            set stage_x2 = data
+            set need_stage2 = false
+
+        elseif cmd == CMD_SET_Y2 then
+            call TraceI("CMD_SET_Y2 (%d)\n",data)
+
+            set stage_y2 = data
+            set need_stage2 = false
+
+        elseif cmd == CMD_SET_SEQUENCE then
+            call TraceI("CMD_SET_SEQUENCE (%d)\n",data)
+
+            if data==2 then // Jaina's base
+                set harvest_ghouls = 5
+            else // original base and Thrall's base
+                set harvest_ghouls = 13
+            endif
+
+            call setup_waves(data)
+
+        elseif cmd == CMD_SET_TARGET then
+            call TraceI("CMD_SET_TARGET (%d)\n",data)
+
+            set target = data
+
+            if need_stage2 then
+                set stage_x2 = stage_x1
+                set stage_y2 = stage_y1
+            endif
+
+            call SetCaptainHome(BOTH_CAPTAINS,stage_x1,stage_y1)
+            call send_waves()
+
+        else
+            call TraceI("unknown command (%d)\n",cmd)
+            call TraceI("unknown data (%d)\n",data)
+        endif
+    endloop
+endfunction
+
+//============================================================================
+//  start_unit
+//============================================================================
+function start_unit takes integer qty, integer unitid, boolean wait returns nothing
+    call SetBuildUnit( qty, unitid )
+    loop
+        exitwhen TownCount(unitid) >= qty
+        call Sleep(2)
+    endloop
+
+    if not wait then
+        return
+    endif
+
+    loop
+        exitwhen TownCountDone(unitid) >= qty
+        call Sleep(1)
+    endloop
+endfunction
+
+//============================================================================
+//  define_town
+//============================================================================
+function define_town takes nothing returns nothing
+    set do_campaign_farms       = false
+    set campaign_wood_peons     = 15
+    set campaign_basics_speed   = 3
+
+    call SetSlowChopping(false)
+
+    call start_unit( 1, ACOLYTE,        true  )
+    call start_unit( 1, NECROPOLIS_1,   false )
+    call start_unit( 2, CRYPT,          false )
+    call start_unit( 1, GRAVEYARD,      false )
+    call start_unit( 1, UNDEAD_ALTAR,   false )
+    call start_unit( 4, ZIGGURAT_1,     false )
+
+    call SetBuildUnit( harvest_ghouls, GHOUL )
+
+    call start_unit( 1, NECROPOLIS_2,   true  )
+    call start_unit( 2, SLAUGHTERHOUSE, false )
+    call start_unit( 1, DAMNED_TEMPLE,  false )
+    call start_unit( 1, SAC_PIT,        false )
+    call start_unit( 1, NECROPOLIS_3,   true  )
+    call start_unit( 1, BONEYARD,       false )
+    call start_unit( 4, ZIGGURAT_2,     false )
+    call start_unit( 4, ACOLYTE,        false )
+
+    loop
+        exitwhen aborting and GetUnitCountDone(ACOLYTE)>0
+        call Sleep(5)
+    endloop
+
+    call Trace("***** UNSUMMON TOWN *****\n")
+    call InitBuildArray()
+    call InitAssaultGroup()
+    call UnsummonAll()
+    call SleepForever()
+endfunction
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    call TraceI("***** rainbow main started for %d *****\n",GetAiPlayer())
+
+    debug if GetAiPlayer()==2 then
+        set do_debug_cheats = true
+        call Cheat("aitrace")
+        //call Cheat("ss")
+    endif
+
+    call CampaignAI(ZIGGURAT_1,null)
+    call StartThread(function define_town)
+    call StartThread(function hero_failsafe)
+    call get_commands()
+endfunction

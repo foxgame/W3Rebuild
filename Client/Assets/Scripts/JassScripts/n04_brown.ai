@@ -1,0 +1,68 @@
+//============================================================================
+//  Night Elf 4 -- brown player -- AI Script
+//============================================================================
+globals
+    player user = Player(1)
+endglobals
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(HOUSE,null)
+	call SetReplacements(2,2,4)
+	set do_campaign_farms = false
+	set campaign_wood_peons = 6
+	set campaign_gold_peons = 0
+
+    call SetBuildUnit( 6, PEASANT       )
+
+	call CampaignDefenderEx( 1,1,1, FOOTMEN	)	
+	call CampaignDefenderEx( 1,1,1, PRIEST	)
+	call CampaignDefenderEx( 0,0,1, RIFLEMAN)
+	call CampaignDefenderEx( 0,0,1, PALADIN	)
+	
+	call WaitForSignal()
+
+	set allow_signal_abort = true
+
+	// *** WAVE 1 ***
+	call InitAssaultGroup()
+    call CampaignAttackerEx( 4,4,6, FOOTMAN	)
+	call CampaignAttackerEx( 1,1,1, PALADIN	)
+    call SuicideOnPlayer(M1,user)
+
+	call SetBuildUpgrEx( 0,0,1, UPG_MELEE	)
+	call SetBuildUpgrEx( 0,0,1, UPG_ARMOR	)
+	call SetBuildUpgrEx( 0,0,1, UPG_MASONRY	)
+
+	// *** WAVE 2 ***
+	call InitAssaultGroup()
+    call CampaignAttackerEx( 5,5,7, FOOTMAN	)
+	call CampaignAttackerEx( 1,1,2, PRIEST	)
+    call SuicideOnPlayerEx(M6,M6,M5,user)
+
+	call SetBuildUpgrEx( 1,1,1, UPG_DEFEND	)
+	call SetBuildUpgrEx( 0,0,1, UPG_PRAYING	)
+
+	loop
+		// *** WAVE 3 ***
+		call InitAssaultGroup()
+		call CampaignAttackerEx( 2,2,3, FOOTMAN	)
+		call CampaignAttackerEx( 2,2,3, RIFLEMAN)
+		call CampaignAttackerEx( 1,1,1, PALADIN	)
+		call SuicideOnPlayerEx(M6,M6,M5,user)
+
+		// *** WAVE 4 ***
+		call InitAssaultGroup()
+		call CampaignAttackerEx( 2,2,3, FOOTMAN	)
+		call CampaignAttackerEx( 1,1,2, PRIEST	)
+		call CampaignAttackerEx( 2,2,2, RIFLEMAN)
+		call CampaignAttackerEx( 0,0,1, PALADIN	)
+		call SuicideOnPlayerEx(M6,M6,M5,user)
+
+		exitwhen CommandsWaiting() !=0
+	endloop
+
+	call SleepForever()
+endfunction

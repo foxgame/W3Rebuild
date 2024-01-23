@@ -1,0 +1,64 @@
+//============================================================================
+//  Orc 3 -- gray player -- AI Script
+//============================================================================
+globals
+    player user = Player(0)
+endglobals
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(HOUSE,null)
+	call SetReplacements(1,1,3)
+
+    call SetBuildUnit( 8, PEASANT       )
+
+	call CampaignDefenderEx( 1,1,1, RIFLEMAN	)	
+	call CampaignDefenderEx( 1,1,1, MORTAR		)
+	
+	call WaitForSignal()
+
+	// *** WAVE 1 ***
+	call InitAssaultGroup()
+    call CampaignAttackerEx( 4,4,5, RIFLEMAN	)
+	call CampaignAttackerEx( 1,1,2, MORTAR		)
+    call SuicideOnPlayer(0,user)
+
+	call SetBuildUpgrEx( 0,0,1, UPG_LEATHER		)
+	call SetBuildUpgrEx( 0,0,1, UPG_RANGED		)
+	call SetBuildUpgrEx( 0,0,2, UPG_MASONRY		)
+	call SetBuildUpgrEx( 1,1,1, UPG_DEFEND		)
+	call SetBuildUpgrEx( 0,0,1, UPG_GUN_RANGE	)
+
+	// *** WAVE 2 ***
+	call InitAssaultGroup()
+    call CampaignAttackerEx( 4,4,6, RIFLEMAN	)
+	call CampaignAttackerEx( 1,1,1, MTN_KING 	)
+    call SuicideOnPlayerEx(M8,M8,M8,user)
+
+	// *** WAVE 3 ***
+	call InitAssaultGroup()
+    call CampaignAttackerEx( 5,5,6, RIFLEMAN	)
+	call CampaignAttackerEx( 2,2,3, MORTAR		)
+    call SuicideOnPlayerEx(M8,M8,M8,user)
+
+	call SetBuildUpgrEx( 1,1,2, UPG_LEATHER		)
+	call SetBuildUpgrEx( 1,1,2, UPG_RANGED		)
+	call SetBuildUpgrEx( 1,1,1, UPG_GUN_RANGE	)
+
+	loop
+		// *** WAVE 4 ***
+		call InitAssaultGroup()
+		call CampaignAttackerEx( 5,5,6, RIFLEMAN	)
+		call CampaignAttackerEx( 1,1,2, MORTAR		)
+		call CampaignAttackerEx( 1,1,1, MTN_KING 	)
+		call SuicideOnPlayerEx(M8,M8,M8,user)
+
+		// *** WAVE 5 ***
+		call InitAssaultGroup()
+		call CampaignAttackerEx( 6,6,6, RIFLEMAN	)
+		call CampaignAttackerEx( 2,2,3, MORTAR		)
+		call SuicideOnPlayerEx(M8,M8,M8,user)
+
+	endloop
+endfunction

@@ -1,0 +1,19 @@
+//============================================================================
+//  $Id: u04x10.ai,v 1.1 2003/04/30 00:51:27 dhale Exp $
+//============================================================================
+globals
+    player user = PlayerEx(4)
+endglobals
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(HOUSE,null)
+    call SetReplacements(1,1,3)
+
+    call CampaignDefenderEx( 1,1,2, HIGH_SWORDMAN   )
+
+    call SleepForever()
+
+endfunction
+

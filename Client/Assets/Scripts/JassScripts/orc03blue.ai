@@ -1,0 +1,51 @@
+//============================================================================
+//  Orc 3 -- blue player -- AI Script
+//============================================================================
+
+function heroes takes nothing returns integer
+    local integer level = GetHeroLevelAI()
+
+    if level == 2 or level == 6 or level == 9 then
+        return 'AHwe' // elemental
+    endif
+
+    if level == 3 or level == 5 or level == 8 then
+        return 'AHbz' // blizzard
+    endif
+
+    if level == 7 then
+        return 'AHmt' // mass teleport
+    endif
+
+    return 'AHab' // brilliance aura
+endfunction
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(function heroes)
+
+    call SetBuildUnit( 1, PEASANT       )
+    call SetBuildUnit( 1, TOWN_HALL     )
+    call SetBuildUnit( 1, KEEP          )
+    call SetBuildUnit( 1, HUMAN_ALTAR   )
+    call SetBuildUnit( 1, ARCHMAGE      )
+    call SetBuildUnit( 1, BARRACKS      )
+    call SetBuildUnit( 2, FOOTMEN       )
+    call SetBuildUnit( 1, BLACKSMITH    )
+    call SetBuildUnit( 2, RIFLEMEN      )
+    call SetBuildUnit( 1, CHURCH        )
+    call SetBuildUnit( 1, PRIEST        )
+    call SetBuildUnit( 3, PEASANT       )
+
+    call SetAssaultGroup( 1, 1, ARCHMAGE    )
+    call SetAssaultGroup( 2, 2, FOOTMEN     )
+    call SetAssaultGroup( 2, 2, RIFLEMEN    )
+    call SetAssaultGroup( 1, 1, PRIEST      )
+
+    call SuicideOnPlayer(1*60,Player(0))
+    loop
+        call SuicideOnPlayer(9*60,Player(0))
+    endloop
+endfunction

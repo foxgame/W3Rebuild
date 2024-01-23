@@ -1,0 +1,20 @@
+function PreloadFiles takes nothing returns nothing
+
+	call Preload( "buildings\\other\\GoldMine\\GoldMine.mdx" )
+	call Preload( "Textures\\Goldmine.blp" )
+	call Preload( "Textures\\Chest.blp" )
+	call Preload( "Textures\\Dust3.blp" )
+	call Preload( "Textures\\Base.blp" )
+	call Preload( "ReplaceableTextures\\Splats\\GoldmineUberSplat.blp" )
+	call Preload( "Textures\\star5tga.blp" )
+	call Preload( "units\\human\\Knight\\Knight.mdx" )
+	call Preload( "Textures\\Dust3x.blp" )
+	call Preload( "Textures\\Knight.blp" )
+	call Preload( "units\\human\\Knight\\Knight_portrait.mdx" )
+	call Preload( "units\\nightelf\\Furion\\Furion_portrait.mdx" )
+	call Preload( "units\\NightElf\\Furion\\Furion.blp" )
+	call PreloadEnd( 1.0 )
+
+endfunction
+
+

@@ -1,0 +1,19 @@
+//============================================================================
+//  $Id: u04x02.ai,v 1.9 2003/04/29 23:06:48 rpardo Exp $
+//============================================================================
+globals
+    player user = PlayerEx(4)
+endglobals
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(HOUSE,null)
+    call SetReplacements(1,1,3)
+
+    call CampaignDefenderEx( 1,1,2, HIGH_SWORDMAN   )
+
+    call SleepForever()
+
+endfunction
+

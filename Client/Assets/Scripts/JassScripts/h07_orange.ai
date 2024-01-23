@@ -1,0 +1,33 @@
+//============================================================================
+//  Human 07 -- orange player -- AI Script
+//============================================================================
+
+globals
+    player attacked = Player(8)
+endglobals
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(ZIGGURAT_1,null)
+
+    call SetBuildUnit( 1, ACOLYTE			)
+    call SetBuildUnit( 1, NECROPOLIS_1		)
+    call SetBuildUnit( 1, CRYPT				)
+    call SetBuildUnit( 1, GRAVEYARD         )
+	call SetBuildUnit( 2, CRYPT				)
+
+    call CampaignDefender( EASY, 2, CRYPT_FIEND )
+    call CampaignDefender( EASY, 2, GHOUL       )
+
+    call WaitForSignal()
+  
+        
+    //*** WAVE 1,2,3.... ***
+    call CampaignAttacker( EASY,    3, GHOUL	     )
+	call CampaignAttacker( EASY,    1, PIT_FIEND     )
+    call SuicideOnPlayer(0,attacked)
+    call ForeverSuicideOnPlayer(3*60,attacked)
+
+endfunction

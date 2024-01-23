@@ -1,0 +1,38 @@
+//============================================================================
+//  Night Elf 08 -- Blue player -- AI Script
+//============================================================================
+globals
+    player user = Player(8)
+endglobals
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+
+    call CampaignAI(HOUSE,null)
+
+    call SetBuildUnit( 1, TOWN_HALL     )
+    call SetBuildUnit( 2, PEASANT       )
+    call SetBuildUnit( 2, BARRACKS      )
+    call SetBuildUnit( 1, HUMAN_ALTAR   )
+	call SetBuildUnit( 1, LUMBER_MILL   )
+    call SetBuildUnit( 1, BLACKSMITH    )
+    call SetBuildUnit( 7, PEASANT       )
+	call SetBuildUnit( 10, HOUSE		)
+    call SetBuildUnit( 1, WORKSHOP      )
+    call SetBuildUnit( 1, KEEP          )
+	call SetBuildUnit( 3, GUARD_TOWER	)
+    call SetBuildUnit( 1, SANCTUM       )
+	call SetBuildUnit( 5, HOUSE	    	)
+	call SetBuildUnit( 1, CASTLE        )
+		
+    
+    call CampaignDefender (EASY, 4, FOOTMAN     )
+	call CampaignDefender (EASY, 1, KNIGHT      )
+    call CampaignDefender (EASY, 2, RIFLEMAN    )
+	call CampaignDefender (EASY, 1, COPTER		)
+	call CampaignDefender (EASY, 1, JAINA       )
+
+
+endfunction

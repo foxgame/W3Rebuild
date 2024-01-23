@@ -1,0 +1,106 @@
+//============================================================================
+//  Night Elf 03 -- blue player -- AI Script
+//============================================================================
+globals
+    player user = Player(1)
+endglobals
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(BURROW,null)
+	call SetReplacements(1,2,4)
+
+    call SetBuildUnit	( 1, PEON					)
+    call SetBuildUnitEx	( 0,0,1, GREAT_HALL			)
+    call SetBuildUnit	( 7, PEON					)	
+    call SetBuildUnitEx	( 0,0,1, ORC_BARRACKS		)
+    call SetBuildUnitEx	( 0,0,1, FORGE				)
+    call SetBuildUnitEx	( 0,0,1, STRONGHOLD			)
+    call SetBuildUnitEx	( 0,0,1, ORC_ALTAR			)
+    call SetBuildUnitEx	( 0,0,1, LODGE				)
+    call SetBuildUnitEx	( 0,0,1, BESTIARY			)
+	call SetBuildUnitEx	( 0,0,1, FORTRESS			)
+
+	call CampaignDefenderEx( 1,1,1, GRUNT			)
+    call CampaignDefenderEx( 0,0,1, HEAD_HUNTER		)
+	call CampaignDefenderEx( 1,1,1, SHAMAN			)
+	call CampaignDefenderEx( 1,1,1, WITCH_DOCTOR	)
+    call CampaignDefenderEx( 0,0,1, BLADE_MASTER	)
+
+	call SetBuildUpgrEx( 0,0,1, UPG_ORC_RANGED		)
+	call SetBuildUpgrEx( 0,0,1, UPG_ORC_MELEE		)
+	call SetBuildUpgrEx( 0,0,1, UPG_ORC_SPIKES		)
+	call SetBuildUpgrEx( 0,0,1, UPG_ORC_ARMOR		)
+	call SetBuildUpgrEx( 0,0,1, UPG_ORC_SHAMAN		)
+	call SetBuildUpgrEx( 0,0,1, UPG_ORC_DOCS		)
+	call SetBuildUpgrEx( 0,0,1, UPG_ORC_REGEN		)
+
+	call WaitForSignal()
+
+    //*** WAVE 1 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 3,3,4, GRUNT			)
+    call SuicideOnPlayerEx(M4,M4,M4,user)
+
+    //*** WAVE 2 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 3,3,4, GRUNT			)
+    call CampaignAttackerEx( 2,2,3, SHAMAN			)   
+    call SuicideOnPlayerEx(M4,M4,M4,user)
+
+	call SetBuildUpgrEx( 1,1,2, UPG_ORC_SHAMAN		)
+	call SetBuildUpgrEx( 1,1,2, UPG_ORC_RANGED		)
+	call SetBuildUpgrEx( 1,1,2, UPG_ORC_MELEE		)
+	call SetBuildUpgrEx( 1,1,2, UPG_ORC_SPIKES		)
+
+    //*** WAVE 3 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 3,3,4, GRUNT			)
+    call CampaignAttackerEx( 2,2,3, WITCH_DOCTOR	)
+	call CampaignAttackerEx( 1,1,1, BLADE_MASTER	)
+    call SuicideOnPlayerEx(M4,M4,M4,user)
+
+	call SetBuildUpgrEx( 1,1,2, UPG_ORC_DOCS		)
+	call SetBuildUpgrEx( 1,1,2, UPG_ORC_ARMOR		)
+
+    //*** WAVE 4 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 2,2,2, GRUNT			)
+    call CampaignAttackerEx( 2,2,2, HEAD_HUNTER		)
+    call CampaignAttackerEx( 2,2,3, SHAMAN			)
+    call CampaignAttackerEx( 1,1,2, CATAPULT		)
+    call SuicideOnPlayerEx(M4,M4,M4,user)
+
+	call SetBuildUpgrEx( 2,2,2, UPG_ORC_SHAMAN		)
+	call SetBuildUpgrEx( 2,2,2, UPG_ORC_DOCS		)
+
+	loop
+		//*** WAVE 5 ***
+		call InitAssaultGroup()
+		call CampaignAttackerEx( 3,3,3, GRUNT			)
+		call CampaignAttackerEx( 2,2,2, HEAD_HUNTER		)
+		call CampaignAttackerEx( 2,2,3, WITCH_DOCTOR	)
+		call CampaignAttackerEx( 1,1,1, BLADE_MASTER	)
+		call SuicideOnPlayerEx(M4,M4,M4,user)
+
+		//*** WAVE 6 ***
+		call InitAssaultGroup()
+		call CampaignAttackerEx( 5,5,6, GRUNT			)
+		call CampaignAttackerEx( 2,2,2, HEAD_HUNTER		)
+		call CampaignAttackerEx( 2,2,3, SHAMAN			)
+		call CampaignAttackerEx( 0,0,1, CATAPULT		)
+		call SuicideOnPlayerEx(M4,M4,M4,user)
+
+		//*** WAVE 7 ***
+		call InitAssaultGroup()
+		call CampaignAttackerEx( 2,2,4, GRUNT			)
+		call CampaignAttackerEx( 2,2,2, HEAD_HUNTER		)
+		call CampaignAttackerEx( 2,2,3, SHAMAN			)
+		call CampaignAttackerEx( 2,2,3, WITCH_DOCTOR	)
+		call CampaignAttackerEx( 1,1,1, BLADE_MASTER	)
+		call SuicideOnPlayerEx(M4,M4,M4,user)
+
+	endloop
+endfunction

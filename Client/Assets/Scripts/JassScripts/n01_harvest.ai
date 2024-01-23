@@ -1,0 +1,8 @@
+//============================================================================
+//  Night Elf 01 -- lumber harvesting only -- AI Script
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(HOUSE,null)
+    set campaign_wood_peons = 6
+    call SleepForever()
+endfunction

@@ -1,0 +1,7 @@
+//============================================================================
+//  Orc 8 -- green player -- AI Script
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(BURROW,null)
+    call SuicideUnits( INFERNAL, 0, 0, 0, 0, 0, 0, 0, 0, 0 )
+endfunction

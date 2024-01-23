@@ -1,0 +1,84 @@
+//============================================================================
+//  Night Elf 08 -- yellow player -- AI Script
+//============================================================================
+
+globals
+	//integer wave_delay = 2*60
+	player user = Player(0)
+endglobals
+
+function set_cheats takes nothing returns nothing
+    call Cheat("warnings")
+    call Cheat("viewres")
+    call Cheat("av")
+    call Cheat("dg")
+endfunction
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    debug call set_cheats()
+
+    call CampaignAI(ZIGGURAT_1,null)
+
+    call SetBuildUnit( 1, ACOLYTE			)
+    call SetBuildUnit( 1, UNDEAD_MINE		)
+	call SetBuildUnit( 1, NECROPOLIS_1		)
+    call SetBuildUnit( 6, ACOLYTE			)
+	call SetBuildUnit( 1, CRYPT				)
+	call SetBuildUnit( 1, GRAVEYARD			)
+	call SetBuildUnit( 3, ZIGGURAT_1  		)
+	call SetBuildUnit( 3, ZIGGURAT_2		)
+	call SetBuildUnit( 1, UNDEAD_ALTAR		)
+	call SetBuildUnit( 1, SAC_PIT			)
+	call SetBuildUnit( 2, CRYPT				)
+    call SetBuildUnit( 1, DAMNED_TEMPLE		)
+	call SetBuildUnit( 1, SLAUGHTERHOUSE	)
+	call SetBuildUnit( 7, ZIGGURAT_1  		)
+    call SetBuildUnit( 7, ZIGGURAT_2		)
+    call SetBuildUnit( 1, NECROPOLIS_2		)
+	call SetBuildUnit( 1, NECROPOLIS_3		)
+
+
+
+	call WaitForSignal()
+
+
+    //*** WAVE 1 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY,    6, GHOUL         )
+    call SuicideOnPlayer(0,user)
+
+    //*** WAVE 2 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY,    6, GHOUL         )
+    call CampaignAttacker( EASY,    1, NECRO         )
+    call SuicideOnPlayer(3*60,user)
+
+    //*** WAVE 3 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY,    8, GHOUL         )
+    call CampaignAttacker( EASY,    2, NECRO         )
+    call SuicideOnPlayer(3*60,user)
+
+    //*** WAVE 4 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY,    8, GHOUL         )
+    call CampaignAttacker( EASY,    2, NECRO         )
+    call CampaignAttacker( EASY,    1, MEAT_WAGON    )
+    call SuicideOnPlayer(3*60,user)
+
+    //*** WAVE 5 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY,    8, GHOUL         )
+    call CampaignAttacker( EASY,    2, NECRO         )
+    call CampaignAttacker( EASY,    2, MEAT_WAGON    )
+    call SuicideOnPlayer(2*60,user)
+
+
+	// repeat previous wave over and over until mission ends
+	call ForeverSuicideOnPlayer(2*60,user)
+	
+
+endfunction

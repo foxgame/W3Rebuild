@@ -1,0 +1,80 @@
+//==================================================================================================
+//  $Id: u08x08.ai,v 1.5.2.3 2003/05/12 19:54:27 mheiberg Exp $
+//==================================================================================================
+globals
+    constant integer SET_X = 1
+    constant integer SET_Y = 2
+endglobals
+
+//--------------------------------------------------------------------------------------------------
+//  get_coords
+//--------------------------------------------------------------------------------------------------
+function get_coords takes nothing returns nothing
+
+    local integer x = -1
+    local integer y = -1
+
+    local integer cmd
+    local integer data
+
+    loop
+        loop
+            exitwhen CommandsWaiting() > 0
+            call Sleep(0.1)
+        endloop
+        set cmd  = GetLastCommand()
+        set data = GetLastData()
+        call PopLastCommand()
+
+        //------------------------------------------------------------------------------------------
+        if cmd == SET_X then
+        //------------------------------------------------------------------------------------------
+            set x = data
+
+        //------------------------------------------------------------------------------------------
+        elseif cmd == SET_Y then
+        //------------------------------------------------------------------------------------------
+            set y = data
+
+        endif
+        exitwhen x != -1 and y != -1
+    endloop
+
+    call ShiftTownSpot(R2I(GetStartLocationX(GetPlayerStartLocation(ai_player))), R2I(GetStartLocationY(GetPlayerStartLocation(ai_player))))
+    call SetCaptainHome(BOTH_CAPTAINS,x,y)
+    call TeleportCaptain(x,y)
+endfunction
+
+//--------------------------------------------------------------------------------------------------
+//  main
+//--------------------------------------------------------------------------------------------------
+function main takes nothing returns nothing
+
+    call CampaignAI(NAGA_CORAL,null)
+    call SetPeonsRepair(true)
+    call get_coords()
+
+    call SetBuildUnitEx( 1,1,1, NAGA_CORAL      )
+    call SetBuildUnitEx( 1,1,1, NAGA_SPAWNING   )
+    call SetBuildUnitEx( 1,1,1, NAGA_SHRINE     )
+    call SetBuildUnitEx( 2,2,2, NAGA_CORAL      )
+    call SetBuildUnitEx( 3,3,3, NAGA_GUARDIAN   )
+
+    call AddGuardPost( NAGA_COUATL,         2485, -1088 )
+    call AddGuardPost( NAGA_COUATL,         2502, -1311 )
+    call AddGuardPost( NAGA_SIREN,          2755,  -875 )
+    call AddGuardPost( NAGA_SNAP_DRAGON,    2746, -1173 )
+
+    call CampaignDefenderEx( 1,1,1, NAGA_MYRMIDON       )
+    call CampaignDefenderEx( 1,1,1, NAGA_SIREN          )
+    call CampaignDefenderEx( 2,2,2, NAGA_SNAP_DRAGON    )
+    call CampaignDefenderEx( 3,3,3, NAGA_COUATL         )
+    call CampaignDefenderEx( 1,1,1, NAGA_ROYAL          )
+
+    call SetBuildUpgrEx( 1,1,1, UPG_SIREN           )
+    call SetBuildUpgrEx( 1,1,1, UPG_NAGA_ENSNARE    )
+    call SetBuildUpgrEx( 1,1,1, UPG_NAGA_ABOLISH    )
+    call SetBuildUpgrEx( 2,2,2, UPG_SIREN           )
+
+    call SleepForever()
+endfunction

@@ -1,0 +1,87 @@
+//============================================================================
+//  Undead 06 -- orange player -- AI Script
+//============================================================================
+globals
+	player user = Player(3)
+endglobals
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(PIG_FARM,null)
+	call SetReplacements(1,1,3)
+
+    call SetBuildUnitEx	( 0,0,1, GREAT_HALL			)
+	call SetBuildUnit	( 1, PEON					)
+    call SetBuildUnitEx	( 0,0,1, ORC_BARRACKS		)
+	call SetBuildUnit	( 8, PEON				    )
+
+    call CampaignDefenderEx( 1,1,2, RAIDER          )
+    call CampaignDefenderEx( 1,1,1, W2_WARLOCK      )
+	call CampaignDefenderEx( 0,1,1, HEAD_HUNTER     )
+
+    call WaitForSignal()
+
+    //*** WAVE 1 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 2,2,3, GRUNT            )
+	call CampaignAttackerEx( 1,1,2, HEAD_HUNTER      )
+    call CampaignAttackerEx( 1,1,2, W2_WARLOCK       )
+    call SuicideOnPlayerEx(M2,M2,M1,user)
+
+	call SetBuildUpgrEx( 0,0,1, UPG_ORC_RANGED		)
+	call SetBuildUpgrEx( 0,0,1, UPG_ORC_MELEE		)
+	call SetBuildUpgrEx( 0,0,1, UPG_ORC_SPIKES		)
+
+    //*** WAVE 2 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 2,2,4, GRUNT            )
+	call CampaignAttackerEx( 2,2,2, RAIDER           )
+    call CampaignAttackerEx( 1,1,2, W2_WARLOCK       )
+	call CampaignAttackerEx( 0,0,1, CATAPULT         )
+    call SuicideOnPlayerEx(M10,M10,M7,user)
+
+	call SetBuildUpgrEx( 0,0,1, UPG_ORC_ARMOR		)
+	call SetBuildUpgrEx( 1,1,1, UPG_ORC_ENSNARE		)
+
+	//*** WAVE 3 ***
+	call InitAssaultGroup()
+	call CampaignAttackerEx( 2,2,4, GRUNT           )
+	call CampaignAttackerEx( 1,1,2, W2_WARLOCK      )
+	call CampaignAttackerEx( 2,2,2, HEAD_HUNTER		)
+	call CampaignAttackerEx( 1,1,2, CATAPULT        )
+	call SuicideOnPlayerEx(M10,M10,M7,user)
+
+	call SetBuildUpgrEx( 1,1,2, UPG_ORC_RANGED		)
+	call SetBuildUpgrEx( 1,1,2, UPG_ORC_MELEE		)
+
+	//*** WAVE 4 ***
+	call InitAssaultGroup()
+	call CampaignAttackerEx( 2,2,4, RAIDER          )
+	call CampaignAttackerEx( 2,2,3, W2_WARLOCK      )
+	call CampaignAttackerEx( 2,2,2, HEAD_HUNTER		)
+	call CampaignAttackerEx( 0,0,1, CATAPULT        )
+	call SuicideOnPlayerEx(M10,M10,M7,user)
+
+	call SetBuildUpgrEx( 1,1,2, UPG_ORC_ARMOR		)
+	call SetBuildUpgrEx( 1,1,2, UPG_ORC_SPIKES		)
+
+    loop
+		//*** WAVE 5+ ***
+		call InitAssaultGroup()
+		call CampaignAttackerEx( 2,2,4, GRUNT           )
+		call CampaignAttackerEx( 1,1,2, W2_WARLOCK      )
+		call CampaignAttackerEx( 2,2,2, HEAD_HUNTER		)
+		call CampaignAttackerEx( 1,1,2, CATAPULT        )
+		call SuicideOnPlayerEx(M10,M10,M7,user)
+
+		//*** WAVE 6+ ***
+		call InitAssaultGroup()
+		call CampaignAttackerEx( 2,2,4, RAIDER          )
+		call CampaignAttackerEx( 2,2,3, W2_WARLOCK      )
+		call CampaignAttackerEx( 2,2,2, HEAD_HUNTER		)
+		call CampaignAttackerEx( 0,0,1, CATAPULT        )
+		call SuicideOnPlayerEx(M10,M10,M7,user)
+    endloop
+endfunction

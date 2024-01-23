@@ -1,0 +1,113 @@
+//============================================================================
+//  $Id: h01x05.ai,v 1.8 2003/04/29 00:26:32 rpardo Exp $
+//============================================================================
+globals
+    player user = PlayerEx(1)
+endglobals
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(ZIGGURAT_1,null)
+	call SetReplacements(2,2,3)
+	set campaign_wood_peons = 2
+
+    call SetBuildUnitEx( 1, 1, 1, ACOLYTE           )
+    call SetBuildUnitEx( 0, 0, 1, NECROPOLIS_1      )
+    call SetBuildUnitEx( 0, 0, 1, CRYPT             )
+    call SetBuildUnitEx( 0, 0, 5, ZIGGURAT_1        )
+    call SetBuildUnitEx( 0, 0, 1, GRAVEYARD         )
+    call SetBuildUnitEx( 0, 0, 1, UNDEAD_ALTAR      )
+    call SetBuildUnitEx( 0, 0, 1, NECROPOLIS_2      )
+	call SetBuildUnitEx( 0, 0, 1, DAMNED_TEMPLE     )
+    call SetBuildUnitEx( 0, 0, 4, ZIGGURAT_2        )
+	call SetBuildUnitEx( 2, 2, 2, UNDEAD_BARGE      )
+    call SetBuildUnitEx( 5, 5, 5, ACOLYTE           )
+
+    call CampaignDefenderEx( 1, 1, 1, GHOUL			)
+	call CampaignDefenderEx( 1, 1, 1, BANSHEE		)
+	call CampaignDefenderEx( 1, 1, 1, NECRO			)
+
+	call SetBuildUpgrEx( 1,1,1, UPG_FIEND_WEB	)
+	call SetBuildUpgrEx( 0,0,1, UPG_NECROS		)
+    call SetBuildUpgrEx( 0,0,1, UPG_BANSHEE		)
+	call SetBuildUpgrEx( 1,1,1, UPG_SKEL_LIFE	)
+
+	call WaitForSignal()
+
+    //*** WAVE 1 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 2,2,4,	GHOUL		)
+	call CampaignAttackerEx( 2,2,4,	BANSHEE		)
+    call SuicideOnPlayerEx(M3,M3,M2,user)
+
+	call SetBuildUpgrEx( 0,0,1, UPG_UNHOLY_STR  )
+	call SetBuildUpgrEx( 0,1,1, UPG_CR_ATTACK   )
+
+    //*** WAVE 2 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 3,3,4,	CRYPT_FIEND	)
+	call CampaignAttackerEx( 2,2,4,	NECRO		)
+    call SuicideOnPlayerEx(M5,M5,M3,user)
+
+	call SetBuildUpgrEx( 0,0,1, UPG_UNHOLY_ARMOR)
+    call SetBuildUpgrEx( 0,0,1, UPG_CR_ARMOR	)
+	call SetBuildUpgrEx( 1,1,1, UPG_NECROS		)
+    call SetBuildUpgrEx( 1,1,1, UPG_BANSHEE		)
+
+    //*** WAVE 3 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 3,3,5,	GHOUL		)
+	call CampaignAttackerEx( 3,3,5,	BANSHEE		)
+    call SuicideOnPlayerEx(M5,M5,M3,user)
+	
+    //*** WAVE 4 ***
+    call InitAssaultGroup()
+	call CampaignAttackerEx( 3,3,5,	GHOUL		)
+    call CampaignAttackerEx( 2,2,4,	CRYPT_FIEND	)
+	call CampaignAttackerEx( 1,1,2,	BANSHEE		)
+    call SuicideOnPlayerEx(M5,M5,M3,user)
+
+	call SetBuildUpgrEx( 1,1,2, UPG_UNHOLY_STR  )
+    call SetBuildUpgrEx( 1,1,2, UPG_CR_ATTACK   )
+
+    //*** WAVE 5 ***
+    call InitAssaultGroup()
+	call CampaignAttackerEx( 4,4,5,	GHOUL		)
+    call CampaignAttackerEx( 1,1,2,	MEAT_WAGON	)
+	call CampaignAttackerEx( 2,2,3,	NECRO		)
+    call SuicideOnPlayerEx(M5,M5,M3,user)
+
+	call SetBuildUpgrEx( 1,1,2, UPG_UNHOLY_ARMOR)
+    call SetBuildUpgrEx( 1,1,2, UPG_CR_ARMOR    )
+
+    //*** WAVE 6 ***
+    call InitAssaultGroup()
+	call CampaignAttackerEx( 5,5,7,	GHOUL		)
+	call CampaignAttackerEx( 3,3,4,	BANSHEE		)
+    call SuicideOnPlayerEx(M5,M5,M3,user)
+
+    //*** WAVE 7+ ***
+    loop
+        call InitAssaultGroup()
+		call CampaignAttackerEx( 3,3,5,	NECRO		)
+		call CampaignAttackerEx( 3,3,4,	CRYPT_FIEND	)
+		call CampaignAttackerEx( 1,1,2,	MEAT_WAGON	)
+        call SuicideOnPlayerEx(M5,M5,M3,user)
+
+        call InitAssaultGroup()
+		call CampaignAttackerEx( 5,5,7,	GHOUL		)
+		call CampaignAttackerEx( 3,3,4,	BANSHEE		)
+        call SuicideOnPlayerEx(M5,M5,M3,user)
+
+		call InitAssaultGroup()
+        call InitAssaultGroup()
+		call CampaignAttackerEx( 3,3,5,	GHOUL		)
+		call CampaignAttackerEx( 2,2,4,	CRYPT_FIEND	)
+		call CampaignAttackerEx( 2,2,3,	BANSHEE		)
+		call CampaignAttackerEx( 1,1,2,	NECRO		)
+        call SuicideOnPlayerEx(M5,M5,M3,user)
+    endloop
+endfunction
+

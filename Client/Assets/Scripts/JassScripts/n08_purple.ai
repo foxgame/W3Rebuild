@@ -1,0 +1,134 @@
+//============================================================================
+//  Night Elf 8 -- purple player -- AI Script
+//============================================================================
+globals
+    player user = Player(1)
+endglobals
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(ZIGGURAT_1,null)
+    call SetReplacements(2,2,4)
+
+	call SetCaptainHome(ATTACK_CAPTAIN,-2265,-4200	)
+	call SetCaptainHome(DEFENSE_CAPTAIN,-2453,-5875	)
+
+    set campaign_wood_peons = 2
+
+    call SetBuildUnit( 1, NECROPOLIS_1		)
+    call SetBuildUnit( 1, ACOLYTE			)
+    call SetBuildUnit( 1, UNDEAD_MINE		)
+    call SetBuildUnit( 1, GRAVEYARD			)
+    call SetBuildUnit( 8, ZIGGURAT_1		)
+	call SetBuildUnit( 3, CRYPT				)
+	call SetBuildUnit( 1, UNDEAD_ALTAR		)
+    call SetBuildUnit( 1, NECROPOLIS_2		)
+    call SetBuildUnit( 3, SLAUGHTERHOUSE	)
+    call SetBuildUnit( 2, DAMNED_TEMPLE		)
+    call SetBuildUnit( 1, NECROPOLIS_3		)
+	call SetBuildUnit( 1, BONEYARD			)
+    call SetBuildUnit( 5, ACOLYTE			)
+	call SetBuildUnit( 8, ZIGGURAT_2		)
+
+    call CampaignDefenderEx( 1,1,2, ABOMINATION	)
+    call CampaignDefenderEx( 1,1,1, NECRO		)
+    call CampaignDefenderEx( 2,2,2, GHOUL		)
+    call CampaignDefenderEx( 1,1,1, CRYPT_FIEND	)
+	call CampaignDefenderEx( 1,1,1, LICH		)
+	
+    call WaitForSignal()
+
+    //*** WAVE 1 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 4,4,6, GHOUL        )
+    call CampaignAttackerEx( 2,2,3, ABOMINATION  )
+    call CampaignAttackerEx( 2,2,3, NECRO        )
+    call SuicideOnPlayerEx(M2,M2,M1,user)
+
+    call SetBuildUpgrEx( 1,1,1, UPG_FIEND_WEB	)
+	call SetBuildUpgrEx( 1,1,1, UPG_CANNIBALIZE )
+    call SetBuildUpgrEx( 1,1,1, UPG_UNHOLY_STR  )
+	call SetBuildUpgrEx( 1,1,1, UPG_CR_ATTACK   )
+
+    //*** WAVE 2 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 2,2,4, GHOUL        )
+	call CampaignAttackerEx( 1,1,2, ABOMINATION  )
+    call CampaignAttackerEx( 2,2,4, CRYPT_FIEND  )
+	call CampaignAttackerEx( 1,1,2, MEAT_WAGON   )
+    call SuicideOnPlayerEx(M6,M6,M4,user)
+    
+    //*** WAVE 3 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 4,4,5, GHOUL		)
+	call CampaignAttackerEx( 2,2,3, ABOMINATION )
+    call CampaignAttackerEx( 1,1,2, NECRO       )
+	call CampaignAttackerEx( 1,1,2, BANSHEE		)
+    call CampaignAttackerEx( 1,1,1, LICH		)
+    call SuicideOnPlayerEx(M6,M6,M4,user)
+    
+    call SetBuildUpgrEx( 2,2,2, UPG_UNHOLY_STR  )
+	call SetBuildUpgrEx( 2,2,2, UPG_CR_ATTACK   )
+    call SetBuildUpgrEx( 1,1,1, UPG_SKEL_LIFE   )
+	call SetBuildUpgrEx( 1,1,1, UPG_WYRM_BREATH )
+
+    //*** WAVE 4 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 3,3,4, CRYPT_FIEND  )
+    call CampaignAttackerEx( 4,4,6, ABOMINATION  )
+    call CampaignAttackerEx( 2,2,4, MEAT_WAGON   )
+    call SuicideOnPlayerEx(M6,M6,M4,user)
+
+    call SetBuildUpgrEx( 1,1,1, UPG_PLAGUE      )
+    call SetBuildUpgrEx( 2,2,2, UPG_UNHOLY_ARMOR)
+	call SetBuildUpgrEx( 2,2,2, UPG_CR_ARMOR	)
+	call SetBuildUpgrEx( 2,2,2, UPG_NECROS      )
+	call SetBuildUpgrEx( 2,2,2, UPG_BANSHEE		)
+
+    //*** WAVE 5 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 3,3,5, ABOMINATION )
+    call CampaignAttackerEx( 4,4,6, NECRO		)
+	call CampaignAttackerEx( 1,1,1, LICH		)
+    call CampaignAttackerEx( 1,1,2, MEAT_WAGON  )
+    call SuicideOnPlayerEx(M6,M6,M4,user)
+
+    call SetBuildUpgrEx( 2,2,3, UPG_UNHOLY_STR  )
+	call SetBuildUpgrEx( 2,2,3, UPG_CR_ATTACK   )
+    call SetBuildUpgrEx( 1,1,1, UPG_GHOUL_FRENZY)
+
+    //*** WAVE 6 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 3,3,5, ABOMINATION )
+    call CampaignAttackerEx( 4,4,6, BANSHEE		)
+	call CampaignAttackerEx( 1,1,1, LICH		)
+    call CampaignAttackerEx( 1,1,2, MEAT_WAGON  )
+    call SuicideOnPlayerEx(M6,M6,M4,user)
+
+    call SetBuildUpgrEx( 2,2,3, UPG_UNHOLY_ARMOR)
+	call SetBuildUpgrEx( 2,2,3, UPG_CR_ARMOR	)
+	call SetBuildUpgrEx( 1,1,1, UPG_MEAT_WAGON	)
+
+    loop
+        //*** WAVE 7+ ***
+		call InitAssaultGroup()
+		call CampaignAttackerEx( 10,10,12, GHOUL	)
+		call CampaignAttackerEx( 2,2,3, ABOMINATION )
+		call CampaignAttackerEx( 2,2,3, NECRO		)
+		call CampaignAttackerEx( 1,1,1, LICH		)
+		call CampaignAttackerEx( 1,1,2, MEAT_WAGON  )
+        call SuicideOnPlayerEx(M6,M6,M4,user)
+
+		//*** WAVE 8+ ***
+		call InitAssaultGroup()
+		call CampaignAttackerEx( 3,3,5, ABOMINATION )
+		call CampaignAttackerEx( 3,3,4, CRYPT_FIEND  )
+		call CampaignAttackerEx( 4,4,6, BANSHEE		)
+		call CampaignAttackerEx( 1,1,1, LICH		)
+		call CampaignAttackerEx( 2,2,3, MEAT_WAGON  )
+        call SuicideOnPlayerEx(M6,M6,M4,user)
+
+    endloop
+endfunction

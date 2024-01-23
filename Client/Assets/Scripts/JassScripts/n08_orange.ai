@@ -1,0 +1,44 @@
+//============================================================================
+//  Night Elf 08 -- red player -- AI Script
+//============================================================================
+globals
+	player user = Player(1)
+endglobals
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+
+    call CampaignAI(BURROW,null)
+    call SetReplacements(6,6,9)
+
+	call CampaignDefenderEx( 2,2,3, DOOMGUARD	)
+
+	call WaitForSignal()
+
+    //*** WAVE 1 ***
+    call InitAssaultGroup()
+	call CampaignAttackerEx( 2,2,4, DOOMGUARD	)
+    call SuicideOnPlayerEx(M7,M7,M6,user)
+
+	//*** WAVE 2 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 6,6,8, FELLHOUND	)
+	call CampaignAttackerEx( 1,1,2, DOOMGUARD	)
+    call SuicideOnPlayerEx(M7,M7,M6,user)
+
+	loop
+        //*** WAVE 3+ ***
+		call InitAssaultGroup()
+		call CampaignAttackerEx( 3,3,4, DOOMGUARD	)
+		call CampaignAttackerEx( 2,2,3, FELLHOUND	)
+		call SuicideOnPlayerEx(M7,M7,M6,user)
+
+		//*** WAVE 4+ ***
+		call InitAssaultGroup()
+		call CampaignAttackerEx( 8,8,9, FELLHOUND	)
+		call CampaignAttackerEx( 1,1,2, DOOMGUARD	)
+		call SuicideOnPlayerEx(M7,M7,M6,user)
+	endloop
+endfunction

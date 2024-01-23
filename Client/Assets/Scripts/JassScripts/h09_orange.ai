@@ -1,0 +1,114 @@
+//============================================================================
+//  Human 09 -- orange player -- AI Script
+//============================================================================
+globals
+	player user = Player(2)
+    integer upg_level = 1
+endglobals
+
+//============================================================================
+//  upgrades
+//============================================================================
+function more_upgrades takes nothing returns nothing
+
+    if upg_level == 1 then
+        call SetBuildUpgr( 1, UPG_UNHOLY_STR    )
+        call SetBuildUpgr( 1, UPG_CANNIBALIZE   )
+
+    elseif upg_level == 2 then
+        call SetBuildUpgr( 1, UPG_CR_ATTACK     )
+
+    elseif upg_level == 3 then
+        call SetBuildUpgr( 1, UPG_FIEND_WEB     )
+        call SetBuildUpgr( 1, UPG_PLAGUE        )
+        call SetBuildUpgr( 1, UPG_UNHOLY_ARMOR  )
+        call SetBuildUpgr( 1, UPG_CR_ARMOR      )
+
+    elseif upg_level == 4 then
+        call SetBuildUpgr( 2, UPG_UNHOLY_STR    )
+        call SetBuildUpgr( 2, UPG_CR_ATTACK     )
+
+    elseif upg_level == 5 then
+        call SetBuildUpgr( 1, UPG_GHOUL_FRENZY  )
+    else
+        return
+    endif
+
+    set upg_level = upg_level + 1
+endfunction
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    debug call Cheat("control 5")
+    debug call Cheat("vision 5")
+
+    call CampaignAI(ZIGGURAT_1,null)
+
+    call SetBuildUnit( 1, ACOLYTE           )
+    call SetBuildUnit( 1, NECROPOLIS_1      )
+    call SetBuildUnit( 1, UNDEAD_MINE       )
+    call SetBuildUnit( 1, CRYPT				)
+    call SetBuildUnit( 1, GRAVEYARD         )
+    call SetBuildUnit( 1, NECROPOLIS_2      )
+    call SetBuildUnit( 2, CRYPT				)
+    call SetBuildUnit( 1, SLAUGHTERHOUSE    )
+    call SetBuildUnit( 1, NECROPOLIS_3      )
+    call SetBuildUnit( 5, ACOLYTE			)
+
+    call CampaignDefender( EASY, 2, GHOUL       )
+    call CampaignDefender( EASY, 2, ABOMINATION )
+    call CampaignDefender( EASY, 2, CRYPT_FIEND )
+
+    call WaitForSignal()
+
+    //*** WAVE 1 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY,    6, GHOUL        )
+    call CampaignAttacker( EASY,    2, ABOMINATION  )
+    call SuicideOnPlayer(0,user)
+
+    //*** WAVE 2 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY,    8, GHOUL        )
+    call CampaignAttacker( EASY,    4, CRYPT_FIEND  )
+    call SuicideOnPlayer(5*60,user)
+
+    call more_upgrades()
+
+    //*** WAVE 3 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY,    12, GHOUL       )
+    call CampaignAttacker( EASY,    3, ABOMINATION  )
+    call CampaignAttacker( EASY,    1, MEAT_WAGON   )
+    call SuicideOnPlayer(6*60,user)
+
+    call more_upgrades()
+
+    //*** WAVE 4 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY,    12, GHOUL       )
+    call CampaignAttacker( EASY,    4, CRYPT_FIEND  )
+    call SuicideOnPlayer(5*60,user)
+
+    call more_upgrades()
+
+    //*** WAVE 5,6+ ***
+    loop
+        call InitAssaultGroup()
+        call CampaignAttacker( EASY,    6, GHOUL        )
+        call CampaignAttacker( EASY,    4, ABOMINATION  )
+        call CampaignAttacker( EASY,    2, MEAT_WAGON   )
+        call SuicideOnPlayer(6*60,user)
+
+        call more_upgrades()
+
+        call InitAssaultGroup()
+        call CampaignAttacker( EASY,    6, ABOMINATION  )
+        call CampaignAttacker( EASY,    6, CRYPT_FIEND  )
+        call SuicideOnPlayer(5*60,user)
+
+        call more_upgrades()
+    endloop
+endfunction

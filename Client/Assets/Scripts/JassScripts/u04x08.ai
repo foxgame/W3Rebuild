@@ -1,0 +1,31 @@
+//============================================================================
+//  $Id: u04x08.ai,v 1.1.2.2 2003/05/10 10:19:22 abond Exp $
+//============================================================================
+globals
+// First Camp
+    constant integer NSPIDERLING    = 'nspd' // lvl 1
+    constant integer NWARRIOR       = 'nnwa' // lvl 3
+// Second Camp
+    constant integer NWEBSPIDERLING = 'n00I' // lvl 1
+	constant integer NSPIDER        = 'n00G' // lvl 5
+// Final Camp
+    constant integer NSPIDERLING02  = 'n00J' // lvl 1
+    constant integer NWARRIOR02     = 'n00K' // lvl 3
+
+    //constant integer NSEER          = 'nnwr' // lvl 5
+    //constant integer NLORD          = 'nnws' // lvl 7
+    //constant integer NQUEEN         = 'nnwq' // lvl 9
+    //constant integer NWEBSPINNER    = 'nnwl' // lvl 3
+	//constant integer NSEERHARD      = 'n00H' // lvl 8
+endglobals
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(HOUSE,null)
+    call SetReplacements(10,10,99)
+
+    call SleepForever()
+
+endfunction
+

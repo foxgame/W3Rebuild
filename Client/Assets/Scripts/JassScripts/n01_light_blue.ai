@@ -1,0 +1,59 @@
+//============================================================================
+//  Night Elf 01 -- light blue player -- AI Script
+//============================================================================
+globals
+    constant player user = Player(1)
+endglobals
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(ZIGGURAT_1,null)
+
+    set campaign_wood_peons = 99 // all idle peons get put on lumber
+
+    call SetBuildUnit( 4, PEASANT   )
+    call SetBuildUnit( 4, PEON      )
+
+    call CampaignDefender( EASY, 1, HIGH_FOOTMAN )
+
+    call WaitForSignal()
+
+    //*** WAVE 1 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY, 2, FOOTMEN     )
+    call SuicideOnPlayer(0,user)
+
+    //*** WAVE 2 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY, 1, GRUNT       )
+    call CampaignAttacker( EASY, 1, HEAD_HUNTER )
+    call SuicideOnPlayer(M3,user)
+
+    //*** WAVE 3 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY, 2, FOOTMEN     )
+    call CampaignAttacker( EASY, 1, RIFLEMAN    )
+    call SuicideOnPlayer(M6,user)
+
+    //*** WAVE 4 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY, 1, GRUNT       )
+    call CampaignAttacker( EASY, 2, HEAD_HUNTER )
+    call SuicideOnPlayer(M3,user)
+
+    loop
+        //*** WAVE 5+ ***
+        call InitAssaultGroup()
+        call CampaignAttacker( EASY, 3, FOOTMEN     )
+        call CampaignAttacker( EASY, 2, RIFLEMAN    )
+        call SuicideOnPlayer(M6,user)
+
+        //*** WAVE 6+ ***
+        call InitAssaultGroup()
+        call CampaignAttacker( EASY, 2, GRUNT       )
+        call CampaignAttacker( EASY, 1, HEAD_HUNTER )
+        call SuicideOnPlayer(M3,user)
+    endloop
+endfunction

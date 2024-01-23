@@ -1,0 +1,178 @@
+//============================================================================
+//  Night Elf 03 -- purple player -- AI Script
+//============================================================================
+globals
+    constant real MAIN_TOWN_X   = -4279
+    constant real MAIN_TOWN_Y   =  3057
+
+    constant real DEFENSE_X     = -3919
+    constant real DEFENSE_Y     =  1198
+
+    constant real FAILSAFE_X    = -2700
+    constant real FAILSAFE_Y    =    80
+
+    constant real GRAVEYARD_X   = -1979
+    constant real GRAVEYARD_Y   = -1037
+
+    constant integer MIN_GHOULS_NORMAL =  3
+	constant integer MIN_GHOULS_HARD   =  8
+    constant integer MAX_GHOULS_NORMAL = 10
+    constant integer MAX_GHOULS_HARD   = 15
+
+    boolean on_alert            = false
+    integer defcon              = 5
+    integer trees_alive         = 100
+    integer best_ghouls         = 0
+endglobals
+
+//============================================================================
+//  set_defcon
+//============================================================================
+function lower_defcon takes nothing returns nothing
+    set on_alert = true
+    set defcon = defcon - 1
+
+    debug call TraceI("DEFCON %d\n",defcon)
+
+    //--------------------------------------------------------------------
+    if defcon == 4 then
+    //--------------------------------------------------------------------
+        call AddGuardPost( NECRO,		-1800,  230 )
+		call CampaignDefenderEx( 1,1,2, NECRO       )
+
+    //--------------------------------------------------------------------
+    elseif defcon == 3 then
+    //--------------------------------------------------------------------
+        call AddGuardPost( GARGOYLE,	-2320,  725 )
+        call AddGuardPost( NECRO,       -2340,  325 )
+		
+		call CampaignDefenderEx( 1,1,1, CRYPT_FIEND )
+
+    //--------------------------------------------------------------------
+    elseif defcon == 2 then
+    //--------------------------------------------------------------------
+        call AddGuardPost( ABOMINATION, -2110,   70 )
+        call AddGuardPost( NECRO,       -2620,  480 )
+
+		call CampaignDefenderEx( 1,1,2, ABOMINATION )
+
+    //--------------------------------------------------------------------
+    else // defcon 1
+    //--------------------------------------------------------------------
+        call AddGuardPost( ABOMINATION, -2025,  570 )
+        call AddGuardPost( GARGOYLE,	-2450,  520 )
+        call AddGuardPost( CRYPT_FIEND, -2120,  290 )
+
+		call CampaignDefender( EASY, 1, TICHONDRIUS )
+
+        call SetCaptainHome(DEFENSE_CAPTAIN,FAILSAFE_X,FAILSAFE_Y)
+    endif
+endfunction
+
+//============================================================================
+//  set_wood_ghouls
+//============================================================================
+function set_wood_ghouls takes nothing returns nothing
+    local integer ghouls = GetUnitCount(GHOUL)
+
+    // detect lost ghouls to reinforce them with defenders
+    //
+    if not on_alert and defcon > 1 and ghouls < best_ghouls then
+        call lower_defcon()
+    endif
+
+    // detect when to stand down alert status
+    //
+    if on_alert and ghouls >= best_ghouls and not CaptainInCombat(false) then
+        set on_alert = false
+    endif
+
+    // save ghoul watermark
+    //
+    if ghouls > best_ghouls then
+        set best_ghouls = ghouls
+    endif
+
+    loop
+        exitwhen CommandsWaiting() == 0
+        set trees_alive = GetLastData()
+        call PopLastCommand()
+    endloop
+
+    if difficulty==HARD then
+        set campaign_wood_peons = MAX_GHOULS_HARD - ((MAX_GHOULS_HARD-MIN_GHOULS_HARD+1)*trees_alive)/100
+    else
+        set campaign_wood_peons = MAX_GHOULS_NORMAL - ((MAX_GHOULS_NORMAL-MIN_GHOULS_NORMAL+1)*trees_alive)/100
+    endif
+endfunction
+
+//============================================================================
+//  rebuild_town
+//============================================================================
+function rebuild_town takes nothing returns nothing
+    call InitBuildArray()
+
+    // revive Tichondrius as first priority
+    //
+    if GetUnitCountDone(UNDEAD_ALTAR)>0 then
+        call SetBuildUnit( 1, TICHONDRIUS   )
+    endif
+
+    call SetBuildUnit( 1, ACOLYTE           )
+
+    // meet all basic needs before allowing the graveyard
+    //
+    if TownCount(NECROPOLIS_1)==0 or GetUnitCount(UNDEAD_MINE)==0 or GetUnitCount(UNDEAD_ALTAR)==0  or GetUnitCount(CRYPT)==0 then
+        call ShiftTownSpot(MAIN_TOWN_X,MAIN_TOWN_Y)
+        call SetBuildUnit( 1, NECROPOLIS_1  )
+        call SetBuildUnit( 1, UNDEAD_MINE   )
+        call SetBuildUnit( 1, CRYPT         )
+        call SetBuildUnit( 1, UNDEAD_ALTAR  )
+        return
+    endif
+
+    // allow only the graveyard when the town spot is shifted to the trees
+    //
+    if GetUnitCount(GRAVEYARD)==0 then
+        call ShiftTownSpot(GRAVEYARD_X,GRAVEYARD_Y)
+        call SetBuildUnit( 1, GRAVEYARD     )
+        return
+    endif
+
+    call SetBuildUnit( campaign_wood_peons, GHOUL )
+
+    // build the rest of the town on the hill
+    //
+    call ShiftTownSpot(MAIN_TOWN_X,MAIN_TOWN_Y)
+    call SetBuildUnit( 8, ZIGGURAT_1        )
+    call SetBuildUnit( 2, CRYPT_FIEND       )
+    call SetBuildUnit( 1, NECROPOLIS_2      )
+    call SetBuildUnit( 1, DAMNED_TEMPLE     )
+    call SetBuildUnit( 2, NECRO             )
+    call SetBuildUnit( 1, SLAUGHTERHOUSE    )
+    call SetBuildUnit( 2, ABOMINATION       )
+    call SetBuildUnit( 8, ZIGGURAT_2        )
+    call SetBuildUnit( 1, NECROPOLIS_3      )
+    call SetBuildUnit( 5, ACOLYTE           )
+endfunction
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(ZIGGURAT_1,null)
+
+    call SetSlowChopping(false)
+    call SetPeonsRepair(true)
+    call SetReplacementCount(99)
+
+    call SetCaptainHome(DEFENSE_CAPTAIN,DEFENSE_X,DEFENSE_Y)
+
+    call CampaignDefenderEx( 1,1,1, CRYPT_FIEND )
+
+    loop
+        call rebuild_town()
+        call set_wood_ghouls()
+        call Sleep(2)
+    endloop
+endfunction

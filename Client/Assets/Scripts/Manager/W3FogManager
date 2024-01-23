@@ -1,0 +1,535 @@
+﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading;
+using Unity.Collections;
+
+public class W3FogManager : SingletonMono< W3FogManager >
+{
+
+    public class W3FogStart
+    {
+        public short startX;
+        public short startZ;
+        public float visionRange;
+        public float upVision;
+
+        public short rangeXMin;
+        public short rangeZMin;
+        public short rangeXMax;
+        public short rangeZMax;
+    }
+
+    public class W3FogChange
+    {
+        public int index;
+        public byte value;
+        public sbyte step;
+    }
+
+    List< W3FogChange > fogChange = new List< W3FogChange >();
+
+    Thread fovThread = null;
+    Thread fovThread1 = null;
+
+
+    public Texture2D shadowTex;
+    public Texture2D fogTex;
+
+    NativeArray<byte> raw;
+
+    public int fogWidth;
+    public int fogHeight;
+    public byte[] shadowBuffer;
+    public byte[] shadowBuffer1;
+
+    public byte[] fogPixelBuffer;
+    public byte[] fogBuffer;
+    public byte[] fogBufferBlur;
+
+    public byte[] fogBuffer1;
+    public byte[] fogBuffer2;
+    public float[] fogBufferOffset;
+
+    public bool fogThreadValue = false;
+
+    public bool isLoaded = false;
+
+    bool fogStart = false;
+    bool fogStartThread = false;
+    bool fogOverThread = false;
+
+
+    bool updateTexture2D = false;
+
+    int fogStartTime = 0;
+
+
+    int sleepTime = 0;
+
+    List< W3FogStart > fogStartList = new List< W3FogStart >();
+    Dictionary< int , int > fogDoodadID = new Dictionary< int , int >();
+
+    byte blurFog( int x , int z )
+    {
+        int blurRadius = 1;
+        int count = blurRadius * 2 + 1;
+        count *= count;
+
+        int a = 0;
+
+        for ( int i = -blurRadius ; i <= blurRadius ; i++ )
+        {
+            for ( int j = -blurRadius ; j <= blurRadius ; j++ )
+            {
+                a += fogBuffer[ ( z + i ) * fogWidth + ( x + j ) ];
+            }
+        }
+
+        return (byte)( a / count );
+    }
+
+    public void calculateFog()
+    {
+        fogStartThread = true;
+
+        Debug.Log( "fogStartThread " + fogStartThread );
+    }
+
+    public void readyCaulateFog()
+    {
+        fogOverThread = false;
+
+        fogStartList.Clear();
+
+        List<W3Unit> units = W3PlayerManager.instance.getLocalPlayer().units;
+
+        for ( int i = 0 ; i < units.Count ; i++ )
+        {
+            W3Unit unit = units[ i ];
+            Vector3 pos = unit.getPos();
+
+            //             if ( W3CameraMovement.instance.x1 < -pos.x / GameDefine.TERRAIN_SIZE_PER &&
+            //                 W3CameraMovement.instance.x2 > -pos.x / GameDefine.TERRAIN_SIZE_PER &&
+            //                  W3CameraMovement.instance.z1 < -pos.z / GameDefine.TERRAIN_SIZE_PER &&
+            //                 W3CameraMovement.instance.z2 > -pos.z / GameDefine.TERRAIN_SIZE_PER )
+            //             {
+            W3FogStart s = new W3FogStart();
+            s.startX = (short)( -pos.x / GameDefine.TERRAIN_SIZE_PER );
+            s.startZ = (short)( -pos.z / GameDefine.TERRAIN_SIZE_PER );
+            s.upVision = unit.upVision;
+            s.visionRange = unit.unitBalance.sight;
+
+            s.rangeXMin = (short)( s.startX - s.visionRange - 1 );
+            if ( s.rangeXMin < 0 )
+                s.rangeXMin = 0;
+            s.rangeZMin = (short)( s.startZ - s.visionRange - 1 );
+            if ( s.rangeZMin < 0 )
+                s.rangeZMin = 0;
+
+            s.rangeXMax = (short)( s.startX + s.visionRange + 1 );
+            if ( s.rangeXMax >= fogWidth )
+                s.rangeXMax = (short)( fogWidth - 1 );
+            s.rangeZMax = (short)( s.startZ + s.visionRange + 1 );
+            if ( s.rangeZMax >= fogHeight )
+                s.rangeZMax = (short)( fogHeight - 1 );
+
+            fogStartList.Add( s );
+//             }
+        }
+
+    }
+
+    public void calculateFogThread()
+    {
+        Debug.Log( "calculateFogThread" );
+
+        fogDoodadID.Clear();
+
+        // first copy pixel buffer
+        System.Array.Copy( fogPixelBuffer , fogBuffer , fogPixelBuffer.Length );
+
+        // calculate all units
+        for ( int i = 0 ; i < fogStartList.Count ; i++ )
+        {
+            W3FogStart s = fogStartList[ i ];
+
+            int startCoordinate = s.startZ * fogWidth + s.startX;
+            fogBuffer[ startCoordinate ] = 255;
+
+            float uv = W3MapManager.instance.smallNodes[ s.startZ ][ s.startX ].ym + s.upVision;
+
+            // Top Left
+            castLight( 1 , 1.0f , 0.0f , s.startX , s.startZ , 0 , 1 , -1 , 0 , s.visionRange , uv );
+            castLight( 1 , 1.0f , 0.0f , s.startX , s.startZ , 1 , 0 , 0 , -1 , s.visionRange , uv );
+
+            // Top right
+            castLight( 1 , 1.0f , 0.0f , s.startX , s.startZ , -1 , 0 , 0 , -1 , s.visionRange , uv );
+            castLight( 1 , 1.0f , 0.0f , s.startX , s.startZ , 0 , -1 , -1 , 0 , s.visionRange , uv );
+
+            // Bottom Right
+            castLight( 1 , 1.0f , 0.0f , s.startX , s.startZ , 0 , -1 , 1 , 0 , s.visionRange , uv );
+            castLight( 1 , 1.0f , 0.0f , s.startX , s.startZ , -1 , 0 , 0 , 1 , s.visionRange , uv );
+
+            // Bottom Left
+            castLight( 1 , 1.0f , 0.0f , s.startX , s.startZ , 1 , 0 , 0 , 1 , s.visionRange , uv );
+            castLight( 1 , 1.0f , 0.0f , s.startX , s.startZ , 0 , 1 , 1 , 0 , s.visionRange , uv );
+
+
+            for ( int i0 = s.rangeXMin ; i0 < s.rangeXMax ; i0++ )
+            {
+                for ( int j0 = s.rangeZMin ; j0 < s.rangeZMax ; j0++ )
+                {
+                    int index = j0 * fogWidth + i0;
+
+                    float r = GameMath.sqrt( i0 - s.startX , j0 - s.startZ );
+
+                    // update doodad
+                    if ( r < s.visionRange &&
+                        fogDoodadID.ContainsKey( W3MapManager.instance.smallNodes[ j0 ][ i0 ].doodadID ) )
+                    {
+                        byte a = 255;
+
+                        if ( a > fogBuffer[ index ] )
+                        {
+                            fogBuffer[ index ] = a;
+                        }
+                    }
+
+                    // explored, update pixel buffer
+                    if ( fogPixelBuffer[ index ] != 96 )
+                    {
+                        if ( r < s.visionRange )
+                        {
+                            byte a = (byte)( 96 - ( 96 - 32 ) / ( s.visionRange * 0.25f ) * ( r - s.visionRange * 0.75f ) );
+
+                            if ( r < s.visionRange * 0.75f )
+                            {
+                                a = 96;
+                            }
+
+                            if ( fogPixelBuffer[ index ] < a )
+                            {
+                                fogPixelBuffer[ index ] = a;
+                            }
+                        }
+                    }
+
+                }
+            }
+
+        }
+
+
+        // blur fog
+        for ( int i = 0 ; i < fogStartList.Count ; i++ )
+        {
+            W3FogStart s = fogStartList[ i ];
+
+            int idx = 0;
+            for ( int i0 = s.rangeXMin ; i0 < s.rangeXMax ; i0++ )
+            {
+                for ( int j0 = s.rangeZMin ; j0 < s.rangeZMax ; j0++ )
+                {
+                    fogBufferBlur[ idx ] = blurFog( i0 , j0 );
+                    idx++;
+                }
+            }
+
+            idx = 0;
+            for ( int i0 = s.rangeXMin ; i0 < s.rangeXMax ; i0++ )
+            {
+                for ( int j0 = s.rangeZMin ; j0 < s.rangeZMax ; j0++ )
+                {
+                    fogBuffer[ j0 * fogWidth + i0 ] = fogBufferBlur[ idx ];
+                    idx++;
+                }
+            }
+        }
+
+        // copy buffer
+        System.Array.Copy( fogBuffer2 , fogBuffer1 , fogBuffer1.Length );
+
+        for ( int i = 0 ; i < fogBufferOffset.Length ; i++ )
+        {
+            fogBufferOffset[ i ] = ( fogBuffer[ i ] - fogBuffer1[ i ] ) * 0.05f;
+        }
+
+
+//         fogStartTime = 0;
+// 
+//         System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();
+//         watch.Start();
+// 
+//         while ( fogStartTime < 21 )
+//         {
+//             if ( fogStartTime == 20 )
+//             {
+//                 for ( int i = 0 ; i < fogWidth * fogHeight ; i++ )
+//                 {
+//                     raw[ i ] = fogBuffer[ i ];
+//                 }
+// 
+//                 System.Array.Copy( fogBuffer , fogBuffer1 , fogBuffer1.Length );
+// 
+//                 updateTexture2D = true;
+//                 Debug.Log( "updateTexture2D " + updateTexture2D + " " + fogStartTime );
+// 
+//                 while ( updateTexture2D )
+//                 {
+//                     Thread.Sleep( 1 );
+//                 }
+//             }
+//             else
+//             {
+//                 for ( int i = 0 ; i < fogWidth * fogHeight ; i++ )
+//                 {
+//                     fogBuffer2[ i ] = (byte)( fogBuffer1[ i ] + fogStartTime * fogBufferOffset[ i ] );
+// 
+//                     raw[ i ] = fogBuffer2[ i ];
+//                 }
+// 
+//                 updateTexture2D = true;
+//                 Debug.Log( "updateTexture2D " + updateTexture2D + " " + fogStartTime );
+// 
+//                 while ( updateTexture2D )
+//                 {
+//                     Thread.Sleep( 1 );
+//                 }
+//             }
+// 
+//             Thread.Sleep( sleepTime );
+// 
+//             fogStartTime++;
+//         }
+// 
+//         watch.Stop();
+        fogOverThread = true;
+
+//        Debug.Log( "calculateFOVThread over " + watch.ElapsedMilliseconds );
+    }
+
+    void fogStartThread1()
+    {
+        fogStartTime++;
+
+        if ( fogStartTime > 20 )
+        {
+            fogStart = false;
+            fogStartTime = 0;
+        }
+        else
+        {
+            if ( fogStartTime == 20 )
+            {
+                for ( int i = 0 ; i < fogWidth * fogHeight ; i++ )
+                {
+                    raw[ i ] = fogBuffer[ i ];
+                }
+
+                System.Array.Copy( fogBuffer , fogBuffer1 , fogBuffer1.Length );
+
+                updateTexture2D = true;
+
+                while ( updateTexture2D )
+                {
+                    Thread.Sleep( 1 );
+                }
+            }
+            else
+            {
+
+                for ( int i = 0 ; i < fogWidth * fogHeight ; i++ )
+                {
+                    fogBuffer2[ i ] = (byte)( fogBuffer1[ i ] + fogStartTime * fogBufferOffset[ i ] );
+
+                    raw[ i ] = fogBuffer2[ i ];
+                }
+
+                updateTexture2D = true;
+
+                while ( updateTexture2D )
+                {
+                    Thread.Sleep( 1 );
+                }
+            }
+        }
+
+
+    }
+
+    private void castLight( int row , float start , float end , int startX , int startZ , int xx , int xz , int zx , int zz , float visionRange , float upVision )
+    {
+        float newStart = 0.0f;
+        if ( start < end )
+        {
+            return;
+        }
+
+        bool blocked = false;
+
+        for ( int distance = row ; distance <= visionRange && !blocked ; distance++ )
+        {
+            int deltaZ = -distance;
+            for ( int deltaX = -distance ; deltaX <= 0 ; deltaX++ )
+            {
+                int currentX = startX + deltaX * xx + deltaZ * xz;
+                int currentZ = startZ + deltaX * zx + deltaZ * zz;
+
+                int coordinate = Mathf.FloorToInt( currentZ ) * fogWidth + Mathf.FloorToInt( currentX );
+
+                float leftSlope = ( deltaX - 0.5f ) / ( deltaZ + 0.5f );
+                float rightSlope = ( deltaX + 0.5f ) / ( deltaZ - 0.5f );
+
+                if ( !( currentX >= 0 && currentZ >= 0 && currentX < fogWidth && currentZ < fogHeight ) || start < rightSlope )
+                {
+                    continue;
+                }
+                else if ( end > leftSlope )
+                {
+                    break;
+                }
+
+                float r = GameMath.sqrt( deltaX , deltaZ );
+
+                if ( r <= visionRange )
+                {
+                    if ( !W3MapManager.instance.isBlockUp( currentX , currentZ , upVision ) )
+                    {
+                        byte a = (byte)( 255 - ( 255 - 32 ) / ( visionRange * 0.25f ) * ( r - visionRange * 0.75f ) );
+
+                        if ( r < visionRange * 0.75f )
+                        {
+                            a = 255;
+                        }
+
+                        if ( a > fogBuffer[ coordinate ] )
+                        {
+                            fogBuffer[ coordinate ] = a;
+                        }
+                    }
+                }
+
+                if ( blocked )
+                {
+                    if ( W3MapManager.instance.smallNodes[ currentZ ][ currentX ].doodadID > 0 &&
+                        !fogDoodadID.ContainsKey( W3MapManager.instance.smallNodes[ currentZ ][ currentX ].doodadID ) )
+                    {
+                        fogDoodadID.Add( W3MapManager.instance.smallNodes[ currentZ ][ currentX ].doodadID , 1 );
+                    }
+
+                    if ( W3MapManager.instance.isBlockUp( currentX , currentZ , upVision ) )
+                    {
+                        newStart = rightSlope;
+                        continue;
+                    }
+                    else
+                    {
+                        blocked = false;
+                        start = newStart;
+                    }
+                }
+                else
+                {
+                    if ( W3MapManager.instance.isBlockUp( currentX , currentZ , upVision ) && distance < visionRange )
+                    {
+                        blocked = true;
+                        castLight( distance + 1 , start , leftSlope , startX , startZ , xx , xz , zx , zz , visionRange , upVision );
+                        newStart = rightSlope;
+                    }
+                }
+            }
+        }
+
+    }
+
+
+    public void FixedUpdate()
+    {
+        if ( !isLoaded )
+        {
+            return;
+        }
+
+        if ( updateTexture2D )
+        {
+            fogTex.Apply( false );
+            updateTexture2D = false;
+        }
+
+        if ( fogStartThread )
+        {
+            if ( fogOverThread )
+            {
+                // thread over
+                //                   Debug.Log( "thread over" );
+
+                fogOverThread = false;
+
+                fogStartThread = false;
+
+                fogStartTime = 0;
+                fogStart = true;
+            }
+            else if ( fovThread == null ||
+                !fovThread.IsAlive )
+            {
+                //                    Debug.Log( "thread start" );
+                fogStart = false;
+
+                readyCaulateFog();
+                fovThread = new Thread( new ThreadStart( calculateFogThread ) );
+                fovThread.Start();
+            }
+        }
+
+        if ( fogStart )
+        {
+            if ( fovThread1 == null ||
+                     !fovThread1.IsAlive )
+            {
+                //                    Debug.Log( "thread start" );
+
+                fovThread1 = new Thread( new ThreadStart( fogStartThread1 ) );
+                fovThread1.Start();
+            }
+
+        }
+
+       Shader.SetGlobalColor( "W3ColorDay0" , W3MapManager.instance.dayColor );
+    }
+
+    public void createMap( int w , int h )
+    {
+        fogWidth = w * 4;
+        fogHeight = h * 4;
+
+        Shader.SetGlobalFloat( "W3FogWidth" , fogWidth );
+        Shader.SetGlobalFloat( "W3FogHeight" , fogHeight );
+
+        sleepTime = (int)( Time.fixedDeltaTime * 1000 ) - 2;
+
+        isLoaded = true;
+        fogPixelBuffer = new byte[ fogWidth * fogHeight ];
+        fogBuffer = new byte[ fogWidth * fogHeight ];
+        fogBufferBlur = new byte[ fogWidth * fogHeight ];
+
+        fogBuffer1 = new byte[ fogWidth * fogHeight ];
+        fogBuffer2 = new byte[ fogWidth * fogHeight ];
+
+        fogBufferOffset = new float[ fogWidth * fogHeight ];
+
+        shadowBuffer = new byte[ fogWidth * fogHeight ];
+        shadowBuffer1 = new byte[ fogWidth * fogHeight ];
+
+        fogTex = new Texture2D( fogWidth , fogHeight , TextureFormat.Alpha8 , false , true );
+        shadowTex = new Texture2D( fogWidth , fogHeight , TextureFormat.Alpha8 , false , true );
+
+        raw = fogTex.GetRawTextureData<byte>();
+
+        //        W3PathFinder.instance.initMap( fogWidth , fogHeight );
+    }
+
+}
+

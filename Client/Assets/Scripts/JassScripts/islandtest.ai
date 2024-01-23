@@ -1,0 +1,45 @@
+//============================================================================
+//  islandtest -- blue player -- AI Script
+//============================================================================
+globals
+    player user = Player(0)
+endglobals
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    debug set do_debug_cheats = true
+
+    call CampaignAI(HOUSE,null)
+
+	call SetBuildUnitEx( 2,2,2, ZEPPLIN     )
+
+    call CampaignDefenderEx( 2,2,2, FOOTMAN	)
+
+    call WaitForSignal()
+
+    loop
+        //*** WAVE 1+ ***
+        call InitAssaultGroup()
+        call CampaignAttackerEx( 1,1,1, FOOTMAN)
+        call CampaignAttackerEx( 1,1,1, RIFLEMAN)
+        call CampaignAttackerEx( 1,1,1, PRIEST)
+        call CampaignAttackerEx( 1,1,1, SORCERESS)
+        call CampaignAttackerEx( 1,1,1, KNIGHT)
+	    call SuicideOnPlayerEx(M2,M2,M2,user)
+
+		//*** WAVE 2+ ***
+		call InitAssaultGroup()
+        call CampaignAttackerEx( 5,5,5, FOOTMAN)
+        call CampaignAttackerEx( 5,5,5, MORTAR)
+	    call SuicideOnPlayerEx(M2,M2,M2,user)
+
+		//*** WAVE 3+ ***
+		call InitAssaultGroup()
+        call CampaignAttackerEx( 4,4,4, FOOTMAN)
+        call CampaignAttackerEx( 2,2,2, RIFLEMAN)
+	    call SuicideOnPlayerEx(M2,M2,M2,user)
+
+    endloop
+endfunction

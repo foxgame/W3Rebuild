@@ -1,0 +1,56 @@
+//============================================================================
+//  Night Elf 03 -- Orange Player -- AI Script
+//============================================================================
+globals
+    constant player user = Player(2)
+endglobals
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(BURROW,null)
+
+    call SetBuildUnit( 1, PEON          )
+    call SetBuildUnit( 1, GREAT_HALL    )
+    call SetBuildUnit( 2, PEON          )
+    call SetBuildUnit( 1, ORC_BARRACKS  )
+    call SetBuildUnit( 1, BURROW        )
+	call SetBuildUnit( 3, PEON          )
+    call SetBuildUnit( 1, FORGE         )
+    call SetBuildUnit( 3, BURROW        )
+	call SetBuildUnit( 8, PEON          )
+    
+    //*** WAVE 1 ***
+    //call InitAssaultGroup()
+    //call CampaignAttacker( EASY,    2, HEAD_HUNTER   )
+    //call CampaignAttacker( EASY,    1, RAIDER        )
+    //call SuicideOnPlayer(0,user)
+
+    //*** WAVE 2 ***
+    //call InitAssaultGroup()
+    //call CampaignAttacker( EASY,    2, GRUNT         )
+    //call CampaignAttacker( EASY,    1, RAIDER        )
+    //call CampaignAttacker( EASY,    2, HEAD_HUNTER   )
+    //call CampaignAttacker( EASY,    1, CATAPULT      )
+    //call SuicideOnPlayer(5*60,user)
+
+    //*** WAVE 3 ***
+    //call InitAssaultGroup()
+    //call CampaignAttacker( EASY,    3, GRUNT         )
+    //call CampaignAttacker( EASY,    2, RAIDER        )
+    //call CampaignAttacker( EASY,    2, HEAD_HUNTER   )
+    //call SuicideOnPlayer(5*60,user)
+
+    //*** WAVE 4 ***
+    //call InitAssaultGroup()
+    //call CampaignAttacker( EASY,    2, GRUNT         )
+    //call CampaignAttacker( EASY,    2, RAIDER        )
+    //call CampaignAttacker( EASY,    2, HEAD_HUNTER   )
+    //call CampaignAttacker( EASY,    1, SHAMAN        )
+    //call CampaignAttacker( EASY,    1, CATAPULT      )
+    //call SuicideOnPlayer(5*60,user)
+
+    // repeat previous wave over and over until mission ends
+    //call ForeverSuicideOnPlayer(4*60,user)
+endfunction

@@ -1,0 +1,121 @@
+//============================================================================
+//  Orc 05 -- yellow player -- AI Script
+//============================================================================
+globals
+    player user = Player(3)
+    integer factor = 1
+endglobals
+
+
+function MikesSuicide takes integer easy, integer med, integer hard, player user returns nothing
+    if CommandsWaiting()>0 then
+        set factor = 2
+        call PopLastCommand()
+    endif
+
+    call SuicideOnPlayerEx(easy/factor, med/factor, hard/factor, user)
+endfunction
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(MOON_WELL,null)
+
+    set campaign_wood_peons = 100
+
+    call SetBuildUnit( 1, TREE_LIFE     )
+    call SetBuildUnit( 1, WISP          )
+    call SetBuildUnit( 1, ANCIENT_WAR   )
+    call SetBuildUnit( 2, WISP          )
+    call SetBuildUnit( 1, ELF_ALTAR     )
+    call SetBuildUnit( 1, HUNTERS_HALL  )
+    call SetBuildUnit( 1, TREE_AGES     )
+    call SetBuildUnit( 1, ANCIENT_WIND  )
+    call SetBuildUnit( 1, ANCIENT_LORE  )
+    call SetBuildUnit( 1, TREE_ETERNITY )
+    call SetBuildUnit( 8, WISP          )
+
+    call CampaignDefender( EASY, 3, ARCHER      )
+    call CampaignDefender( EASY, 2, HUNTRESS    )
+
+    call WaitForSignal()
+
+    //*** WAVE 1 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY, 2, ARCHER      )
+    call SuicideOnPlayer(0,user)
+
+    //*** WAVE 2 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY, 2, ARCHER      )
+    call CampaignAttacker( EASY, 1, HUNTRESS    )
+    call SuicideOnPlayer(3*60,user)
+
+    //*** WAVE 3 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY, 2, ARCHER      )
+    call CampaignAttacker( EASY, 2, HUNTRESS    )
+    call CampaignAttacker( EASY, 1, BALLISTA    )
+    call MikesSuicide(4*60,4*60,4*60,user)
+
+    //*** WAVE 4 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY, 5, ARCHER          )
+    call CampaignAttacker( EASY, 2, HUNTRESS        )
+    call MikesSuicide(6*60,6*60,6*60,user)
+
+    //*** WAVE 5 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY, 3, ARCHER      )
+    call CampaignAttacker( EASY, 1, HUNTRESS    )
+    call MikesSuicide(2*60,2*60,2*60,user)
+
+    //*** WAVE 6 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY, 4, HUNTRESS    )
+    call CampaignAttacker( EASY, 2, BALLISTA    )
+    call CampaignAttacker( EASY, 1, WISP        )
+    call MikesSuicide(6*60,6*60,6*60,user)
+
+    //*** WAVE 7 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY, 2, HUNTRESS        )
+    call CampaignAttacker( EASY, 1, ANCIENT_PROTECT )
+    call MikesSuicide(3*60,3*60,3*60,user)
+
+    //*** WAVE 8 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY, 6, ARCHER      )
+    call MikesSuicide(4*60,4*60,4*60,user)
+
+    loop
+        //*** WAVE 9 ***
+        call InitAssaultGroup()
+        call CampaignAttacker( EASY, 3, HUNTRESS        )
+        call CampaignAttacker( EASY, 2, ANCIENT_PROTECT )
+        call MikesSuicide(4*60,4*60,4*60,user)
+
+        //*** WAVE 10 ***
+        call InitAssaultGroup()
+        call CampaignAttacker( EASY, 4, ARCHER      )
+        call CampaignAttacker( EASY, 2, HUNTRESS    )
+        call CampaignAttacker( EASY, 1, BALLISTA    )
+        call CampaignAttacker( EASY, 2, WISP        )
+        call MikesSuicide(6*60,6*60,6*60,user)
+
+        //*** WAVE 11 ***
+        call InitAssaultGroup()
+        call CampaignAttacker( EASY, 2, ARCHER          )
+        call CampaignAttacker( EASY, 1, HUNTRESS        )
+        call CampaignAttacker( EASY, 1, ANCIENT_PROTECT )
+        call CampaignAttacker( EASY, 1, WISP            )
+        call MikesSuicide(2*60,2*60,2*60,user)
+
+        //*** WAVE 12 ***
+        call InitAssaultGroup()
+        call CampaignAttacker( EASY, 6, ARCHER      )
+        call CampaignAttacker( EASY, 1, BALLISTA    )
+        call MikesSuicide(4*60,4*60,4*60,user)
+    endloop
+endfunction

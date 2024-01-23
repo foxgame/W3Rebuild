@@ -1,0 +1,30 @@
+function PreloadFiles takes nothing returns nothing
+
+	call Preload( "units\\nightelf\\HeroKeeperoftheGrove\\HeroKeeperoftheGrove_portrait.mdx" )
+	call Preload( "Textures\\Keeperofthegrove.blp" )
+	call Preload( "units\\demon\\ChaosHellscream\\ChaosHellscream_portrait.mdx" )
+	call Preload( "Textures\\HellscreamChaos.blp" )
+	call Preload( "units\\creeps\\RockGolem\\RockGolem.mdx" )
+	call Preload( "units\\Creeps\\RockGolem\\rocktile.blp" )
+	call Preload( "units\\Creeps\\RockGolem\\RockGolem2.blp" )
+	call Preload( "buildings\\undead\\SacrificialPit\\SacrificialPit.mdx" )
+	call Preload( "buildings\\Undead\\SacrificialPit\\CreepySacrificialPit.blp" )
+	call Preload( "Textures\\Ghost2.blp" )
+	call Preload( "Textures\\GenericGlowX.blp" )
+	call Preload( "SharedModels\\UBirth.mdx" )
+	call Preload( "SharedModels\\UndeadBirth.blp" )
+	call Preload( "Textures\\Green_Glow2.blp" )
+	call Preload( "Textures\\AuraRune7Green.blp" )
+	call Preload( "Textures\\grad2b.blp" )
+	call Preload( "Textures\\GenericGlow5.blp" )
+	call Preload( "Textures\\Tornado2b.blp" )
+	call Preload( "buildings\\other\\FountainOfLifeBlood\\FountainOfLifeBlood.mdx" )
+	call Preload( "buildings\\Other\\FountainOfLifeBlood\\FountainOfLifeBlood.blp" )
+	call Preload( "Textures\\FountainOfLife.blp" )
+	call Preload( "buildings\\Other\\FountainOfLifeBlood\\FlareBlood.blp" )
+	call Preload( "Textures\\BackGround.blp" )
+	call PreloadEnd( 0.0 )
+
+endfunction
+
+

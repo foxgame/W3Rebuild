@@ -1,0 +1,54 @@
+//============================================================================
+//  Night Elf 04 -- light blue player -- AI Script
+//============================================================================
+globals
+    constant player undead = Player(3)
+endglobals
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+
+    call CampaignAI(HOUSE,null)
+	set do_campaign_farms = false
+
+    call SetStagePoint(4211,1446)
+
+    call SetBuildUnit( 4, PEASANT       )
+
+    call CampaignDefender( EASY, 1, GRYPHON		)
+    call CampaignDefender( EASY, 1, COPTER		)
+
+	call SetBuildUpgr( 1, UPG_BOMBS				)
+
+	call WaitForSignal()
+
+    //*** WAVE 1 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY,    3, COPTER	)
+    call SuicideOnPlayer(70,undead)
+
+    //*** WAVE 2 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY,    5, GRYPHON  )
+    call SuicideOnPlayer(M4,undead)
+
+	loop
+		//*** WAVE 3 ***
+		call InitAssaultGroup()
+		call CampaignAttacker( EASY,    8, COPTER	)
+		call SuicideOnPlayer(M2,undead)
+
+		//*** WAVE 4 ***
+		call InitAssaultGroup()
+		call CampaignAttacker( EASY,    7, GRYPHON  )
+		call SuicideOnPlayer(M4,undead)
+
+		//*** WAVE 5 ***
+		call InitAssaultGroup()
+		call CampaignAttacker( EASY,    3, GRYPHON  )
+		call CampaignAttacker( EASY,    2, COPTER	)
+		call SuicideOnPlayer(M2,undead)
+	endloop
+endfunction

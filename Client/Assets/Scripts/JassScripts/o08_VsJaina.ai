@@ -1,0 +1,10 @@
+//============================================================================
+//  Orc 8 -- Infernals Vs. Jaina -- AI Script
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(BURROW,null)
+    loop
+        call SuicideUnitEx( 1, INFERNAL, 9 )
+        call Sleep(1)
+    endloop
+endfunction

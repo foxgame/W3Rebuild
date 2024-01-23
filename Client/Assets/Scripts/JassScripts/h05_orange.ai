@@ -1,0 +1,53 @@
+//============================================================================
+//  Human 05 -- orange player -- AI Script
+//============================================================================
+globals
+    player user = Player(1)
+endglobals
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    set do_campaign_farms = false
+
+    call CampaignAI(ZIGGURAT_1,null)
+
+	call SetCaptainHome(ATTACK_CAPTAIN,6235,2786)
+	call SetCaptainHome(DEFENSE_CAPTAIN,5021,2735)
+
+    call SetBuildUnit( 1,NECROPOLIS_1    )
+    call SetBuildUnit( 1,ACOLYTE         )
+    call SetBuildUnit( 2,ZIGGURAT_1      )
+    call SetBuildUnit( 1,UNDEAD_MINE     )
+    call SetBuildUnit( 1,UNDEAD_ALTAR    )
+    call SetBuildUnit( 1,GRAVEYARD       )
+    call SetBuildUnit( 2,CRYPT           )
+    call SetBuildUnit( 5,ACOLYTE         )
+    call SetBuildUnit( 8,ZIGGURAT_1      )
+    call SetBuildUnit( 1,NECROPOLIS_2    )
+    call SetBuildUnit( 1,SAC_PIT         )
+    call SetBuildUnit( 1,DAMNED_TEMPLE   )
+    call SetBuildUnit( 1,SLAUGHTERHOUSE  )
+	call SetBuildUnit( 8,ZIGGURAT_2		 )
+    call SetBuildUnit( 1,NECROPOLIS_3    )
+
+    call CampaignDefenderEx( 9,9,9, GHOUL		)
+    call CampaignDefenderEx( 2,4,6, NECRO       )
+    call CampaignDefenderEx( 2,3,4, ABOMINATION )
+	call CampaignDefenderEx( 2,3,4, MEAT_WAGON	)
+
+	call WaitForSignal()
+
+    set allow_signal_abort = true
+
+
+    //*** WAVE 1 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 4,4,6, GHOUL       )
+    call SuicideOnPlayer(M3,user)
+
+    call ForeverSuicideOnPlayer(M2,user)
+
+    call SuicideUnits( MEAT_WAGON, ABOMINATION, GHOUL, NECRO, SKEL_WARRIOR, LICH, 0, 0, 0, 0 )
+endfunction

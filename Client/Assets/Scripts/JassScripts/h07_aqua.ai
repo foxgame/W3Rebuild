@@ -1,0 +1,132 @@
+//============================================================================
+//  Human 07 -- aqua player -- AI Script
+//============================================================================
+
+globals
+	player user = Player(1)
+endglobals
+
+function set_cheats takes nothing returns nothing
+    call Cheat("warnings")
+    call Cheat("viewres")
+    call Cheat("av")
+    call Cheat("dg")
+    call Cheat("vision 3")
+    call Cheat("vision 10")
+endfunction
+
+//============================================================================
+//  hero_levels
+//============================================================================
+function hero_levels takes nothing returns integer
+    local integer hero  = GetHeroId()
+    local integer level = GetHeroLevelAI()
+
+    if hero == LICH then
+        if level == 2 or level == 4 then
+            return 'AUfn' // frost nova
+        endif
+
+        if level == 3 then
+            return 'AUfa' // frost armor
+        endif
+
+        if level == 5 then
+            return 'AUdd' // death & decay
+        endif
+    endif
+
+    return 0
+endfunction
+
+//============================================================================
+//  SetDefenders
+//============================================================================
+function SetDefenders takes nothing returns nothing
+    call CampaignDefender( EASY, 1, GARGOYLE    )
+    call CampaignDefender( EASY, 2, GHOUL       )
+    call CampaignDefender( EASY, 1, NECRO       )
+endfunction
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    debug call set_cheats()
+
+    call CampaignAI(ZIGGURAT_1,function hero_levels)
+
+    call SetBuildUnit( 1, ACOLYTE			)
+    call SetBuildUnit( 1, NECROPOLIS_1		)
+    call SetBuildUnit( 1, CRYPT				)
+	call SetBuildUnit( 1, GRAVEYARD			)
+    call SetBuildUnit( 1, UNDEAD_MINE		)
+    call SetBuildUnit( 1, NECROPOLIS_2		)
+    call SetBuildUnit( 1, UNDEAD_ALTAR      )
+	call SetBuildUnit( 1, SLAUGHTERHOUSE	)
+	call SetBuildUnit( 1, DAMNED_TEMPLE     )
+    call SetBuildUnit( 1, NECROPOLIS_3		)
+    call SetBuildUnit( 1, SAC_PIT           )
+    call SetBuildUnit( 5, ACOLYTE			)
+
+    loop
+        call SetDefenders()
+        exitwhen CommandsWaiting() != 0
+        call Sleep(10)
+    endloop
+    call PopLastCommand()
+
+    //*** WAVE 1 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY,    4, GHOUL        )
+    call CampaignAttacker( EASY,    1, NECRO        )
+    call SuicideOnPlayer(0,user)
+
+    call SetDefenders()
+
+    //*** WAVE 2 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY,    3, GARGOYLE     )
+    call SuicideOnPlayer(5*60,user)
+
+    call SetDefenders()
+
+    //*** WAVE 3 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY,    4, GHOUL        )
+    call CampaignAttacker( EASY,    1, ABOMINATION  )
+    call CampaignAttacker( EASY,    1, NECRO        )
+    call CampaignAttacker( EASY,    1, LICH         )
+    call SuicideOnPlayer(4*60,user)
+
+    call SetDefenders()
+
+    //*** WAVE 4 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY,    2, GHOUL        )
+    call CampaignAttacker( EASY,    2, ABOMINATION  )
+    call CampaignAttacker( EASY,    1, NECRO        )
+    call CampaignAttacker( EASY,    1, MEAT_WAGON   )
+    call CampaignAttacker( EASY,    1, LICH         )
+    call SuicideOnPlayer(5*60,user)
+
+    loop
+        call SetDefenders()
+
+        //*** WAVE 5,7,9,... ***
+        call InitAssaultGroup()
+        call CampaignAttacker( EASY,    6, GARGOYLE     )
+        call SuicideOnPlayer(5*60,user)
+
+        call SetDefenders()
+
+        //*** WAVE 6,8,10,... ***
+        call InitAssaultGroup()
+        call CampaignAttacker( EASY,    4, ABOMINATION  )
+        call CampaignAttacker( EASY,    2, NECRO        )
+        call CampaignAttacker( EASY,    2, MEAT_WAGON   )
+        call CampaignAttacker( EASY,    1, LICH         )
+        call SuicideOnPlayer(4*60,user)
+
+    endloop
+endfunction

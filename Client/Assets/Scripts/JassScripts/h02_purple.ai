@@ -1,0 +1,34 @@
+//============================================================================
+//  Human 02 -- purple player -- Uther Script
+//============================================================================
+
+function UtherAI takes nothing returns integer
+    local integer level = GetHeroLevelAI()
+
+    if level == 1 or level == 4 or level == 7 then
+        return 'AHhb' // holy bolt
+    endif
+
+    if level == 2 or level == 5 or level == 8 then
+        return 'AHds' // divine shield
+    endif
+
+    if level == 3 or level == 6 or level == 9 then
+        return 'AHad' // devotion aura
+    endif
+
+    if level == 10 then
+        return 'AHre' // resurrection
+    endif
+
+	return 0
+
+endfunction
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    call SetHeroLevels(function UtherAI)
+    call SleepForever()
+endfunction

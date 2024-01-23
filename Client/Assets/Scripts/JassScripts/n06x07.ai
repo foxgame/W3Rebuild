@@ -1,0 +1,15 @@
+//============================================================================
+//  $Id
+//============================================================================
+
+function main takes nothing returns nothing
+
+    call CampaignAI(ZIGGURAT_1,null)
+
+    call SetBuildUnit( 1, ACOLYTE )
+
+    call CampaignDefenderEx( 1, 2, 3, GHOUL     )
+
+    call SleepForever()
+
+endfunction

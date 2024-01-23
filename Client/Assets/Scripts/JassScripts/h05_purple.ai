@@ -1,0 +1,129 @@
+//============================================================================
+//  Purple 05 -- purple player -- AI Script
+//============================================================================
+globals
+    player user = Player(1)
+endglobals
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(ZIGGURAT_1,null)
+	call SetCaptainHome(ATTACK_CAPTAIN,1264,-1401)
+
+    call SetBuildUnit( 1, NECROPOLIS_1      )
+    call SetBuildUnit( 1, ACOLYTE           )
+    call SetBuildUnit( 1, UNDEAD_MINE       )
+    call SetBuildUnit( 1, UNDEAD_ALTAR      )
+    call SetBuildUnit( 2, CRYPT             )
+    call SetBuildUnit( 1, GRAVEYARD         )
+    call SetBuildUnit( 5, ACOLYTE           )
+	call SetBuildUnit( 1, LICH				)
+    call SetBuildUnit( 8, ZIGGURAT_1        )
+    call SetBuildUnit( 8, ZIGGURAT_2        )
+    call SetBuildUnit( 1, NECROPOLIS_2      )
+    call SetBuildUnit( 1, SAC_PIT           )
+    call SetBuildUnit( 1, DAMNED_TEMPLE     )
+    call SetBuildUnit( 1, SLAUGHTERHOUSE    )
+    call SetBuildUnit( 1, NECROPOLIS_3      )
+
+    call CampaignDefenderEx( 3,3,3, GHOUL       )
+    call CampaignDefenderEx( 2,2,2, NECRO       )
+    call CampaignDefenderEx( 2,2,2, ABOMINATION )
+	call CampaignDefenderEx( 1,1,1, MEAT_WAGON	)
+	call CampaignDefenderEx( 1,1,1, LICH		)
+
+    call WaitForSignal()
+
+    set allow_signal_abort = true
+
+    //*** WAVE 1 Time elapsed 0min ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 6,6,6, GHOUL			)
+	call CampaignAttackerEx( 0,0,2, ABOMINATION	)
+    call SuicideOnPlayer(M1,user)
+
+    //*** WAVE 2 Time elapsed 3min ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 4,4,4, GHOUL       )
+    call CampaignAttackerEx( 0,0,2, ABOMINATION )
+    call CampaignAttackerEx( 0,0,1, NECRO       )
+    call SuicideOnPlayer(M3,user)
+
+    //*** WAVE 3 Time elapsed 6min ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 4,4,8, GHOUL       )
+    call CampaignAttackerEx( 1,1,3, NECRO       )
+    call SuicideOnPlayer(M3,user)
+
+    //*** WAVE 4 Time elapsed 9min ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 2,2,4, GHOUL       )
+    call CampaignAttackerEx( 0,0,1, NECRO       )
+    call CampaignAttackerEx( 1,1,2, ABOMINATION )
+    call SuicideOnPlayer(M3,user)
+
+	call SetBuildUpgrEx( 0,0,1, UPG_CANNIBALIZE   )
+    call SetBuildUpgrEx( 1,1,1, UPG_SKEL_LIFE     )
+    call SetBuildUpgrEx( 1,1,1, UPG_UNHOLY_ARMOR  )
+	call SetBuildUpgrEx( 1,1,1, UPG_NECROS        )
+
+    //*** WAVE 5 Time elapsed 12min ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 2,2,5, GHOUL       )
+    call CampaignAttackerEx( 1,1,2, ABOMINATION )
+    call CampaignAttackerEx( 2,2,2, NECRO       )
+    call CampaignAttackerEx( 0,0,2, MEAT_WAGON  )
+	call CampaignAttackerEx( 0,0,1, LICH		)
+    call SuicideOnPlayer(M3,user)
+
+	//*** WAVE 6 Time elapsed 15min ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 3,3,4, GHOUL       )
+    call CampaignAttackerEx( 2,2,1, NECRO       )
+    call CampaignAttackerEx( 0,0,2, ABOMINATION )
+	call CampaignAttackerEx( 1,1,2, MEAT_WAGON  )
+    call SuicideOnPlayer(M3,user)
+
+	call SetBuildUpgrEx( 1,1,1, UPG_UNHOLY_STR    )
+	call SetBuildUpgrEx( 0,0,1, UPG_GHOUL_FRENZY  )
+	call SetBuildUpgrEx( 0,0,1, UPG_PLAGUE        )
+
+    //*** WAVE 7 Time elapsed 18min ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 4,4,4, GHOUL       )
+    call CampaignAttackerEx( 2,2,2, ABOMINATION )
+    call CampaignAttackerEx( 1,1,4, NECRO       )
+	call CampaignAttackerEx( 0,0,1, LICH		)
+    call SuicideOnPlayer(M3,user)
+
+	//*** WAVE 8 Time elapsed 21min ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 3,3,4, GHOUL       )
+    call CampaignAttackerEx( 1,1,1, NECRO       )
+    call CampaignAttackerEx( 0,0,2, ABOMINATION )
+	call CampaignAttackerEx( 0,0,2, MEAT_WAGON  )
+	call CampaignAttackerEx( 0,0,1, LICH		)
+    call SuicideOnPlayer(M3,user)
+
+    //*** WAVE 9 Time elapsed 24min ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 4,4,8, GHOUL       )
+	call CampaignAttackerEx( 1,1,1, NECRO       )
+    call CampaignAttackerEx( 1,1,3, ABOMINATION )
+	call CampaignAttackerEx( 1,1,2, MEAT_WAGON  )
+    call SuicideOnPlayer(M3,user)
+
+	//*** WAVE 10 Time elapsed 27min ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 4,4,6, GHOUL       )
+	call CampaignAttackerEx( 1,1,1, NECRO       )
+    call CampaignAttackerEx( 1,1,4, ABOMINATION )
+	call CampaignAttackerEx( 2,2,3, MEAT_WAGON  )
+    call SuicideOnPlayer(M3,user)
+
+    call ForeverSuicideOnPlayer(M2,user)
+
+    call SuicideUnits( MEAT_WAGON, ABOMINATION, GHOUL, NECRO, SKEL_WARRIOR, LICH, 0, 0, 0, 0 )
+endfunction

@@ -1,0 +1,52 @@
+//============================================================================
+//  Night Elf 04 -- red player -- AI Script
+//============================================================================
+globals
+    constant player undead = Player(3)
+endglobals
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+
+    call CampaignAI(BURROW,null)
+	set do_campaign_farms = false
+
+    call SetStagePoint(-4350,-103)
+
+    call SetBuildUnit( 4, PEON          )
+	call SetBuildUnit( 2, ZEPPLIN       )
+
+    call CampaignDefender( EASY, 1, GRUNT			)
+    call CampaignDefender( EASY, 3, WYVERN			)
+
+	call WaitForSignal()
+
+    //*** WAVE 1 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY,    2, WYVERN        )
+    call SuicideOnPlayer(0,undead)
+
+    //*** WAVE 2 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY,    6, WYVERN		)
+    call SuicideOnPlayer(M2,undead)
+
+	loop
+		//*** WAVE 3 ***
+		call InitAssaultGroup()
+		call CampaignAttacker( EASY,    4, WYVERN		)
+		call SuicideOnPlayer(M2,undead)
+
+		//*** WAVE 4 ***
+		call InitAssaultGroup()
+		call CampaignAttacker( EASY,    8, WYVERN		)
+		call SuicideOnPlayer(M2,undead)
+
+		//*** WAVE 5 ***
+		call InitAssaultGroup()
+		call CampaignAttacker( EASY,    6, WYVERN		)
+		call SuicideOnPlayer(M2,undead)
+	endloop
+endfunction

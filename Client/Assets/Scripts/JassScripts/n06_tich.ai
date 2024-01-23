@@ -1,0 +1,56 @@
+//============================================================================
+//  Night Elf 06 -- Tichondrius -- AI Script
+//============================================================================
+globals
+    constant real TICH_CAPT_X = 6987
+    constant real TICH_CAPT_Y = 2537
+
+    constant real WAVE_CAPT_X = 5530
+    constant real WAVE_CAPT_Y = 1270
+
+    player user = Player(1)
+
+    constant integer WAVE_DOOMS = 'nC00'
+endglobals
+
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(HOUSE,null)
+    call SetReplacementCount(99)
+
+	call SetCaptainHome( DEFENSE_CAPTAIN, TICH_CAPT_X, TICH_CAPT_Y )
+	call SetCaptainHome( ATTACK_CAPTAIN,  WAVE_CAPT_X, WAVE_CAPT_Y )
+
+    call CampaignDefender( EASY, 1, TICHONDRIUS )
+    call CampaignDefender( EASY, 2, DOOMGUARD   )
+
+    call WaitForSignal()
+
+
+	//*** WAVE 1 ***
+	call InitAssaultGroup()
+	call CampaignAttackerEx( 4,4,6, FELLHOUND   )
+	call CampaignAttackerEx( 1,1,2, WAVE_DOOMS  )
+	call SuicideOnPlayerEx(M2,M2,M1,user)
+
+	loop
+		//*** WAVE 2 ***
+		call InitAssaultGroup()
+		call CampaignAttackerEx( 1,1,4, INFERNAL    )
+		call CampaignAttackerEx( 1,1,2, WAVE_DOOMS  )
+		call SuicideOnPlayerEx(M5,M5,M4,user)
+
+		//*** WAVE 3 ***
+		call InitAssaultGroup()
+		call CampaignAttackerEx( 3,3,4, FELLHOUND   )
+		call CampaignAttackerEx( 1,1,2, INFERNAL    )
+		call CampaignAttackerEx( 0,0,1, WAVE_DOOMS  )
+    	call SuicideOnPlayerEx(M6,M6,M5,user)
+
+		//*** WAVE 4 ***
+		call InitAssaultGroup()
+		call CampaignAttackerEx( 3,3,6, FELLHOUND   )
+		call CampaignAttackerEx( 2,2,3, WAVE_DOOMS  )
+		call SuicideOnPlayerEx(M5,M5,M4,user)
+    endloop
+endfunction

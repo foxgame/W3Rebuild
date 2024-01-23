@@ -1,0 +1,18 @@
+//============================================================================
+//  Night Elf 01 -- yellow player -- AI Script
+//============================================================================
+globals
+endglobals
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+
+    call CampaignAI(BURROW,null)
+
+    set campaign_wood_peons = 100
+	set campaign_gold_peons = 0
+
+    call SleepForever()
+endfunction

@@ -1,0 +1,12 @@
+//==================================================================================================
+//  $Id: n07x07.ai,v 1.6 2003/04/19 15:22:18 rpardo Exp $
+//==================================================================================================
+function main takes nothing returns nothing
+    call CampaignAI(ZIGGURAT_1,null)
+	call SetReplacements(1,1,3)
+
+    call CampaignDefenderEx( 0,0,1, NECRO       )
+    call CampaignDefenderEx( 0,0,1, BANSHEE     )
+
+    call SleepForever()
+endfunction

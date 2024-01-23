@@ -1,0 +1,141 @@
+//============================================================================
+//  Human 06 -- Malganis -- AI Script
+//============================================================================
+globals
+    constant integer SET_GOAL_X             = 1
+    constant integer SET_GOAL_Y             = 2
+    constant integer ATTACK_GOAL            = 3
+    constant integer ATTACK_PLAYER          = 4
+    constant integer SET_TELEPORT_X         = 5
+    constant integer SET_TELEPORT_Y         = 6
+    constant integer TELEPORT               = 7
+    constant integer STOP_CURRENT_ATTACK    = 8
+    constant integer ATTACK_ZOMBIES         = 9
+
+    constant player USER                    = Player(1)
+    constant player ZOMBIES                 = Player(2)
+
+    integer command
+    integer command_data
+endglobals
+
+//============================================================================
+//  add_units
+//============================================================================
+function add_units takes integer unitid returns nothing
+    call AddAssault(GetUnitCount(unitid),unitid)
+endfunction
+
+//============================================================================
+//  gather_forces
+//============================================================================
+function gather_forces takes nothing returns nothing
+    loop
+        call add_units( MALGANIS    )
+        call add_units( GHOUL       )
+        call add_units( ABOMINATION )
+        call add_units( MEAT_WAGON  )
+        call add_units( NECRO       )
+        call Sleep(1)
+    endloop
+endfunction
+
+//============================================================================
+//  get_command
+//============================================================================
+function get_command takes nothing returns nothing
+    loop
+        exitwhen CommandsWaiting() != 0
+        call Sleep(0.5)
+    endloop
+    set command = GetLastCommand()
+    set command_data = GetLastData()
+    call PopLastCommand()
+endfunction
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    local player kill     = null
+    local real goal_x     = 0
+    local real goal_y     = 0
+    local real teleport_x = 0
+    local real teleport_y = 0
+
+    call CampaignAI(ZIGGURAT_1,null)
+    call StartThread(function gather_forces)
+
+    set campaign_wood_peons = 0
+
+    loop
+        call get_command()
+
+        //--------------------------------------------------------------------
+        if command==SET_GOAL_X then
+        //--------------------------------------------------------------------
+            call TraceI("set bldg x = (%d)\n",command_data)
+
+            set goal_x = command_data
+
+        //--------------------------------------------------------------------
+        elseif command==SET_GOAL_Y then
+        //--------------------------------------------------------------------
+            call TraceI("set bldg y = (%d)\n",command_data)
+
+            set goal_y = command_data
+
+        //--------------------------------------------------------------------
+        elseif command==ATTACK_GOAL then
+        //--------------------------------------------------------------------
+            call Trace("attack bldg\n")
+
+            set kill = null
+
+            call SetCaptainHome(ATTACK_CAPTAIN,goal_x,goal_y)
+            call CaptainAttack(goal_x,goal_y)
+
+        //--------------------------------------------------------------------
+        elseif command==SET_TELEPORT_X then
+        //--------------------------------------------------------------------
+            call TraceI("set teleport x = (%d)\n",command_data)
+
+            set teleport_x = command_data
+
+        //--------------------------------------------------------------------
+        elseif command==SET_TELEPORT_Y then
+        //--------------------------------------------------------------------
+            call TraceI("set teleport y = (%d)\n",command_data)
+
+            set teleport_y = command_data
+
+        //--------------------------------------------------------------------
+        elseif command==TELEPORT then
+        //--------------------------------------------------------------------
+            call Trace("teleport captain\n")
+
+            call TeleportCaptain(teleport_x,teleport_y)
+            call ClearCaptainTargets()
+
+            if kill != null then
+                call CaptainVsPlayer(kill)
+            endif
+
+        //--------------------------------------------------------------------
+        elseif command==ATTACK_PLAYER then
+        //--------------------------------------------------------------------
+            call Trace("kill player\n")
+
+            set kill = USER
+
+            call CaptainVsUnits(USER)
+
+        //--------------------------------------------------------------------
+        elseif command==ATTACK_ZOMBIES then
+        //--------------------------------------------------------------------
+            call Trace("attack zombies\n")
+
+            set kill = ZOMBIES
+        endif
+    endloop
+endfunction

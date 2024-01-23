@@ -1,0 +1,27 @@
+//==================================================================================================
+//  $Id: h02x07.ai,v 1.13.2.1 2003/05/09 09:17:04 abond Exp $
+//==================================================================================================
+function main takes nothing returns nothing
+
+    call CampaignAI(ZIGGURAT_1,null)
+
+    call SetHarvestLumber(false)
+    call DoCampaignFarms(false)
+
+    call SetBuildUnitEx( 1,1,1, UNDEAD_MINE     )
+
+    loop
+        exitwhen TownCountDone(NECROPOLIS_1) > 0
+        call Sleep(1)
+    endloop
+
+    call InitBuildArray()
+    call ResetCaptainLocs()
+    call SetHarvestLumber(true)
+    call SetWoodPeons(2)
+
+    call CampaignDefenderEx( 1,1,2, GHOUL       )
+    call CampaignDefenderEx( 1,1,2, CRYPT_FIEND )
+
+    call SleepForever()
+endfunction

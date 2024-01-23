@@ -1,0 +1,62 @@
+//============================================================================
+//  $Id: n02x01.ai,v 1.12 2003/04/28 17:56:10 rpardo Exp $
+//============================================================================
+globals
+    player user = PlayerEx(2)
+endglobals
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(NAGA_CORAL,null)
+	call SetReplacements(1,1,3)
+	set do_campaign_farms = false
+    call SetAmphibious()
+
+    call SetBuildUnitEx( 8, 8, 8, NAGA_SLAVE    )
+
+    call CampaignDefenderEx( 0, 0, 2, NAGA_SNAP_DRAGON  )
+    call CampaignDefenderEx( 1, 1, 2, NAGA_REAVER	    )
+	call CampaignDefenderEx( 0, 0, 1, NAGA_SIREN		)
+
+    call WaitForSignal()
+
+    // WAVE 1
+    call InitAssaultGroup()
+	call CampaignAttackerEx( 1, 1, 2, NAGA_SIREN		)
+    call CampaignAttackerEx( 3, 3, 5, NAGA_REAVER		)
+    call SuicideOnPlayerEx(M3,M3,M2,user)
+
+	call SetBuildUpgrEx( 0,0,1, UPG_SIREN			)
+    call SetBuildUpgrEx( 0,0,1, UPG_NAGA_ATTACK		)
+	call SetBuildUpgrEx( 0,0,1, UPG_NAGA_ARMOR		)
+
+	// WAVE 2
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 2, 2, 4, NAGA_REAVER		)
+	call CampaignAttackerEx( 2, 2, 4, NAGA_SNAP_DRAGON  )
+    call SuicideOnPlayerEx(M5,M5,M4,user)
+
+	// WAVE 3
+    call InitAssaultGroup()
+	call CampaignAttackerEx( 1, 1, 2, NAGA_SIREN		)
+    call CampaignAttackerEx( 6, 6, 8, NAGA_REAVER		)
+    call SuicideOnPlayerEx(M7,M7,M4,user)
+
+    // begin a more balanced attack -- this AI uses ground only
+    //
+    loop
+		// *** WAVE 4+ ***
+		call InitAssaultGroup()
+		call CampaignAttackerEx( 4, 4, 6, NAGA_REAVER		)
+		call CampaignAttackerEx( 1, 1, 3, NAGA_SNAP_DRAGON  )
+		call SuicideOnPlayerEx(M8,M8,M4,user)
+
+		call InitAssaultGroup()
+		call CampaignAttackerEx( 1, 1, 2, NAGA_SIREN		)
+		call CampaignAttackerEx( 2, 2, 4, NAGA_REAVER		)
+		call CampaignAttackerEx( 3, 3, 6, NAGA_SNAP_DRAGON  )
+		call SuicideOnPlayerEx(M8,M8,M4,user)
+	endloop
+endfunction

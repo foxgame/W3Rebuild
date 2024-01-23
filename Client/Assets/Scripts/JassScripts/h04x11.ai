@@ -1,0 +1,12 @@
+//============================================================================
+//  $Id: h04x11.ai,v 1.5 2003/04/20 22:10:55 smercer Exp $
+//============================================================================
+
+globals
+    constant integer USER = 7
+endglobals
+
+function main takes nothing returns nothing
+    call CampaignAI(MOON_WELL,null)
+    call SuicideUnitsEx( USER, HUNTRESS, ARCHER, DRUID_CLAW, DRUID_CLAW_M, DRUID_TALON, DRYAD, MOUNTAIN_GIANT, 'espv', 'even', 0)
+endfunction

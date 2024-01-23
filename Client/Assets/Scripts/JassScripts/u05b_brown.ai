@@ -1,0 +1,38 @@
+//============================================================================
+//  Undead 05b -- brown player -- AI Script
+//============================================================================
+globals
+    player user = Player(3)
+endglobals
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(ELF_FARM,null)
+	
+	call SetReplacements(0,1,3)
+
+    call SetBuildUnitEx( 0,0,1, TOWN_HALL			)
+    call SetBuildUnitEx( 2,2,2, PEASANT				)
+    call SetBuildUnitEx( 0,0,1, ELF_HIGH_BARRACKS	)
+	call SetBuildUnitEx( 0,0,14, ELF_FARM			)
+    call SetBuildUnitEx( 0,0,1, LUMBER_MILL			)
+    call SetBuildUnitEx( 0,0,1, BLACKSMITH			)
+    call SetBuildUnitEx( 0,0,1, HUMAN_ALTAR			)
+	call SetBuildUnitEx( 0,0,1, KEEP				)
+    call SetBuildUnitEx( 0,0,1, SANCTUM				)
+	call SetBuildUnitEx( 0,0,1, CASTLE				)
+    
+    call CampaignDefenderEx( 1,1,3, HIGH_SWORDMAN	)
+    call CampaignDefenderEx( 1,1,4, HIGH_ARCHER		)
+	call CampaignDefenderEx( 0,1,1, PRIEST			)
+	call CampaignDefenderEx( 0,1,1, SORCERESS		)
+	call CampaignDefenderEx( 0,2,4, DRAGON_HAWK		)
+
+	call SetBuildUpgrEx( 0,0,2, UPG_SORCERY			)
+	call SetBuildUpgrEx( 0,0,2, UPG_PRAYING			)
+
+    call SleepForever()
+
+endfunction

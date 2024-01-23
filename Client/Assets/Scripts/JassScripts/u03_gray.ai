@@ -1,0 +1,30 @@
+//============================================================================
+//  Undead 03 -- gray player -- AI Script
+//============================================================================
+globals
+    player user = Player(3)
+endglobals
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(HOUSE,null)
+
+	call SetReplacements(0,1,3)
+
+    call SetBuildUnitEx( 0,0,0, TOWN_HALL       )
+    call SetBuildUnitEx( 0,0,0, PEASANT         )
+    call SetBuildUnitEx( 0,0,1, BARRACKS		)
+	call SetBuildUnitEx( 0,0,8, HOUSE			)
+    call SetBuildUnitEx( 0,0,1, WORKSHOP	    )
+    call SetBuildUnitEx( 0,0,1, BLACKSMITH      )
+
+	call CampaignDefenderEx( 1,1,3, RIFLEMEN )
+    call CampaignDefenderEx( 0,1,2, MORTAR  )
+
+	call SleepForever() 
+	
+endfunction
+
+

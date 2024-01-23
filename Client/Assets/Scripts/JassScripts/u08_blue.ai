@@ -1,0 +1,134 @@
+//============================================================================
+//  Undead 08 -- Blue (Grey) player -- AI Script
+//============================================================================
+globals
+    player user = Player(3)
+	player kel	= Player(6)
+endglobals
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(HOUSE,null)
+
+	set do_campaign_farms = false
+	call SetCaptainHome(ATTACK_CAPTAIN,2963,4429)
+
+    call SetBuildUnit( 1, TOWN_HALL     )
+    call SetBuildUnit( 2, PEASANT       )
+    call SetBuildUnit( 2, BARRACKS      )
+    call SetBuildUnit( 1, LUMBER_MILL   )
+    call SetBuildUnit( 1, BLACKSMITH    )
+    call SetBuildUnit( 5, PEASANT       )
+	call SetBuildUnit( 6, HOUSE		)
+    call SetBuildUnit( 1, WORKSHOP      )
+    call SetBuildUnit( 1, KEEP          )
+    call SetBuildUnit( 1, SANCTUM       )
+	call SetBuildUnit( 1, HUMAN_ALTAR   )
+    call SetBuildUnit( 1, CASTLE        )
+	call SetBuildUnit( 3, AVIARY        )
+    call SetBuildUnit( 1, WATCH_TOWER   )
+    call SetBuildUnit( 2, CANNON_TOWER  )
+	call SetBuildUnit( 1, GUARD_TOWER	)
+    
+    call CampaignDefender (EASY, 1, FOOTMAN     )
+	call CampaignDefender (EASY, 1, KNIGHT      )
+    call CampaignDefender (EASY, 1, RIFLEMAN    )
+	call CampaignDefender (EASY, 2, GRYPHON		)
+	call CampaignDefender (EASY, 1, ARCHMAGE    )
+
+	call SetBuildUpgrEx( 0,0,1, UPG_MELEE	    )
+	call SetBuildUpgrEx( 0,0,1, UPG_RANGED	    )
+	call SetBuildUpgrEx( 0,0,1, UPG_SORCERY	    )
+	call SetBuildUpgrEx( 1,1,1, UPG_GUN_RANGE	)
+	call SetBuildUpgrEx( 0,0,1, UPG_BREEDING	)
+	call SetBuildUpgrEx( 3,3,3, UPG_MASONRY	    )
+	call SetBuildUpgr  ( 1,		UPG_SENTINEL	)
+
+    call WaitForSignal()
+
+    set allow_signal_abort = true
+
+    //*** WAVE 1 Time 2min ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx(2,2,3, GRYPHON		)
+    call SuicideOnPlayer(M3,user)
+
+    //*** WAVE 2 Time 5min ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx(3,3,4, GRYPHON		)
+    call SuicideOnPlayer(M3,user)
+
+	call SetBuildUpgrEx( 0,0,1, UPG_ARMOR	    )
+	call SetBuildUpgrEx( 0,0,1, UPG_LEATHER	    )
+
+    //*** WAVE 3 Time 8min ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx(4,4,5, GRYPHON		)
+    call SuicideOnPlayer(M3,user)
+
+	call SetBuildUpgrEx( 1,1,1, UPG_HAMMERS	    )
+	call SetBuildUpgrEx( 1,1,2, UPG_MELEE	    )
+	call SetBuildUpgrEx( 1,1,2, UPG_RANGED	    )
+
+    //*** WAVE 4 Time 11min ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx(4,4,5, GRYPHON		)
+    call SuicideOnPlayer(M3,kel)
+
+	call SetBuildUpgrEx( 1,1,2, UPG_ARMOR	    )
+	call SetBuildUpgrEx( 1,1,2, UPG_LEATHER	    )
+	call SetBuildUpgrEx( 1,1,2, UPG_SORCERY	    )
+
+	//*** WAVE 5 Time 14min ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx(5,5,6, GRYPHON		)
+    call SuicideOnPlayer(M3,user)
+
+	call SetBuildUpgrEx( 1,1,1, UPG_BREEDING	)
+	call SetBuildUpgrEx( 2,2,3, UPG_MELEE	    )
+	call SetBuildUpgrEx( 2,2,3, UPG_RANGED	    )
+	call SetBuildUpgrEx( 2,2,3, UPG_ARMOR	    )
+	call SetBuildUpgrEx( 2,2,3, UPG_LEATHER	    )
+	call SetBuildUpgrEx( 2,2,2, UPG_SORCERY	    )
+
+	//*** WAVE 6 Time 17min ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx(3,3,4, KNIGHT		)
+    call CampaignAttackerEx(4,4,5, GRYPHON		)
+    call SuicideOnPlayer(M3,user)
+
+	//*** WAVE 7 Time 20min ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx(4,4,5, KNIGHT		)
+    call CampaignAttackerEx(4,4,5, GRYPHON		)
+    call SuicideOnPlayer(M3,user)
+
+	//*** WAVE 8 Time 23min ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx(3,3,4, KNIGHT		)
+    call CampaignAttackerEx(5,5,6, GRYPHON		)
+    call CampaignAttackerEx(1,1,2, SORCERESS	)
+    call SuicideOnPlayer(M3,user)
+
+	//*** WAVE 9 Time 26min ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx(3,3,4, KNIGHT		)
+    call CampaignAttackerEx(5,5,6, GRYPHON		)
+    call CampaignAttackerEx(1,1,2, SORCERESS	)
+	call CampaignAttackerEx(1,1,2, MORTAR		)
+	call CampaignAttackerEx(1,1,1, ARCHMAGE		)	
+    call SuicideOnPlayer(M3,kel)
+
+	//*** WAVE 10 Time 29min ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx(3,3,4, KNIGHT		)
+    call CampaignAttackerEx(5,5,6, GRYPHON		)
+    call CampaignAttackerEx(1,1,2, SORCERESS	)
+	call CampaignAttackerEx(1,1,2, MORTAR		)
+	call CampaignAttackerEx(1,1,1, ARCHMAGE		)	
+    call SuicideOnPlayer(M3,kel)
+
+    call SuicideUnits( RIFLEMAN, TANK, COPTER, MORTAR, FOOTMAN, KNIGHT, PRIEST, ARCHMAGE, GRYPHON, 0 )
+endfunction

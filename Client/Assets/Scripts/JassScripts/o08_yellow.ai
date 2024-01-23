@@ -1,0 +1,110 @@
+//============================================================================
+//  Orc 08 -- yellow player -- AI Script
+//============================================================================
+globals
+	player Thrall = Player(0)
+	player Jaina  = Player(9)
+endglobals
+
+//============================================================================
+//  custom_suicide
+//============================================================================
+function custom_suicide takes integer seconds, player target returns nothing
+    if CommandsWaiting() != 0 then
+        call SleepForever()
+    else
+        call SuicideOnPlayer(seconds,target)
+    endif
+endfunction
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    debug call Cheat("vision 4")
+    debug call Cheat("control 4")
+
+    call CampaignAI(BURROW,null)
+    call GroupTimedLife(false)
+
+    call SetCaptainHome(BOTH_CAPTAINS,1271,2764)
+
+    //*** WAVE 1 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY, 6, CHAOS_GRUNT     )
+    call custom_suicide(0,Thrall)
+
+    //*** WAVE 2 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY, 4, CHAOS_GRUNT     )
+    call CampaignAttacker( EASY, 3, CHAOS_RAIDER    )
+    call custom_suicide(5*60,Jaina)
+
+    //*** WAVE 3 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY, 4, CHAOS_GRUNT     )
+    call CampaignAttacker( EASY, 2, CHAOS_RAIDER    )
+    call custom_suicide(2*60,Jaina)
+
+    //*** WAVE 4 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY, 5, CHAOS_GRUNT     )
+    call CampaignAttacker( EASY, 2, CHAOS_RAIDER    )
+    call CampaignAttacker( EASY, 2, CHAOS_WARLOCK   )
+    call custom_suicide(4*60,Thrall)
+
+    //*** WAVE 5 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY, 8, CHAOS_GRUNT     )
+    call CampaignAttacker( EASY, 1, CHAOS_WARLOCK   )
+    call custom_suicide(2*60,Jaina)
+
+    //*** WAVE 6 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY, 6, CHAOS_GRUNT     )
+    call CampaignAttacker( EASY, 3, CHAOS_RAIDER    )
+    call CampaignAttacker( EASY, 2, CHAOS_WARLOCK   )
+    call custom_suicide(5*60,Thrall)
+
+    //*** WAVE 7 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY, 6, CHAOS_GRUNT     )
+    call CampaignAttacker( EASY, 5, CHAOS_RAIDER    )
+    call custom_suicide(3*60,Jaina)
+
+    //*** WAVE 8 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY, 8, CHAOS_GRUNT     )
+    call CampaignAttacker( EASY, 2, CHAOS_RAIDER    )
+    call CampaignAttacker( EASY, 3, CHAOS_WARLOCK   )
+    call custom_suicide(3*60,Thrall)
+
+    //*** WAVE 9 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY, 8, CHAOS_GRUNT     )
+    call CampaignAttacker( EASY, 6, CHAOS_RAIDER    )
+    call CampaignAttacker( EASY, 2, CHAOS_WARLOCK   )
+    call custom_suicide(2*60,Jaina)
+
+    //*** WAVE 10 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY, 6, CHAOS_GRUNT     )
+    call CampaignAttacker( EASY, 8, CHAOS_RAIDER    )
+    call CampaignAttacker( EASY, 3, CHAOS_WARLOCK   )
+    call custom_suicide(2*60,Thrall)
+
+    //*** WAVE 11,12+ ***
+    loop
+        call InitAssaultGroup()
+        call CampaignAttacker( EASY, 8, CHAOS_GRUNT     )
+        call CampaignAttacker( EASY, 6, CHAOS_RAIDER    )
+        call CampaignAttacker( EASY, 2, CHAOS_WARLOCK   )
+        call custom_suicide(4*60,Jaina)
+
+        call InitAssaultGroup()
+        call CampaignAttacker( EASY, 6, CHAOS_GRUNT     )
+        call CampaignAttacker( EASY, 8, CHAOS_RAIDER    )
+        call CampaignAttacker( EASY, 3, CHAOS_WARLOCK   )
+        call custom_suicide(4*60,Thrall)
+    endloop
+endfunction

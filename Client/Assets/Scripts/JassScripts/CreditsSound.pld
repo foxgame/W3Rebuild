@@ -1,0 +1,31 @@
+function PreloadFiles takes nothing returns nothing
+
+	call Preload( "units\\nightelf\\Chimaera\\Chimaera_portrait.mdx" )
+	call Preload( "units\\NightElf\\Chimaera\\Chimera.blp" )
+	call Preload( "units\\nightelf\\DruidoftheClaw\\DruidoftheClaw.mdx" )
+	call Preload( "units\\NightElf\\DruidOfTheClaw\\Druidoftheclaw.blp" )
+	call Preload( "units\\NightElf\\DruidOfTheClaw\\Bear.blp" )
+	call Preload( "Textures\\GenericGlow2b.blp" )
+	call Preload( "Textures\\DeathScream.blp" )
+	call Preload( "Textures\\RibbonNE1.blp" )
+	call Preload( "units\\NightElf\\DruidOfTheClaw\\Tj_leaf.blp" )
+	call Preload( "units\\nightelf\\DruidoftheClaw\\DruidoftheClaw_portrait.mdx" )
+	call Preload( "units\\nightelf\\Wisp\\Wisp.mdx" )
+	call Preload( "ReplaceableTextures\\Weather\\CloudSingleFlat.blp" )
+	call Preload( "Textures\\Dust5.blp" )
+	call Preload( "Textures\\GenericGlow2c.blp" )
+	call Preload( "units\\creeps\\Wendigo\\Wendigo_portrait.mdx" )
+	call Preload( "units\\Creeps\\Wendigo\\Wendigo.blp" )
+	call Preload( "buildings\\nightelf\\AncientOfWind\\AncientOfWind_portrait.mdx" )
+	call Preload( "buildings\\NightElf\\AncientOfWind\\AncientoftheWind.blp" )
+	call Preload( "Textures\\rootbase.blp" )
+	call Preload( "units\\human\\Jaina\\Jaina_portrait.mdx" )
+	call Preload( "units\\Human\\Jaina\\Jaina.blp" )
+	call Preload( "units\\creeps\\SludgeMonster\\SludgeMonster.mdx" )
+	call Preload( "units\\creeps\\CentaurArcher\\CentaurArcher_portrait.mdx" )
+	call Preload( "Textures\\Centaur.blp" )
+	call PreloadEnd( 0.0 )
+
+endfunction
+
+

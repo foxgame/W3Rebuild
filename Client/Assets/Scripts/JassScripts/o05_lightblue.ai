@@ -1,0 +1,111 @@
+//============================================================================
+//  Orc 05 -- light blue player -- AI Script
+//============================================================================
+globals
+    player user = Player(3)
+endglobals
+
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(MOON_WELL,null)
+	call SetReplacements(2,2,4)
+
+    // don't harvest immediately
+    set campaign_wood_peons = 0
+
+    call SetBuildUnit( 1, WISP          )
+    call SetBuildUnit( 1, ELF_ALTAR     )
+    call SetBuildUnit( 1, HUNTERS_HALL  )
+    call SetBuildUnit( 8, WISP          )
+
+    call SetBuildUnitEx( 3,3,3, ANCIENT_PROTECT )
+
+    call CampaignDefender( EASY, 3, ARCHER      )
+    call CampaignDefender( EASY, 2, HUNTRESS    )
+
+	call SetBuildUpgrEx( 0,0,1, UPG_BLESSING	)
+
+    // wait to start harvesting
+    call WaitForSignal()
+    set campaign_wood_peons = 0
+
+    // wait to start attack waves
+    call WaitForSignal()
+
+    //*** WAVE 1 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 3,3,5, ARCHER          )
+    call CampaignAttackerEx( 1,1,1, ANCIENT_PROTECT )
+    call SuicideOnPlayerEx(M6,M6,M6,user)
+
+	call SetBuildUpgrEx( 0,0,1, UPG_STR_MOON	    )
+	call SetBuildUpgrEx( 1,1,1, UPG_ULTRAVISION	    )
+                                                    
+    //*** WAVE 2 ***                                
+    call InitAssaultGroup()                         
+    call CampaignAttackerEx( 3,3,4, ARCHER          )
+    call CampaignAttackerEx( 2,2,3, ANCIENT_PROTECT )
+    call SuicideOnPlayerEx(M8,M8,M7,user)           
+                                                    
+	call SetBuildUpgrEx( 0,0,1, UPG_MOON_ARMOR	    )
+	call SetBuildUpgrEx( 0,0,1, UPG_GLAIVE		    )
+                                                    
+    //*** WAVE 3 ***                                
+    call InitAssaultGroup()                         
+    call CampaignAttackerEx( 2,2,3, ARCHER          )
+    call CampaignAttackerEx( 2,2,4, HUNTRESS        )
+    call CampaignAttackerEx( 1,1,1, BALLISTA        )
+    call CampaignAttackerEx( 1,1,1, ANCIENT_PROTECT )
+	call SuicideOnPlayerEx(M8,M8,M7,user)           
+                                                    
+	call SetBuildUpgrEx( 1,1,1, UPG_BOWS		    )
+	call SetBuildUpgrEx( 1,1,2, UPG_STR_MOON	    )
+                                                    
+    //*** WAVE 4 ***                                
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 4,4,5, ARCHER          )
+    call CampaignAttackerEx( 2,2,3, HUNTRESS        )
+    call CampaignAttackerEx( 2,2,3, ANCIENT_PROTECT )
+    call SuicideOnPlayerEx(M8,M8,M7,user)           
+                                                    
+	call SetBuildUpgrEx( 1,1,1, UPG_MARKSMAN	    )
+	call SetBuildUpgrEx( 1,1,2, UPG_MOON_ARMOR	    )
+                                                    
+    //*** WAVE 5 ***                                
+    call InitAssaultGroup()                         
+    call CampaignAttackerEx( 4,4,6, HUNTRESS        )
+    call CampaignAttackerEx( 1,1,2, BALLISTA        )
+    call CampaignAttackerEx( 1,1,2, ANCIENT_PROTECT )
+    call SuicideOnPlayerEx(M8,M8,M7,user)           
+                                                    
+	call SetBuildUpgrEx( 1,1,1, UPG_GLAIVE		    )
+	call SetBuildUpgrEx( 1,1,1, UPG_BOLT		    )
+	call SetBuildUpgrEx( 2,2,2, UPG_MOON_ARMOR	    )
+	call SetBuildUpgrEx( 2,2,2, UPG_STR_MOON	    )
+
+    loop
+        //*** WAVE 6 ***
+        call InitAssaultGroup()
+		call CampaignAttackerEx( 3,3,5, ARCHER          )
+        call CampaignAttackerEx( 3,3,4, ANCIENT_PROTECT )
+        call SuicideOnPlayerEx(M8,M8,M7,user)
+
+        //*** WAVE 7 ***
+        call InitAssaultGroup()
+		call CampaignAttackerEx( 1,1,2, ARCHER          )
+		call CampaignAttackerEx( 2,2,3, HUNTRESS        )
+		call CampaignAttackerEx( 2,2,3, BALLISTA        )
+        call CampaignAttackerEx( 1,1,2, ANCIENT_PROTECT )
+        call SuicideOnPlayerEx(M8,M8,M7,user)
+
+        //*** WAVE 8 ***
+        call InitAssaultGroup()
+		call CampaignAttackerEx( 5,5,8, HUNTRESS        )
+		call CampaignAttackerEx( 1,1,2, BALLISTA        )
+        call CampaignAttackerEx( 2,2,3, ANCIENT_PROTECT )
+        call SuicideOnPlayerEx(M8,M8,M7,user)
+    endloop
+endfunction

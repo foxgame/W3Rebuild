@@ -1,0 +1,48 @@
+//============================================================================
+//  $Id: n05x03.ai,v 1.9 2003/04/26 11:30:56 bfitch Exp $
+//============================================================================
+globals
+    player user = PlayerEx(2)
+endglobals
+
+function main takes nothing returns nothing
+    call CampaignAI(NAGA_CORAL,null)
+    call SetAmphibious()
+
+    call SetBuildUnitEx( 1, 1, 1, NAGA_SLAVE )
+
+	call SetBuildUpgrEx( 1,1,2, UPG_SIREN			)
+	call SetBuildUpgrEx( 0,0,1, UPG_NAGA_ENSNARE	)
+    call SetBuildUpgrEx( 0,0,1, UPG_NAGA_ATTACK		)
+	call SetBuildUpgrEx( 0,0,1, UPG_NAGA_ARMOR		)
+	call SetBuildUpgrEx( 0,0,1, UPG_NAGA_ABOLISH	)
+
+    call CampaignDefenderEx( 1, 1, 2, NAGA_MYRMIDON		)
+    call CampaignDefenderEx( 1, 1, 2, NAGA_SIREN        )
+	call CampaignDefenderEx( 1, 1, 2, NAGA_REAVER       )
+
+	//*** WAVE 1 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 4, 4, 6, NAGA_REAVER		)
+    call CampaignAttackerEx( 1, 1, 2, NAGA_MYRMIDON     )
+    call SuicideOnPlayerEx(30,30,30,user)
+
+	//*** WAVE 2 ***
+    call InitAssaultGroup()
+	call CampaignAttackerEx( 4, 4, 6, NAGA_REAVER	)
+    call CampaignAttackerEx( 1, 1, 2, NAGA_MYRMIDON )
+    call SuicideOnPlayerEx(M4,M4,M3,user)
+
+	//*** WAVE 3 ***
+    call InitAssaultGroup()
+	call CampaignAttackerEx( 4, 4, 6, NAGA_REAVER	)
+    call CampaignAttackerEx( 2, 2, 4, NAGA_DRAGON   )
+    call SuicideOnPlayerEx(M4,M4,M3,user)
+
+	//*** WAVE 4 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 1, 1, 4, NAGA_MYRMIDON	)
+    call CampaignAttackerEx( 2, 2, 3, NAGA_DRAGON   )
+    call SuicideOnPlayerEx(M4,M4,M3,user)
+
+endfunction

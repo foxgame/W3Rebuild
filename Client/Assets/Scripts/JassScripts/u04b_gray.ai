@@ -1,0 +1,22 @@
+//============================================================================
+//  Undead 04B -- gray player -- AI Script
+//============================================================================
+globals
+    player user = Player(3)
+endglobals
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(ELF_FARM,null)
+	
+	call SetReplacements(0,1,3)
+
+    call SetBuildUnitEx( 1,2,3, ZEPPLIN         )
+    
+	call CampaignDefenderEx( 1,1,1, SYLVANUS    )
+
+    call SleepForever()
+endfunction
+

@@ -1,0 +1,155 @@
+//==================================================================================================
+//  $Id: u05x03.ai,v 1.15.2.1 2003/05/09 09:17:05 abond Exp $
+//==================================================================================================
+globals
+    player user = PlayerEx(4)
+
+    integer delay       = M5          // normal & easy delay
+    integer hard_delay  = M4          // hard delay
+    integer fast_delay  = M3          // hard delay after final signal
+endglobals
+
+//--------------------------------------------------------------------------------------------------
+//  check_base_deaths
+//--------------------------------------------------------------------------------------------------
+function check_base_deaths takes nothing returns nothing
+    if difficulty == HARD then
+        return
+    endif
+    loop
+        exitwhen CommandsWaiting() != 0 
+        call Trace("check_base_deaths waiting for signal...\n")
+        call Sleep(10)
+    endloop
+    call PopLastCommand()
+    set delay = fast_delay
+endfunction
+
+//--------------------------------------------------------------------------------------------------
+//  upgrade_towers
+//--------------------------------------------------------------------------------------------------
+function upgrade_towers takes nothing returns nothing
+    local integer count
+    loop
+        set count = TownCountDone(WATCH_TOWER)
+        if count > 0 then
+            call SetProduce(count,GUARD_TOWER,-1)
+        endif
+        call Sleep(1)
+    endloop
+endfunction
+
+//--------------------------------------------------------------------------------------------------
+//  main
+//--------------------------------------------------------------------------------------------------
+function main takes nothing returns nothing
+
+    call CampaignAI(HOUSE,null)
+    call SetReplacements(2,2,4)
+
+    if difficulty == HARD then
+        set delay = hard_delay
+    endif
+
+    call SetBuildUnitEx( 0,0,1, TOWN_HALL       )
+    call SetBuildUnitEx( 3,3,3, PEASANT         )
+    call SetBuildUnitEx( 0,0,2, BARRACKS        )
+    call SetBuildUnitEx( 0,0,1, LUMBER_MILL     )
+    call SetBuildUnitEx( 0,0,1, HUMAN_ALTAR     )
+    call SetBuildUnitEx( 0,0,1, BLACKSMITH      )
+    call SetBuildUnitEx( 7,7,7, PEASANT         )
+    call SetBuildUnitEx( 0,0,1, KEEP            )
+    call SetBuildUnitEx( 0,0,1, WORKSHOP        )
+    call SetBuildUnitEx( 0,0,1, CASTLE          )
+
+    call WaitForSignal()
+
+    // SUICIDE WAVES - Occur after timer runs out
+    call SuicideOnce( 4, 4, 4, FOOTMAN      )
+    call SuicideOnce( 2, 2, 2, KNIGHT       )
+    call SuicideOnce( 1, 1, 2, MORTAR       )
+    call SuicideOnce( 2, 2, 2, RIFLEMAN     )
+
+    call WaitForSignal()
+
+    // ENABLE DEFENDERS - Occurs after Suicide is over
+    call CampaignDefenderEx( 1,1,1, KNIGHT      )
+    call CampaignDefenderEx( 1,1,1, RIFLEMAN    )
+    call CampaignDefenderEx( 0,0,1, COPTER      )
+
+    call StartThread(function upgrade_towers)
+
+    call WaitForSignal()
+
+    call StartThread(function check_base_deaths)
+
+    //*** WAVE 1 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 4,4,6, FOOTMAN     )
+    call CampaignAttackerEx( 2,2,4, RIFLEMAN    )
+    call SuicideOnPlayerEx(M1,M1,M1,user)
+
+    call SetBuildUpgrEx( 1,1,1, UPG_MELEE       )
+    call SetBuildUpgrEx( 1,1,1, UPG_RANGED      )
+    call SetBuildUpgrEx( 1,1,1, UPG_MASONRY     )
+    call SetBuildUpgrEx( 1,1,1, UPG_DEFEND      )
+
+    //*** WAVE 2 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 1,1,2, STEAM_TANK  )
+    call CampaignAttackerEx( 4,4,4, RIFLEMAN    )
+    call SuicideOnPlayer(delay,user)
+
+    call SetBuildUpgrEx( 1,1,1, UPG_GUN_RANGE   )
+    call SetBuildUpgrEx( 1,1,1, UPG_LEATHER     )
+    call SetBuildUpgrEx( 1,1,1, UPG_ARMOR       )
+    call SetBuildUpgrEx( 1,1,1, UPG_BREEDING    )
+    call SetBuildUpgrEx( 1,1,1, UPG_BOMBS       )
+
+    //*** WAVE 3 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 6,6,8, FOOTMAN     )
+    call CampaignAttackerEx( 3,3,6, RIFLEMAN    )
+    call CampaignAttackerEx( 2,2,3, MORTAR      )
+    call SuicideOnPlayer(delay,user)
+
+    call SetBuildUpgrEx( 0,0,2, UPG_MELEE       )
+    call SetBuildUpgrEx( 0,0,2, UPG_RANGED      )
+    call SetBuildUpgrEx( 1,1,2, UPG_MASONRY     )
+    call SetBuildUpgrEx( 1,1,1, UPG_TANK        )
+
+    //*** WAVE 4 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 2,2,3, ROCKET_TANK )
+    call CampaignAttackerEx( 2,2,4, FOOTMAN     )
+    call CampaignAttackerEx( 3,3,6, RIFLEMAN    )
+    call SuicideOnPlayer(delay,user)
+
+    call SetBuildUpgrEx( 0,0,2, UPG_LEATHER     )
+    call SetBuildUpgrEx( 0,0,2, UPG_ARMOR       )
+    call SetBuildUpgrEx( 1,1,1, UPG_BREEDING    )
+
+    //*** WAVE 5 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 4,4,6, KNIGHT      )
+    call CampaignAttackerEx( 2,2,4, RIFLEMAN    )
+    call CampaignAttackerEx( 1,1,1, MORTAR      )
+    call SuicideOnPlayer(delay,user)
+
+    loop
+        //*** WAVE 6 ***
+        call InitAssaultGroup()
+        call CampaignAttackerEx( 2,2,3, ROCKET_TANK )
+        call CampaignAttackerEx( 2,2,5, KNIGHT      )
+        call CampaignAttackerEx( 3,3,5, RIFLEMAN    )
+        call SuicideOnPlayer(delay,user)
+
+        //*** WAVE 7 ***
+        call InitAssaultGroup()
+        call CampaignAttackerEx( 5,5,7, KNIGHT      )
+        call CampaignAttackerEx( 2,2,4, RIFLEMAN    )
+        call CampaignAttackerEx( 1,1,2, MORTAR      )
+        call SuicideOnPlayer(delay,user)
+    endloop
+endfunction
+

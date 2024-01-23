@@ -1,0 +1,898 @@
+//==================================================================================================
+//  $Id: u08x02.ai,v 1.14.2.7 2003/05/12 20:47:05 abond Exp $
+//==================================================================================================
+globals
+    constant integer ILLIDAN_TOWN_X     = 4400
+    constant integer ILLIDAN_TOWN_Y     = 6300
+
+    constant integer ILLIDAN_DEF_X      = 5050
+    constant integer ILLIDAN_DEF_Y      = 6600
+
+    constant player USER                = PlayerEx(1)
+
+    constant integer OFFSET_X           = 600
+    constant integer OFFSET_Y           = 500
+
+    constant integer NAGA_COUATL2       = 'n000'
+    constant integer NAGA_REAVER2       = 'n001'
+    constant integer NAGA_ROYAL2        = 'n002'
+    constant integer NAGA_MYRMIDON2     = 'n003'
+    constant integer NAGA_SNAP_DRAGON2  = 'n004'
+    constant integer NAGA_TURTLE2       = 'n005'
+    constant integer NAGA_SIREN2        = 'n007'
+
+    constant integer BUCKET_COUATL      = 0
+    constant integer BUCKET_SNAP_DRAGON = 1
+    constant integer BUCKET_REAVER      = 2
+    constant integer BUCKET_MYRMIDON    = 3
+    constant integer BUCKET_SIREN       = 4
+    constant integer BUCKET_TURTLE      = 5
+    constant integer BUCKET_ROYAL       = 6
+    constant integer BUCKET_END         = 7
+
+    constant integer SET_TOWN_1_X       =  1
+    constant integer SET_TOWN_1_Y       =  2
+    constant integer SET_TOWN_2_X       =  3
+    constant integer SET_TOWN_2_Y       =  4
+    constant integer SET_TOWN_3_X       =  5
+    constant integer SET_TOWN_3_Y       =  6
+    constant integer SET_TOWN_4_X       =  7
+    constant integer SET_TOWN_4_Y       =  8
+    constant integer PEONS_LOST         =  9
+    constant integer SLOT_LOST          = 10
+    constant integer SLOT_GAINED        = 11
+    constant integer SLOT_STEPPED_ON    = 12
+
+    constant integer STARTUP_CMDS       = 12
+
+    constant boolean NORMAL_ATTACK      = true
+    constant boolean PEON_ATTACK        = false
+
+    constant integer NO_CONTROL         = 1
+    constant integer ILLIDAN_CONTROL    = 2
+    constant integer ARTHAS_CONTROL     = 3
+
+    constant integer NOT_POSSIBLE       = 1
+
+    constant integer START_SLOT         = 2
+
+    integer startup                     = 0
+    boolean first_attack                = true
+
+    integer action_state                = SLOT_LOST
+    integer next_slot                   = -1
+    integer attack_delay                = 1
+    integer attack_index                = 0
+    boolean rebuild_Illidan             = true
+    boolean stepped_on                  = false
+    boolean suicide_mode                = false
+    boolean did_suicide                 = false
+    boolean timeout_failure             = false
+
+    integer array town_x
+    integer array town_y
+
+    boolean array peons_lost
+    boolean array slot_owned
+    integer array slot_control
+
+    integer array Illidan0
+    integer array Illidan1
+    integer array Illidan2
+    integer array Illidan3
+
+    integer array attack_min_COPs
+    integer array attack_max_COPs
+    integer array attack_qty
+    integer array attack_bucket
+
+    integer array bucket_qty
+    integer array bucket_unitid
+
+    real array food_factor
+    real dragon_factor
+endglobals
+
+//--------------------------------------------------------------------------------------------------
+//  set_attack_group
+//--------------------------------------------------------------------------------------------------
+function set_attack_group takes integer min_COPs, integer max_COPs, integer normal, integer hard, integer idx returns nothing
+
+    set attack_min_COPs[attack_index] = min_COPs
+    set attack_max_COPs[attack_index] = max_COPs
+    set attack_bucket[attack_index]   = idx
+
+    if difficulty==EASY or difficulty==NORMAL then
+        set attack_qty[attack_index] = normal
+    else
+        set attack_qty[attack_index] = hard
+    endif
+
+    set attack_index = attack_index + 1
+endfunction
+
+//--------------------------------------------------------------------------------------------------
+//  wave_time
+//--------------------------------------------------------------------------------------------------
+function wave_time takes integer norm, integer hard returns integer
+    if difficulty==EASY or difficulty==NORMAL then
+        return norm
+    else
+        return hard
+    endif
+endfunction
+
+//--------------------------------------------------------------------------------------------------
+//  balance_factor
+//--------------------------------------------------------------------------------------------------
+function balance_factor takes real norm, real hard returns real
+    if difficulty==EASY or difficulty==NORMAL then
+        return norm
+    else
+        return hard
+    endif
+endfunction
+
+//--------------------------------------------------------------------------------------------------
+//  balance_info
+//--------------------------------------------------------------------------------------------------
+function balance_info takes nothing returns nothing
+
+    set food_factor[0] = balance_factor( 0.40, 0.50 )   // bigger is harder
+    set food_factor[1] = balance_factor( 0.45, 0.55 )
+    set food_factor[2] = balance_factor( 0.50, 0.60 )
+    set food_factor[3] = balance_factor( 0.50, 0.60 )
+    set food_factor[4] = balance_factor( 0.50, 0.60 )
+
+    set dragon_factor  = balance_factor( 1.00, 1.50 )
+
+    // these should not happen unless the user somehow kills Illidan right away
+    //
+    set Illidan0[0] = wave_time( M1, M1 )
+    set Illidan0[1] = wave_time( M1, M1 )
+    set Illidan0[2] = wave_time( M1, M1 )
+    set Illidan0[3] = wave_time( M1, M1 )
+    set Illidan0[4] = wave_time( M1, M1 )
+
+    // these are some of the most common cases
+    //
+    set Illidan1[0] = wave_time( M3, M3 )
+    set Illidan1[1] = wave_time( M3, M3 )
+    set Illidan1[2] = wave_time( M2, M2 )
+    set Illidan1[3] = wave_time( M2, M2 )
+
+    set Illidan2[0] = wave_time( M4, M4 )
+    set Illidan2[1] = wave_time( M4, M4 )
+    set Illidan2[2] = wave_time( M3, M2 )
+    set Illidan2[3] = NOT_POSSIBLE
+
+    // Illidan is near to winning
+    //
+    set Illidan3[0] = wave_time( M5, M5 )
+    set Illidan3[1] = wave_time( M5, M5 )
+    set Illidan3[2] = NOT_POSSIBLE
+    set Illidan3[3] = NOT_POSSIBLE
+
+    //                    from  to  norm hard 
+    //                    COPs COPs  qty  qty unit
+    //                    ---- ---- ---- ---- --------------------
+    call set_attack_group(  0,   3,   0,   0, BUCKET_COUATL      ) // special: based on wyrms
+    //------------------------------------------------------------
+    call set_attack_group(  0,   3,   1,   1, BUCKET_SNAP_DRAGON )
+
+    call set_attack_group(  0,   1,   2,   2, BUCKET_REAVER      )
+    call set_attack_group(  2,   3,   1,   1, BUCKET_MYRMIDON    )
+    call set_attack_group(  2,   3,   0,   1, BUCKET_ROYAL       )
+    call set_attack_group(  0,   3,   1,   1, BUCKET_SIREN       )
+
+    call set_attack_group(  0,   3,   1,   1, BUCKET_SNAP_DRAGON )
+
+    call set_attack_group(  0,   1,   2,   2, BUCKET_REAVER      )
+    call set_attack_group(  2,   3,   1,   1, BUCKET_MYRMIDON    )
+    call set_attack_group(  3,   3,   1,   0, BUCKET_ROYAL       )
+
+    call set_attack_group(  0,   3,   2,   2, BUCKET_SNAP_DRAGON )
+    call set_attack_group(  0,   3,   2,   2, BUCKET_SIREN       )
+    call set_attack_group(  0,   3,   2,   2, BUCKET_TURTLE      )
+
+    call set_attack_group(  0,   3,   2,   2, BUCKET_MYRMIDON    )
+    call set_attack_group(  0,   3,   3,   3, BUCKET_SNAP_DRAGON )
+    //------------------------------------------------------------
+    call set_attack_group(  0,   3,  99,  99, BUCKET_MYRMIDON    )
+endfunction
+
+//--------------------------------------------------------------------------------------------------
+//  unit_info
+//--------------------------------------------------------------------------------------------------
+function unit_info takes nothing returns nothing
+
+    set bucket_unitid[ BUCKET_COUATL      ] = NAGA_COUATL2
+    set bucket_unitid[ BUCKET_SNAP_DRAGON ] = NAGA_SNAP_DRAGON2
+    set bucket_unitid[ BUCKET_REAVER      ] = NAGA_REAVER2
+    set bucket_unitid[ BUCKET_MYRMIDON    ] = NAGA_MYRMIDON2
+    set bucket_unitid[ BUCKET_SIREN       ] = NAGA_SIREN2
+    set bucket_unitid[ BUCKET_TURTLE      ] = NAGA_TURTLE2
+    set bucket_unitid[ BUCKET_ROYAL       ] = NAGA_ROYAL2
+endfunction
+
+//--------------------------------------------------------------------------------------------------
+//  slots_controlled
+//--------------------------------------------------------------------------------------------------
+function slots_controlled takes integer who returns integer
+
+    local integer sum = 0
+
+    local integer i = 1
+    loop
+        if slot_control[i] == who then
+            set sum = sum + 1
+        endif
+        set i = i + 1
+        exitwhen i > 4
+    endloop
+
+    return sum
+endfunction
+
+//--------------------------------------------------------------------------------------------------
+//  message_loop
+//--------------------------------------------------------------------------------------------------
+function message_loop takes nothing returns nothing
+
+    local integer cmd
+    local integer data
+
+    local integer i = 1
+    loop
+        set town_x[i] = 0
+        set town_y[i] = 0
+
+        set peons_lost[i]   = false
+        set slot_owned[i]   = true
+        set slot_control[i] = NO_CONTROL
+
+        set i = i + 1
+        exitwhen i > 4
+    endloop
+
+    loop
+        loop
+            exitwhen CommandsWaiting() > 0
+            call Sleep(0.1)
+        endloop
+        set cmd  = GetLastCommand()
+        set data = GetLastData()
+        call PopLastCommand()
+
+        set startup = startup + 1
+        call TraceIII("COMMAND[%d] (%d,%d)\n",startup,cmd,data)
+
+        //------------------------------------------------------------------------------------------
+        if cmd == SET_TOWN_1_X then
+        //------------------------------------------------------------------------------------------
+            set town_x[1] = data
+
+        //------------------------------------------------------------------------------------------
+        elseif cmd == SET_TOWN_1_Y then
+        //------------------------------------------------------------------------------------------
+            set town_y[1] = data
+
+        //------------------------------------------------------------------------------------------
+        elseif cmd == SET_TOWN_2_X then
+        //------------------------------------------------------------------------------------------
+            set town_x[2] = data
+
+        //------------------------------------------------------------------------------------------
+        elseif cmd == SET_TOWN_2_Y then
+        //------------------------------------------------------------------------------------------
+            set town_y[2] = data
+
+        //------------------------------------------------------------------------------------------
+        elseif cmd == SET_TOWN_3_X then
+        //------------------------------------------------------------------------------------------
+            set town_x[3] = data
+
+        //------------------------------------------------------------------------------------------
+        elseif cmd == SET_TOWN_3_Y then
+        //------------------------------------------------------------------------------------------
+            set town_y[3] = data
+
+        //------------------------------------------------------------------------------------------
+        elseif cmd == SET_TOWN_4_X then
+        //------------------------------------------------------------------------------------------
+            set town_x[4] = data
+
+        //------------------------------------------------------------------------------------------
+        elseif cmd == SET_TOWN_4_Y then
+        //------------------------------------------------------------------------------------------
+            set town_y[4] = data
+
+        //------------------------------------------------------------------------------------------
+        elseif cmd == PEONS_LOST then
+        //------------------------------------------------------------------------------------------
+            call TraceI("PEONS_LOST %d\n",data)
+
+            set peons_lost[data]   = true
+
+        //------------------------------------------------------------------------------------------
+        elseif cmd == SLOT_LOST then
+        //------------------------------------------------------------------------------------------
+            call TraceI("SLOT_LOST %d\n",data)
+
+            set slot_owned[data] = false
+
+            if next_slot == -1 then
+                set next_slot = data
+            endif
+
+        //------------------------------------------------------------------------------------------
+        elseif cmd == SLOT_GAINED then
+        //------------------------------------------------------------------------------------------
+            call TraceI("SLOT_GAINED %d\n",data)
+
+            set slot_owned[data] = true
+            set peons_lost[data] = false
+            set stepped_on       = false
+
+            if startup > STARTUP_CMDS then
+                set slot_control[data] = ILLIDAN_CONTROL
+            endif
+
+        //------------------------------------------------------------------------------------------
+        elseif cmd == SLOT_STEPPED_ON then
+        //------------------------------------------------------------------------------------------
+            call Trace("SLOT_STEPPED_ON\n")
+
+            set stepped_on = true
+        endif
+
+        // possibly speed up next wave when Arthas takes one back
+        //
+        if (cmd==PEONS_LOST or cmd==SLOT_LOST) and (startup > STARTUP_CMDS) then
+
+            set slot_control[data] = ARTHAS_CONTROL
+
+            if slots_controlled(ARTHAS_CONTROL) >= 2 then
+                call Trace("ATTACK NOW\n")
+                set sleep_seconds = 1
+            endif
+        endif
+
+        call TraceI("Arthas has %d slots\n",slots_controlled(ARTHAS_CONTROL))
+        call TraceI("Illidan has %d slots\n",slots_controlled(ILLIDAN_CONTROL))
+    endloop
+endfunction
+
+//--------------------------------------------------------------------------------------------------
+//  get_start_commands
+//--------------------------------------------------------------------------------------------------
+function get_start_commands takes nothing returns nothing
+    loop
+        exitwhen startup >= STARTUP_CMDS
+        call Sleep(1)
+    endloop
+    call Trace("all startup commands received\n")
+endfunction
+
+//--------------------------------------------------------------------------------------------------
+//  pick_next_slot
+//--------------------------------------------------------------------------------------------------
+function pick_next_slot takes nothing returns nothing
+
+    local integer count = 0
+    local integer array needed
+    local integer i
+
+    local integer debug1
+    set i = 1
+    loop
+        if slot_owned[i] then
+            set debug1 = 10
+        else
+            set debug1 = 0
+        endif
+        if peons_lost[i] then
+            set debug1 = debug1 + 1
+        endif
+        call TraceIII("slot[%d] owned/lost=%02d control=%d\n",i,debug1,slot_control[i])
+        set i = i + 1
+        exitwhen i > 4
+    endloop
+
+    // recover any COP I control but lost the guardian town
+    //
+    set i = 1
+    loop
+        if slot_owned[i] and peons_lost[i] then
+            set count = count + 1
+            set needed[count] = i
+        endif
+
+        set i = i + 1
+        exitwhen i > 4
+    endloop
+    if count != 0 then
+        set next_slot = needed[GetRandomInt(1,count)]
+        set action_state = PEONS_LOST
+        return
+    endif
+
+    // gain the north COP before all others
+    //
+    if not slot_owned[1] then
+        set next_slot = 1
+        set action_state = SLOT_LOST
+        return
+    endif
+
+    // gain a COP that's currently considered neutral
+    //
+    set i = 2
+    loop
+        if (not slot_owned[i]) and (slot_control[i] == NO_CONTROL) then
+            set count = count + 1
+            set needed[count] = i
+        endif
+
+        set i = i + 1
+        exitwhen i > 4
+    endloop
+    if count != 0 then
+        set next_slot = needed[GetRandomInt(1,count)]
+        set action_state = SLOT_LOST
+        return
+    endif
+
+    // no neutral COPs left, so take one from Arthas
+    //
+    set i = 2
+    loop
+        if not slot_owned[i] then
+            set count = count + 1
+            set needed[count] = i
+        endif
+
+        set i = i + 1
+        exitwhen i > 4
+    endloop
+    if count == 0 then
+        call SleepForever() // Illidan won!
+    endif
+
+    set next_slot = needed[GetRandomInt(1,count)]
+    set action_state = SLOT_LOST
+endfunction
+
+//--------------------------------------------------------------------------------------------------
+//  Illidan_count
+//--------------------------------------------------------------------------------------------------
+function Illidan_count takes boolean onlyDone returns integer
+
+    if GetUnitCountDone(ILLIDAN) > 0 or GetUnitCountDone(ILLIDAN_DEMON) > 0 then
+        return 1
+    endif
+
+    if onlyDone then
+        return 0
+    endif
+
+    if GetUnitCount(ILLIDAN) > 0 or GetUnitCount(ILLIDAN_DEMON) > 0 then
+        return 1
+    endif
+
+    return 0
+endfunction
+
+//--------------------------------------------------------------------------------------------------
+//  attack_move
+//--------------------------------------------------------------------------------------------------
+function attack_move takes integer dx, integer dy returns nothing
+
+    if CaptainIsEmpty() or Illidan_count(true) < 1 then
+        if CaptainIsEmpty() then
+            call TraceI("SKIP attack_move [empty=1, Illidan=%d]\n",Illidan_count(true))
+        else
+            call TraceI("SKIP attack_move [empty=0, Illidan=%d]\n",Illidan_count(true))
+        endif
+        return
+    endif
+
+    call TraceII("attack_move( %d, %d )\n",dx,dy)
+
+    call AttackMoveXY( town_x[next_slot]+dx, town_y[next_slot]+dy )
+    call Sleep(5)
+    call SleepUntilAtGoal()
+    call SleepInCombat()
+    call RemoveInjuries()
+endfunction
+
+//--------------------------------------------------------------------------------------------------
+//  set_attack_rate
+//--------------------------------------------------------------------------------------------------
+function set_attack_rate takes nothing returns nothing
+
+    local integer Islots = slots_controlled(ILLIDAN_CONTROL)
+    local integer Aslots = slots_controlled(ARTHAS_CONTROL)
+
+    if Aslots >= 0 and Aslots <= 3 then
+        if Islots == 0 then
+            set attack_delay = Illidan0[Aslots]
+        elseif Islots == 1 then
+            set attack_delay = Illidan1[Aslots]
+        elseif Islots == 2 then
+            set attack_delay = Illidan2[Aslots]
+        elseif Islots == 3 then
+            set attack_delay = Illidan3[Aslots]
+        else
+            set attack_delay = NOT_POSSIBLE
+        endif
+    else
+        set attack_delay = NOT_POSSIBLE
+    endif
+
+    call TraceI("set_attack_rate = %d seconds\n",attack_delay)
+endfunction
+
+//--------------------------------------------------------------------------------------------------
+//  Illidan_attack
+//--------------------------------------------------------------------------------------------------
+function Illidan_attack takes boolean normal_attack returns nothing
+    local integer last_x
+    local integer last_y
+    local integer dx
+    local integer dy
+    local integer i
+
+    if normal_attack then
+        call TraceI("Illidan_attack: normal attack (in %d seconds)\n",attack_delay)
+        set sleep_seconds = attack_delay
+    else
+        call Trace("Illidan_attack: QUICK attack\n")
+        set sleep_seconds = 1
+    endif
+
+    call Trace("Illidan_attack: wait for Illidan\n")
+    loop
+        exitwhen Illidan_count(true) > 0
+        call SuicideSleep(1)
+    endloop
+    call Trace("Illidan_attack: Illidan ready to attack, form group\n")
+
+    loop
+        call FormGroup(1,false)
+
+        exitwhen sleep_seconds < 1
+
+        call TraceI("Illidan_attack: exit in %d seconds\n",sleep_seconds)
+        call SuicideSleep(5)
+
+        if Illidan_count(true) < 1 then
+            call TraceI("Illidan dead, suspend Illidan_attack for %d seconds\n",sleep_seconds)
+            call Sleep(sleep_seconds)
+            return
+        endif
+    endloop
+
+    if first_attack then
+        set first_attack = false
+    else
+        call pick_next_slot()
+        call TraceI("Illidan_attack: next_slot = %d\n",next_slot)
+    endif
+
+    set last_x = town_x[next_slot]
+    set last_y = town_y[next_slot]
+
+    call SetCaptainHome(ATTACK_CAPTAIN,last_x,last_y)
+
+    call attack_move(0,0)
+    call attack_move(+OFFSET_X,+OFFSET_Y)
+    call attack_move(+OFFSET_X,-OFFSET_Y)
+    call attack_move(-OFFSET_X,-OFFSET_Y)
+    call attack_move(-OFFSET_X,+OFFSET_Y)
+    call attack_move(+OFFSET_X,+OFFSET_Y)
+    call attack_move(0,0)
+
+    if next_slot == 1 then
+        set dx = 0
+        set dy = +1000
+
+    elseif next_slot == 2 then
+        set dx = +1000
+        set dy = 0
+
+    elseif next_slot == 3 then
+        set dx = 0
+        set dy = -1000
+
+    else // next_slot == 4
+        set dx = -1000
+        set dy = 0
+    endif
+
+    call Trace("prepare for last move\n")
+
+    set rebuild_Illidan = false
+    call Sleep(20)
+    set rebuild_Illidan = true
+
+    call Trace("wait for Illidan to finish COP\n")
+    loop
+        exitwhen not stepped_on
+        call Sleep(1)
+    endloop
+endfunction
+
+//--------------------------------------------------------------------------------------------------
+//  send_captain_home
+//--------------------------------------------------------------------------------------------------
+function send_captain_home takes nothing returns nothing
+    call SetCaptainHome(ATTACK_CAPTAIN,ILLIDAN_TOWN_X,ILLIDAN_TOWN_Y)
+    call TeleportCaptain(ILLIDAN_TOWN_X,ILLIDAN_TOWN_Y)
+    call ClearCaptainTargets()
+endfunction
+
+//--------------------------------------------------------------------------------------------------
+//  let_Illidan_die
+//--------------------------------------------------------------------------------------------------
+function let_Illidan_die takes nothing returns nothing
+    local integer timeout = 0
+    local integer force_size
+    local integer temp
+
+    call Trace("start let_Illidan_die\n")
+
+    loop
+        exitwhen Illidan_count(true) > 0    // wait for him to revive
+        call Sleep(1)
+    endloop
+    call Trace("let_Illidan_die: revived\n")
+
+    loop
+        exitwhen Illidan_count(true) < 1    // wait for him to die
+        call Sleep(1)
+    endloop
+    call Trace("let_Illidan_die: Illidan dead, suicide what's left\n")
+
+    set suicide_mode = true
+    set stepped_on = false
+
+    call InitAssaultGroup()                 // stop reinforcing his group
+    loop
+        exitwhen SuicidePlayer(USER,false)
+        call Sleep(1)
+    endloop
+
+    call Trace("let_Illidan_die: target picked, waiting to enter combat\n")
+    loop
+        exitwhen CaptainIsEmpty() or CaptainInCombat(true)
+        call Sleep(1)
+
+        if timeout - (timeout/5)*5 == 0 then
+            call TraceI("timeout in %d seconds\n",M1-timeout)
+        endif
+
+        set timeout = timeout + 1
+        exitwhen timeout >= M1
+    endloop
+
+    call Trace("let_Illidan_die: waiting to die\n")
+    set force_size = CaptainGroupSize()
+    set timeout = 0
+    loop
+        exitwhen CaptainIsEmpty()           // wait for all to die
+        call Sleep(1)
+
+        if timeout - (timeout/5)*5 == 0 then
+            call TraceI("timeout in %d seconds\n",M1-timeout)
+        endif
+
+        set temp = CaptainGroupSize()
+        if force_size != temp then
+            set force_size = temp
+            set timeout = 0
+        else
+            set timeout = timeout + 1
+            exitwhen timeout >= M1
+        endif
+    endloop
+
+    call Trace("let_Illidan_die: suicide done, changing force size\n")
+    call send_captain_home()
+    set suicide_mode = false
+endfunction
+
+//--------------------------------------------------------------------------------------------------
+//  extra_attackers
+//--------------------------------------------------------------------------------------------------
+function extra_attackers takes nothing returns nothing
+
+    local integer COPs = slots_controlled(ARTHAS_CONTROL)
+    local real Arthas_factor = food_factor[COPs]
+    local real player_food = GetPlayerState(USER,PLAYER_STATE_RESOURCE_FOOD_USED) * Arthas_factor
+    local real Illidan_food = 0
+
+    local integer idx
+    local integer food_each
+    local integer count
+    local integer use
+    local integer i
+
+    call TraceI("calculating extra attackers versus %d food\n",R2I(player_food))
+
+    // clear all buckets
+    //
+    set i = 0
+    loop
+        set bucket_qty[i] = 0
+        set i = i + 1
+        exitwhen i >= BUCKET_END
+    endloop
+
+    // fill buckets as desired
+    //
+    set i = 0
+    loop
+        exitwhen i >= attack_index
+
+        set count     = attack_qty[i]
+        set idx       = attack_bucket[i]
+        set food_each = GetFoodUsed(bucket_unitid[idx])
+
+        if (COPs < attack_min_COPs[i]) or (COPs > attack_max_COPs[i]) then
+            set count = 0
+        endif
+
+        if count > 0 and food_each > 0 then
+            set use = R2I( (player_food - Illidan_food) / food_each )
+            if use > count then
+                set use = count
+            elseif use < 0 then
+                set use = 0
+            endif
+        else
+            set use = count
+        endif
+
+        call TraceII("add %d of entry %d\n",use,i)
+
+        if use > 0 then
+            set bucket_qty[idx] = bucket_qty[idx] + use
+            set Illidan_food = Illidan_food + use * food_each
+        endif
+
+        exitwhen use != count
+
+        set i = i + 1
+    endloop
+
+    // use buckets by filling attack captain
+    //
+    set i = 0
+    loop
+        set count = bucket_qty[i]
+
+        call TraceII("use %d of bucket %d\n",count,i)
+        if count > 0 then
+            call SetAssaultGroup(count,count,bucket_unitid[i])
+        endif
+
+        set i = i + 1
+        exitwhen i >= BUCKET_END
+    endloop
+endfunction
+
+//--------------------------------------------------------------------------------------------------
+//  set_Illidan_force
+//--------------------------------------------------------------------------------------------------
+function set_Illidan_force takes nothing returns nothing
+
+    call InitAssaultGroup()
+
+    call Trace("set_Illidan_force: clear force, wait for rebuild_Illidan\n")
+    loop
+        exitwhen rebuild_Illidan
+        call Sleep(1)
+    endloop
+    call SetAssaultGroup(1,1,ILLIDAN)
+
+    set attack_qty[0] = R2I( GetPlayerUnitTypeCount(USER,FROST_WYRM) * dragon_factor )
+    call TraceI("dragon factor calls for %d couatls\n",attack_qty[0])
+    call extra_attackers()
+endfunction
+
+//--------------------------------------------------------------------------------------------------
+//  Illidan_force
+//--------------------------------------------------------------------------------------------------
+function Illidan_force takes nothing returns nothing
+    loop
+        call Trace("Illidan_force: top of loop\n")
+        call set_Illidan_force()
+
+        call Trace("Illidan_force: call let_Illidan_die\n")
+        call let_Illidan_die()
+    endloop
+endfunction
+
+//--------------------------------------------------------------------------------------------------
+//  main
+//--------------------------------------------------------------------------------------------------
+function main takes nothing returns nothing
+
+    call CampaignAI(NAGA_CORAL,null)
+
+    call unit_info()
+    call balance_info()
+
+    call SetCaptainHome(DEFENSE_CAPTAIN,ILLIDAN_DEF_X,ILLIDAN_DEF_Y)
+    call DoCampaignFarms(false)
+    call GroupTimedLife(true)
+    call SetAmphibious()
+    call SetReplacements(9,9,9)
+    call SetPeonsRepair(true)
+    call SetFormGroupTimeouts(false)
+    call SetHeroesTakeItems(true)
+    call SetWoodPeons(3)
+    call SetGoldPeons(0)
+
+    call StartThread(function message_loop)
+    call StartThread(function Illidan_force)
+
+    call get_start_commands()
+    call send_captain_home()
+
+    set attack_delay = 30
+    call Illidan_attack(NORMAL_ATTACK)
+
+    call SetBuildUnitEx( 1,1,1, NAGA_TEMPLE     )
+    call SetBuildUnitEx( 1,1,1, NAGA_SLAVE      )
+    call SetBuildUnitEx( 1,1,1, NAGA_ALTAR      )
+    call SetBuildUnitEx( 2,2,2, NAGA_SLAVE      )
+    call SetBuildUnitEx( 1,1,1, NAGA_SPAWNING   )
+    call SetBuildUnitEx( 3,3,3, NAGA_SLAVE      )
+    call SetBuildUnitEx( 1,1,1, NAGA_SHRINE     )
+
+    call SetBuildUpgrEx( 1,1,1, UPG_SIREN           )
+    call SetBuildUpgrEx( 1,1,1, UPG_NAGA_ENSNARE    )
+    call SetBuildUpgrEx( 1,1,1, UPG_NAGA_ABOLISH    )
+    call SetBuildUpgrEx( 2,2,2, UPG_SIREN           )
+
+    // only needs 1 of each to "pull" for attack waves
+    //
+    call CampaignDefenderEx( 1,1,1, ILLIDAN             )
+    call CampaignDefenderEx( 1,1,1, NAGA_SNAP_DRAGON    )
+    call CampaignDefenderEx( 1,1,1, NAGA_SIREN          )
+    call CampaignDefenderEx( 1,1,1, NAGA_MYRMIDON       )
+    call CampaignDefenderEx( 1,1,1, NAGA_TURTLE         )
+    call CampaignDefenderEx( 1,1,1, NAGA_COUATL2        )
+    call CampaignDefenderEx( 1,1,1, NAGA_ROYAL          )
+
+    loop
+        if suicide_mode then
+            call Trace("main loop - suicide mode\n")
+            loop
+                exitwhen not suicide_mode
+                call Sleep(1)
+            endloop
+            set did_suicide = true
+        else
+            call Trace("main loop - normal mode\n")
+        endif
+
+        call set_attack_rate()
+
+        call Trace("main loop: call set_Illidan_force\n")
+        call set_Illidan_force()
+
+        // if Illidan is dead
+        call Trace("main loop: call Illidan_attack\n")
+
+        if (action_state == PEONS_LOST) or did_suicide or timeout_failure then
+            set did_suicide = false
+            set timeout_failure = false
+            call Illidan_attack(PEON_ATTACK)
+        else
+            call Illidan_attack(NORMAL_ATTACK)
+        endif
+    endloop
+endfunction

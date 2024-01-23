@@ -1,0 +1,19 @@
+//==================================================================================================
+//  $Id: u08x06.ai,v 1.1 2003/04/15 15:51:09 bfitch Exp $
+//==================================================================================================
+function main takes nothing returns nothing
+
+    call CampaignAI(NAGA_CORAL,null)
+    call SetAmphibious()
+
+    call SetBuildUnitEx( 1,1,1, NAGA_TEMPLE     )
+    call SetBuildUnitEx( 1,1,1, NAGA_SLAVE      )
+    call SetBuildUnitEx( 1,1,1, NAGA_SPAWNING   )
+    call SetBuildUnitEx( 3,3,3, NAGA_SLAVE      )
+
+    // no defenders
+    // no attack waves
+    // AI just replaces lost preplaced units
+
+    call SleepForever()
+endfunction

@@ -1,0 +1,58 @@
+//==================================================================================================
+//  $Id: n07x01.ai,v 1.27 2003/05/05 11:28:09 bfitch Exp $
+//==================================================================================================
+globals
+    player targ = PlayerEx(6)
+endglobals
+
+function main takes nothing returns nothing
+
+    call CampaignAI(HOUSE,null)
+
+	call SetPeonsRepair(true)
+	call SetDefendPlayer(true)
+
+    call SetReplacements(6,6,3)
+
+    call SetBuildUnitEx( 1,1,1, BLOOD_PEASANT   )
+    call SetBuildUnitEx( 1,1,1, TOWN_HALL       )
+	call SetBuildUnitEx( 1,1,1, HUMAN_ALTAR     )
+    call SetBuildUnitEx( 4,4,4, WATCH_TOWER     )
+    call SetBuildUnitEx( 1,1,1, LUMBER_MILL     )
+    call SetBuildUnitEx( 4,4,4, GUARD_TOWER     )
+    call SetBuildUnitEx( 1,1,0, ARCANE_VAULT    )
+    call SetBuildUnitEx( 1,1,0, BLACKSMITH      )
+    call SetBuildUnitEx( 1,1,0, KEEP            )
+    call SetBuildUnitEx( 1,1,0, ARCANE_SANCTUM  )
+	call SetBuildUnitEx( 1,1,0, CASTLE          )
+	call SetBuildUnitEx( 1,1,0, AVIARY          )
+	call SetBuildUnitEx( 8,8,8, BLOOD_PEASANT   )
+
+	call CampaignDefenderEx( 1,1,1, KAEL            )
+	call CampaignDefenderEx( 1,1,1, SPELL_BREAKER   )
+	call CampaignDefenderEx( 2,2,2, HIGH_SWORDMAN   )
+    call CampaignDefenderEx( 1,1,1, SORCERESS       )
+    call CampaignDefenderEx( 1,1,1, PRIEST          )
+    call CampaignDefenderEx( 2,2,2, HIGH_ARCHER		)
+
+	call SetBuildUpgrEx( 1,1,1, UPG_SORCERY			)
+	call SetBuildUpgrEx( 1,1,1, UPG_PRAYING			)
+    call SetBuildUpgrEx( 1,1,1, UPG_MASONRY			)
+	call SetBuildUpgrEx( 1,1,1, UPG_ARMOR			)
+	call SetBuildUpgrEx( 1,1,1, UPG_LEATHER			)
+	call SetBuildUpgrEx( 1,1,1, UPG_RANGED			)
+	call SetBuildUpgrEx( 1,1,1, UPG_MELEE			)
+	call SetBuildUpgrEx( 2,2,1, UPG_PRAYING			)
+    call SetBuildUpgrEx( 2,2,1, UPG_MASONRY			)
+	call SetBuildUpgrEx( 2,2,2, UPG_ARMOR			)
+	call SetBuildUpgrEx( 2,2,2, UPG_LEATHER			)
+	call SetBuildUpgrEx( 2,2,2, UPG_RANGED			)
+	call SetBuildUpgrEx( 2,2,2, UPG_MELEE			)
+    call SetBuildUpgrEx( 3,3,2, UPG_MASONRY			)
+	call SetBuildUpgrEx( 3,3,2, UPG_ARMOR			)
+	call SetBuildUpgrEx( 3,3,2, UPG_LEATHER			)
+	call SetBuildUpgrEx( 3,3,2, UPG_RANGED			)
+	call SetBuildUpgrEx( 3,3,2, UPG_MELEE			)
+
+	call SleepForever()
+endfunction

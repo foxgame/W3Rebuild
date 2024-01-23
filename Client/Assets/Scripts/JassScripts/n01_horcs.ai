@@ -1,0 +1,79 @@
+//============================================================================
+//  Night Elf 01 -- light blue player -- AI Script
+//============================================================================
+globals
+    constant integer SIDE_HUMAN = 1
+    constant integer SIDE_ORC   = 2
+
+    integer side
+
+    constant player user = Player(1)
+endglobals
+
+//============================================================================
+//  mixed_wave
+//============================================================================
+function mixed_wave takes integer hqty, integer hid, integer oqty, integer oid returns nothing
+    if side == SIDE_HUMAN then
+        call CampaignAttacker( EASY, hqty, hid )
+    else
+        call CampaignAttacker( EASY, oqty, oid )
+    endif
+endfunction
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    if GetUnitCount(PEASANT)>0 then
+        set side = SIDE_HUMAN
+
+        call CampaignAI(HOUSE,null)
+
+        call SetBuildUnit( 6, PEASANT )
+
+        call CampaignDefender( EASY, 1, HIGH_FOOTMAN )
+    else
+        set side = SIDE_ORC
+
+        call CampaignAI(BURROW,null)
+
+        call SetBuildUnit( 5, PEON )
+    endif
+
+    set campaign_wood_peons = 99 // all idle peons get put on lumber
+
+    call WaitForSignal()
+
+    //*** WAVE 1 ***
+    call InitAssaultGroup()
+    call mixed_wave( 1,FOOTMAN,  1,GRUNT )
+    call SuicideOnPlayer(0,user)
+
+    //*** WAVE 2 ***
+    call InitAssaultGroup()
+    call mixed_wave( 1,RIFLEMAN,  1,GRUNT )
+    call SuicideOnPlayer(M3,user)
+
+    //*** WAVE 3 ***
+    call InitAssaultGroup()
+    call mixed_wave( 2,FOOTMAN,  1,HEAD_HUNTER )
+    call SuicideOnPlayer(M6,user)
+
+    //*** WAVE 4 ***
+    call InitAssaultGroup()
+    call mixed_wave( 1,RIFLEMAN,  1,GRUNT )
+    call SuicideOnPlayer(M3,user)
+
+    loop
+        //*** WAVE 5+ ***
+        call InitAssaultGroup()
+        call mixed_wave( 2,FOOTMAN,  2,HEAD_HUNTER )
+        call SuicideOnPlayer(M6,user)
+
+        //*** WAVE 6+ ***
+        call InitAssaultGroup()
+        call mixed_wave( 1,RIFLEMAN,  2,GRUNT )
+        call SuicideOnPlayer(M3,user)
+    endloop
+endfunction

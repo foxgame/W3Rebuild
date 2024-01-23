@@ -1,0 +1,7 @@
+//============================================================================
+//  Night Elf 3 -- owlbear owners -- AI Script
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(MOON_WELL,null)
+    call SuicideUnits( 'nowk', 'nowe', 'nowb', 'nowk', 'nowe', 'nowb', 'nowk', 'nowe', 'nowb', 0 )
+endfunction

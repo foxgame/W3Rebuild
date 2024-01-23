@@ -1,0 +1,105 @@
+//============================================================================
+//  Night Elf 04 -- purple player -- AI Script
+//============================================================================
+globals
+    constant player orcs = Player(0)
+	constant player humans = Player(9)
+endglobals
+
+//============================================================================
+//  after_orcs
+//============================================================================
+function after_orcs takes nothing returns nothing
+
+	call SetStagePoint(237,-4826)
+
+    //*** WAVE 1 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY,    3, GARGOYLE		)
+    call SuicideOnPlayer(M1,humans)
+
+    //*** WAVE 2 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY,    1, FROST_WYRM	)
+    call SuicideOnPlayer(M3,humans)
+
+    //*** WAVE 3 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY,    4, GARGOYLE     )
+	call CampaignAttacker( EASY,    1, FROST_WYRM	)
+    call SuicideOnPlayer(M3,humans)
+
+    //*** WAVE 4 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY,    4, GARGOYLE     )
+    call SuicideOnPlayer(M3,humans)
+
+	loop
+		//*** WAVE 5 ***
+		call InitAssaultGroup()
+		call CampaignAttacker( EASY,    4, GARGOYLE     )
+		call SuicideOnPlayer(M3,humans)
+
+		//*** WAVE 6+ ***
+		call InitAssaultGroup()
+		call CampaignAttacker( EASY,    4, GARGOYLE     )
+		call CampaignAttacker( EASY,    1, FROST_WYRM	)
+		call SuicideOnPlayer(M3,humans)
+	endloop
+endfunction
+
+//============================================================================
+//  test_orcs
+//============================================================================
+function test_orcs takes nothing returns nothing
+    if CommandsWaiting() > 0 then
+        call after_orcs()
+    endif
+endfunction 
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    debug call Cheat("control 3")
+    debug call Cheat("vision 3")
+
+    call CampaignAI(BURROW,null)
+	set do_campaign_farms = false
+
+    call SetStagePoint(-4350,-103)
+
+    call SetBuildUnit( 2, ACOLYTE           )
+
+    call CampaignDefender( EASY, 2, GARGOYLE	)
+    call CampaignDefender( EASY, 1, FROST_WYRM	)
+
+	call WaitForSignal()
+
+    //*** WAVE 1 ***
+    call InitAssaultGroup()
+    call CampaignAttacker( EASY,    3, GARGOYLE		)
+    call SuicideOnPlayer(M2,orcs)
+	call test_orcs()
+
+	loop
+		//*** WAVE 2 ***
+		call InitAssaultGroup()
+		call CampaignAttacker( EASY,    7, GARGOYLE     )
+		call SuicideOnPlayer(M2,orcs)
+		call test_orcs()
+
+		//*** WAVE 3 ***
+		call InitAssaultGroup()
+		call CampaignAttacker( EASY,    5, GARGOYLE     )
+		call CampaignAttacker( EASY,    1, FROST_WYRM	)
+		call SuicideOnPlayer(M2,orcs)
+		call test_orcs()
+
+		//*** WAVE 4 ***
+		call InitAssaultGroup()
+		call CampaignAttacker( EASY,    8, GARGOYLE     )
+		call SuicideOnPlayer(M2,orcs)
+		call test_orcs()
+	endloop
+endfunction

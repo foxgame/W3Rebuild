@@ -1,0 +1,119 @@
+//============================================================================
+//  Undead 07 -- Orange player (Grey)  -- AI Script
+//============================================================================
+globals
+    player user = Player(6)
+endglobals
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    debug set do_debug_cheats = true
+
+    call CampaignAI(HOUSE,null)
+	call SetReplacements(2,2,4)
+	set do_campaign_farms = false
+
+    call SetBuildUnitEx( 0,0,1, TOWN_HALL		)
+	call SetBuildUnitEx( 3,3,3, PEASANT			)
+    call SetBuildUnitEx( 0,0,2, BARRACKS		)
+    call SetBuildUnitEx( 0,0,1, LUMBER_MILL		)
+	call SetBuildUnitEx( 0,0,1, HUMAN_ALTAR		)
+    call SetBuildUnitEx( 3,3,3, PEASANT			)
+    call SetBuildUnitEx( 0,0,1, BLACKSMITH		)
+    call SetBuildUnitEx( 4,4,4, PEASANT			)
+    call SetBuildUnitEx( 0,0,1, KEEP			)
+	call SetBuildUnitEx( 0,0,1, WORKSHOP		)
+    call SetBuildUnitEx( 0,0,1, SANCTUM			)
+	call SetBuildUnitEx( 0,0,1, CASTLE			)
+	call SetBuildUnitEx( 0,0,3, AVIARY			)
+    
+    call CampaignDefenderEx( 1,1,2, GRYPHON		)
+	call CampaignDefenderEx( 1,1,1, PRIEST		)
+
+	call SetBuildUpgrEx( 1,1,1, UPG_MELEE		)
+	call SetBuildUpgrEx( 1,1,1, UPG_RANGED		)
+	call SetBuildUpgrEx( 0,0,1, UPG_PRAYING		)
+	call SetBuildUpgrEx( 0,0,1, UPG_SORCERY		)
+	call SetBuildUpgrEx( 0,0,1, UPG_MASONRY		)
+
+    call WaitForSignal()
+
+    //*** WAVE 1 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 3,3,6, GRYPHON     )
+    call SuicideOnPlayerEx(M5,M5,0,user)
+
+	call SetBuildUpgrEx( 1,1,1, UPG_LEATHER		)
+	call SetBuildUpgrEx( 1,1,1, UPG_ARMOR		)
+
+    //*** WAVE 2 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 1,1,4, KNIGHT      )
+    call CampaignAttackerEx( 3,3,4, GRYPHON     )
+	call CampaignAttackerEx( 0,0,2, MORTAR		)
+    call SuicideOnPlayerEx(M10,M10,M7,user)
+
+	call SetBuildUpgrEx( 1,1,1, UPG_HAMMERS		)
+	call SetBuildUpgrEx( 1,1,2, UPG_PRAYING		)
+	call SetBuildUpgrEx( 0,0,1, UPG_BREEDING	)
+	call SetBuildUpgrEx( 0,0,1, UPG_SENTINEL	)
+
+	//*** WAVE 3 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 0,0,2, KNIGHT      )
+    call CampaignAttackerEx( 2,2,3, SORCERESS	)
+    call CampaignAttackerEx( 4,4,6, GRYPHON	    )
+    call SuicideOnPlayerEx(M10,M10,M8,user)
+
+	call SetBuildUpgrEx( 0,0,2, UPG_MELEE		)
+	call SetBuildUpgrEx( 0,0,2, UPG_RANGED		)
+	call SetBuildUpgrEx( 1,1,2, UPG_SORCERY		)
+	call SetBuildUpgrEx( 1,1,2, UPG_MASONRY		)
+
+	//*** WAVE 4 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 2,2,3, KNIGHT      )
+    call CampaignAttackerEx( 1,1,2, PRIEST      )
+	call CampaignAttackerEx( 1,1,1, SORCERESS	)
+    call CampaignAttackerEx( 2,2,5, GRYPHON	    )
+	call CampaignAttackerEx( 0,0,2, MORTAR		)
+    call SuicideOnPlayerEx(M10,M10,M7,user)
+
+	call SetBuildUpgrEx( 0,0,2, UPG_LEATHER		)
+	call SetBuildUpgrEx( 0,0,2, UPG_ARMOR		)
+	call SetBuildUpgrEx( 1,1,1, UPG_BREEDING	)
+
+	//*** WAVE 5 ***
+    call InitAssaultGroup()
+    call CampaignAttackerEx( 1,1,3, KNIGHT      )
+    call CampaignAttackerEx( 0,0,1, PRIEST      )
+	call CampaignAttackerEx( 2,2,2, SORCERESS	)
+    call CampaignAttackerEx( 5,5,7, GRYPHON	    )
+	call CampaignAttackerEx( 0,0,1, MORTAR		)
+    call SuicideOnPlayerEx(M10,M10,M8,user)
+
+	call SetBuildUpgrEx( 2,2,2, UPG_SORCERY		)
+	call SetBuildUpgrEx( 1,1,1, UPG_HAMMERS		)
+
+    loop
+		//*** WAVE 6 ***
+		call InitAssaultGroup()
+		call CampaignAttackerEx( 3,3,6, KNIGHT      )
+		call CampaignAttackerEx( 1,1,2, PRIEST      )
+		call CampaignAttackerEx( 1,1,2, SORCERESS	)
+		call CampaignAttackerEx( 2,2,3, GRYPHON	    )
+		call CampaignAttackerEx( 0,0,2, MORTAR		)
+		call SuicideOnPlayerEx(M10,M10,M7,user)
+
+		//*** WAVE 7 ***
+		call InitAssaultGroup()
+		call CampaignAttackerEx( 1,1,2, KNIGHT      )
+		call CampaignAttackerEx( 1,1,2, PRIEST      )
+		call CampaignAttackerEx( 1,1,2, SORCERESS	)
+		call CampaignAttackerEx( 6,6,8, GRYPHON	    )
+		call CampaignAttackerEx( 0,0,2, MORTAR		)
+		call SuicideOnPlayerEx(M10,M10,M8,user)
+    endloop
+endfunction

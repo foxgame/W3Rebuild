@@ -1,0 +1,346 @@
+//============================================================================
+//  Orc 3 -- Grom Ally -- AI Script
+//============================================================================
+globals
+    constant integer GO_AGRO        = 1     //                      no data
+    constant integer GO_KILL        = 2     //                      no data
+    constant integer PLAYER_DIED    = 3     // data = player ID
+    constant integer PLAYER_ASS     = 4     //                      no data
+    constant integer CLEAR_AGRO     = 5     // data = player ID
+                                    
+    constant integer USER           = 0
+    constant integer BLUE           = 1
+    constant integer GRAY           = 8
+    constant integer LIGHT_BLUE     = 9
+    constant integer GREEN          = 10
+
+    constant integer EASY_AGRO      = 120
+    constant integer NORMAL_AGRO    = 120
+    constant integer HARD_AGRO      = 120
+
+    integer grom_target             = -1
+    integer wave_index              = 0
+    integer strength                = 1
+    boolean agro_mode               = true
+
+    boolean array alive
+    boolean array needs_agro
+endglobals
+
+//============================================================================
+//  set_build_units
+//============================================================================
+function set_build_units takes boolean fplayer returns nothing
+    if not fplayer then
+        call SetBuildUnit( 1, PEON              )
+        call SetBuildUnit( 1, GREAT_HALL        )
+	    call SetBuildUnit( 1, ORC_BARRACKS      )
+        call SetBuildUnit( 1, STRONGHOLD        )
+        call SetBuildUnit( 1, ORC_ALTAR         )
+	    call SetBuildUnit( 1, FORGE             )
+	    call SetBuildUnit( 1, BESTIARY          )
+        call SetBuildUnit( 7, PEON              )
+    else
+	    call SetBuildUnit( 2, ORC_BARRACKS		)
+	    call SetBuildUnit( 2, BESTIARY			)
+	    call SetBuildUnit( 4, ORC_WATCH_TOWER   )
+    endif
+endfunction
+
+//============================================================================
+//  set_defenders
+//============================================================================
+function set_defenders takes boolean fplayer returns nothing
+    if not fplayer then
+	    call CampaignDefenderEx( 1,1,1, GROM		)
+	    call CampaignDefenderEx( 2,2,2, GRUNT		)
+	    call CampaignDefenderEx( 2,2,2, HEAD_HUNTER	)
+	    call CampaignDefenderEx( 4,4,4, RAIDER		)
+    else
+	    call CampaignDefenderEx( 2,2,2, GRUNT		)
+	    call CampaignDefenderEx( 1,1,1, HEAD_HUNTER	)
+        call CampaignDefenderEx( 1,1,2, RAIDER		)
+    endif
+endfunction
+
+//============================================================================
+//  assault_wave
+//============================================================================
+function assault_wave takes nothing returns nothing
+    //------------------------------------------------------------------------
+    if grom_target == USER then
+    //------------------------------------------------------------------------
+        call CampaignAttackerEx	( 3,3,4, GRUNT		 )
+	    call CampaignAttackerEx	( 3,3,4, HEAD_HUNTER )
+	    call CampaignAttackerEx	( 1,1,2, CATAPULT	 )
+	    call CampaignAttackerEx	( 2,2,4, RAIDER		 )
+
+        call SuicideOnPlayer(M5,Player(grom_target))
+
+    //------------------------------------------------------------------------
+    elseif strength == 1 then
+    //------------------------------------------------------------------------
+        call CampaignAttackerEx	( 4,4,5, GRUNT		 )
+
+        call SuicideOnPlayer(M5,Player(grom_target))
+        set strength = 2
+
+    //------------------------------------------------------------------------
+    elseif strength == 2 then
+    //------------------------------------------------------------------------
+		call CampaignAttackerEx	( 3,3,4, GRUNT		 )
+        call CampaignAttackerEx	( 2,2,2, HEAD_HUNTER )
+
+        call SuicideOnPlayer(M5,Player(grom_target))
+        set strength = 3
+
+    //------------------------------------------------------------------------
+    else // strength >= 3
+    //------------------------------------------------------------------------
+		call CampaignAttackerEx	( 3,3,4, RAIDER		 )
+        call CampaignAttackerEx	( 2,2,2, HEAD_HUNTER )
+
+        call SuicideOnPlayer(M5,Player(grom_target))
+        set strength = 1
+    endif
+endfunction
+
+//============================================================================
+//  agro_wave
+//============================================================================
+function agro_wave takes nothing returns nothing
+    //------------------------------------------------------------------------
+    if strength==1 then
+    //------------------------------------------------------------------------
+	    call CampaignAttackerEx	( 4,4,5, GRUNT       )
+
+        call SuicideOnPlayer(0,Player(grom_target))
+
+    //------------------------------------------------------------------------
+    elseif strength==2 then
+    //------------------------------------------------------------------------
+	    call CampaignAttackerEx	( 3,3,4, GRUNT		 )
+	    call CampaignAttackerEx	( 3,3,4, HEAD_HUNTER )
+
+        call SuicideOnPlayer(M3,Player(grom_target))
+
+    //------------------------------------------------------------------------
+    else // strength >= 3
+    //------------------------------------------------------------------------
+		call CampaignAttackerEx	( 3,3,4, GRUNT		 )
+		call CampaignAttackerEx	( 3,3,4, HEAD_HUNTER )
+		call CampaignAttackerEx	( 3,3,4, RAIDER		 )
+
+        call SuicideOnPlayer(M3,Player(grom_target))
+    endif
+endfunction
+
+//============================================================================
+//  init_arrays
+//============================================================================
+function init_arrays takes nothing returns nothing
+    local integer index = 0
+    loop
+        set alive      [index] = false
+        set needs_agro [index] = false
+
+        set index = index + 1
+        exitwhen index == 11
+    endloop
+
+    set alive      [ BLUE       ] = true
+    set alive      [ GRAY       ] = true
+    set alive      [ LIGHT_BLUE ] = true
+    set alive      [ GREEN      ] = true
+
+    set needs_agro [ BLUE       ] = true
+    set needs_agro [ GRAY       ] = true
+    set needs_agro [ LIGHT_BLUE ] = true
+    set needs_agro [ GREEN      ] = true
+endfunction
+
+//============================================================================
+//  wait_for_start
+//============================================================================
+function wait_for_start takes nothing returns nothing
+    loop
+        call Trace("waiting for first command...\n")
+        exitwhen CommandsWaiting() != 0
+        call Sleep(5)
+    endloop
+    call TraceI("...first command (%d) received.\n",GetLastCommand())
+endfunction
+
+//============================================================================
+//  possible_agro
+//============================================================================
+function possible_agro takes integer target returns nothing
+    if grom_target == -1 and alive[target] and needs_agro[target] then
+        set grom_target = target
+        set needs_agro[target] = false
+        call TraceI("NOTICE: SET NEEDS_AGRO[%d] = FALSE\n",target)
+    endif
+endfunction
+
+//============================================================================
+//  next_alive
+//============================================================================
+function next_alive takes nothing returns nothing
+    loop
+        set grom_target = wave_index
+        set wave_index  = wave_index + 1
+
+        if wave_index == 11 then
+            set wave_index = 0
+            call Sleep(1)
+        endif
+
+        exitwhen alive[grom_target]
+    endloop
+    call TraceI("Grom setting normal attack wave target = %d\n",grom_target)
+endfunction
+
+//============================================================================
+//  go_agro
+//============================================================================
+function go_agro takes nothing returns nothing
+    if grom_target != -1 then
+
+        call Trace("Grom successful, sleeping for a while\n")
+
+        if difficulty==EASY then
+            call Sleep(EASY_AGRO)
+        elseif difficulty==NORMAL then
+            call Sleep(NORMAL_AGRO)
+        else
+            call Sleep(HARD_AGRO)
+        endif
+
+        set grom_target = -1
+        set strength    = 1
+    endif
+
+    call possible_agro( BLUE       )
+    call possible_agro( GRAY       )
+    call possible_agro( LIGHT_BLUE )
+    call possible_agro( GREEN      )
+
+    call TraceI("changing agro target to %d\n",grom_target)
+endfunction
+
+//============================================================================
+//  process_commands
+//============================================================================
+function process_commands takes nothing returns nothing
+    local integer cmd
+    local integer data
+    loop
+        exitwhen CommandsWaiting() == 0
+        set cmd  = GetLastCommand()
+        set data = GetLastData()
+        call PopLastCommand()
+
+        call TraceI("COMMAND = %d\n",cmd)
+        call TraceI("DATA = %d\n",data)
+
+        //====================================================================
+        if cmd == GO_AGRO then
+        //====================================================================
+            call go_agro()
+
+        //====================================================================
+        elseif cmd == GO_KILL then
+        //====================================================================
+            call Trace("agro waves complete, starting assault waves\n")
+
+            set agro_mode = false
+            set strength  = 1
+
+        //====================================================================
+        elseif cmd == PLAYER_DIED then
+        //====================================================================
+            call TraceI("NOTICE: TOWN %d JUST DIED\n",data)
+
+            set alive[data] = false
+
+        //====================================================================
+        elseif cmd == PLAYER_ASS then
+        //====================================================================
+            call Trace("player gonna get punished now!\n")
+
+            call set_build_units(true)
+            call set_defenders(true)
+
+            set alive[USER] = true     // ha ha!
+            set wave_index = USER
+
+        //====================================================================
+        elseif cmd == CLEAR_AGRO then
+        //====================================================================
+            if data == grom_target then
+                call TraceI("player agro'd Grom's target (%d) first\n",data)
+                call go_agro()
+            else
+                call TraceI("player agro'd %d (not Grom's current target)\n",data)
+            endif
+
+            call TraceI("NOTICE: SET NEEDS_AGRO[%d] = FALSE\n",data)
+
+            set needs_agro[data] = false
+
+        //====================================================================
+        else // UNKNOWN COMMAND
+        //====================================================================
+            call TraceI("WARNING: UNKNOWN COMMAND (%d)\n",cmd)
+        endif
+    endloop
+endfunction
+
+//============================================================================
+//  agro_loop
+//============================================================================
+function agro_loop takes nothing returns nothing
+    loop
+        call process_commands()
+        exitwhen not agro_mode
+
+        if grom_target == -1 then
+            call Trace("ERROR: Grom has no agro target!\n")
+            return
+        endif
+
+	    call InitAssaultGroup()
+        call CampaignAttacker( EASY, 1, GROM )
+        call agro_wave()
+
+        set strength = strength + 1
+    endloop
+endfunction
+
+//============================================================================
+//  wave_loop
+//============================================================================
+function wave_loop takes nothing returns nothing
+    loop
+        call process_commands()
+        call next_alive()
+	    call InitAssaultGroup()
+        call CampaignAttacker( EASY, 1, GROM )
+        call assault_wave()
+    endloop
+endfunction
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(BURROW,null)
+
+    call init_arrays()
+    call set_build_units(false)
+    call set_defenders(false)
+
+    call wait_for_start()
+    call agro_loop()
+    call wave_loop()
+endfunction

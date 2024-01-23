@@ -1,0 +1,20 @@
+//============================================================================
+//  Human 07 -- gray player -- AI Script
+//============================================================================
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(HOUSE,null)
+
+    call SetBuildUnit( 1, TOWN_HALL 		)
+    call SetBuildUnit( 1, PEASANT			)
+    call SetBuildUnit( 1, BARRACKS			)
+    call SetBuildUnit( 1, BLACKSMITH		)
+	call SetBuildUnit( 1, KEEP      		)
+    call SetBuildUnit( 1, WORKSHOP          )
+    call SetBuildUnit( 2, PEASANT			)
+
+    call SleepForever()
+endfunction

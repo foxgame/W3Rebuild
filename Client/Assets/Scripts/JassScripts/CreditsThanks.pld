@@ -1,0 +1,31 @@
+function PreloadFiles takes nothing returns nothing
+
+	call Preload( "units\\undead\\EvilArthas\\UndeadArthas_portrait.mdx" )
+	call Preload( "units\\Undead\\EvilArthas\\UndeadArthas.blp" )
+	call Preload( "units\\critters\\VillagerWoman\\VillagerWoman_portrait.mdx" )
+	call Preload( "units\\Critters\\VillagerWoman\\VillagerWoman.blp" )
+	call Preload( "buildings\\nightelf\\AncientProtector\\AncientProtector_portrait.mdx" )
+	call Preload( "buildings\\NightElf\\AncientProtector\\AncientProtector.blp" )
+	call Preload( "units\\creeps\\GnollWarden\\GnollWarden.mdx" )
+	call Preload( "units\\Creeps\\GnollWarden\\GnollWarden.blp" )
+	call Preload( "buildings\\nightelf\\AncientOfWar\\AncientOfWar_portrait.mdx" )
+	call Preload( "buildings\\NightElf\\AncientOfWar\\AncientOfWar1.blp" )
+	call Preload( "units\\creeps\\assassin\\assassin_portrait.mdx" )
+	call Preload( "units\\Creeps\\Assassin\\Assassin.blp" )
+	call Preload( "units\\creeps\\IronGolem\\IronGolem_portrait.mdx" )
+	call Preload( "units\\Creeps\\IronGolem\\IronGolem.blp" )
+	call Preload( "Textures\\Clouds8x8Grey.blp" )
+	call Preload( "buildings\\nightelf\\TreeofLife\\TreeofLife_portrait.mdx" )
+	call Preload( "buildings\\NightElf\\TreeOfLife\\TreeofLife.blp" )
+	call Preload( "buildings\\other\\DragonBuilding\\DragonBuilding.mdx" )
+	call Preload( "buildings\\Other\\DragonBuilding\\DragonRoost.blp" )
+	call Preload( "ReplaceableTextures\\TeamGlow\\TeamGlow06.blp" )
+	call Preload( "Textures\\Magic1.blp" )
+	call Preload( "Textures\\Clouds8x8Fire.blp" )
+	call Preload( "Textures\\RockParticle.blp" )
+	call Preload( "Textures\\CartoonCloud.blp" )
+	call PreloadEnd( 0.0 )
+
+endfunction
+
+

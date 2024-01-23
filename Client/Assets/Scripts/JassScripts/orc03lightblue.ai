@@ -1,0 +1,30 @@
+//============================================================================
+//  Orc 3 -- light blue player -- AI Script
+//============================================================================
+
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(null)
+
+    call SetBuildUnit( 1, PEASANT       )
+    call SetBuildUnit( 1, TOWN_HALL     )
+    call SetBuildUnit( 1, KEEP          )
+    call SetBuildUnit( 1, BARRACKS      )
+    call SetBuildUnit( 4, FOOTMEN       )
+    call SetBuildUnit( 1, CHURCH        )
+    call SetBuildUnit( 1, PRIEST        )
+    call SetBuildUnit( 1, SANCTUM       )
+    call SetBuildUnit( 1, SORCERESS     )
+    call SetBuildUnit( 3, PEASANT       )
+
+    call SetAssaultGroup( 4, 4, FOOTMEN     )
+    call SetAssaultGroup( 1, 1, PRIEST      )
+    call SetAssaultGroup( 1, 1, SORCERESS   )
+
+    call SuicideOnPlayer(1*60,Player(0))
+    loop
+        call SuicideOnPlayer(6*60,Player(0))
+    endloop
+endfunction

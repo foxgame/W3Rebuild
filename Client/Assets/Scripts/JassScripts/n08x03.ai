@@ -1,0 +1,32 @@
+//============================================================================
+//  Night Elf 8 Ex -- players 3 -- AI Script
+//============================================================================
+globals
+    constant integer SWISP          = 'e001'
+    constant integer SHUNTRESS      = 'e000'
+    constant integer SARCHER        = 'e005'
+    constant integer SANCIENTWAR    = 'e009'
+    constant integer SPROTECTOR     = 'e008'
+    constant integer SMOONWELL      = 'e007'
+endglobals
+//============================================================================
+//  main
+//============================================================================
+function main takes nothing returns nothing
+    call CampaignAI(MOON_WELL,null)
+	call SetReplacements(9,9,9)
+	call DoCampaignFarms(false)
+	call SetPeonsRepair(true)
+
+	call SetBuildUnitEx( 2,2,2, SWISP           )
+	call SetBuildUnitEx( 2,2,2, SPROTECTOR      )
+	call SetBuildUnitEx( 1,1,1, SANCIENTWAR     )
+	call SetBuildUnitEx( 2,2,2, SMOONWELL       )
+
+    call CampaignDefenderEx( 1, 1, 1, SARCHER	)
+	call CampaignDefenderEx( 1, 1, 1, SHUNTRESS	)
+
+	call SleepForever()
+
+endfunction
+
