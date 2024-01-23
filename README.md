@@ -2,8 +2,10 @@
 魔兽3早期重制代码。
 资源文件可以使用tools/3dmax工具自行导出放入Assets/Objects/。
 或下载：https://pan.baidu.com/s/1QfLYEu83T6HdllzqsN6NAQ?pwd=1mce 
+
 编译不过把一些功能注释掉或使用老版本unity编辑器。
 不提供任何类说明解释，自行研究。
+
 
 -由于开发周期过长，早期代码不再继续维护。
 -不支持urp、hdrp、ecs等.
