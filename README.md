@@ -1,5 +1,5 @@
 # W3Rebuild
-魔兽3早期重制代码。
+魔兽3早期Unity重制代码。
 
 资源文件可以使用tools/3dmax工具自行导出放入Assets/。
 
